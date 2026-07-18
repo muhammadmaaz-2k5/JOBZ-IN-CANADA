@@ -12,6 +12,13 @@ class Application extends Model
         'resume_id',
         'cover_letter',
         'status',
+        'applied_at',
+        'withdrawn_at',
+    ];
+
+    protected $casts = [
+        'applied_at' => 'datetime',
+        'withdrawn_at' => 'datetime',
     ];
 
     public function job()
@@ -37,5 +44,15 @@ class Application extends Model
     public function interviews()
     {
         return $this->hasMany(Interview::class);
+    }
+
+    public function statusHistory()
+    {
+        return $this->hasMany(ApplicationStatusHistory::class, 'application_id');
+    }
+
+    public function screeningAnswers()
+    {
+        return $this->hasMany(ScreeningAnswer::class, 'application_id');
     }
 }

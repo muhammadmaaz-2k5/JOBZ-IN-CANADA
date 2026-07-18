@@ -9,6 +9,8 @@ use App\Http\Controllers\EmployerProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\EmployerJobController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\EmployerApplicantController;
 
 Route::get('/', function () {
     return view('home');
@@ -51,6 +53,14 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     Route::delete('/seeker/profile/project/{id}', [SeekerProfileController::class, 'deleteProject'])->name('seeker.project.delete');
     Route::post('/seeker/profile/certification', [SeekerProfileController::class, 'addCertification'])->name('seeker.certification.add');
     Route::delete('/seeker/profile/certification/{id}', [SeekerProfileController::class, 'deleteCertification'])->name('seeker.certification.delete');
+
+    // Application actions
+    Route::get('/jobs/{slug}/apply', [ApplicationController::class, 'showApplyForm'])->name('jobs.apply');
+    Route::post('/jobs/{slug}/apply', [ApplicationController::class, 'submitApplication'])->name('jobs.apply.submit');
+    Route::get('/seeker/applications', [ApplicationController::class, 'seekerDashboard'])->name('seeker.applications.index');
+    Route::get('/seeker/applications/{id}', [ApplicationController::class, 'show'])->name('seeker.applications.show');
+    Route::post('/seeker/applications/{id}/withdraw', [ApplicationController::class, 'withdraw'])->name('seeker.applications.withdraw');
+    Route::get('/seeker/applications/{id}/download', [ApplicationController::class, 'downloadResume'])->name('seeker.applications.download');
 });
 
 // Employer Profile & Job Management
@@ -70,6 +80,16 @@ Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
         Route::post('/employer/jobs/{id}/duplicate', [EmployerJobController::class, 'duplicate'])->name('employer.jobs.duplicate');
         Route::post('/employer/jobs/{id}/status', [EmployerJobController::class, 'changeStatus'])->name('employer.jobs.status');
         Route::delete('/employer/jobs/{id}', [EmployerJobController::class, 'destroy'])->name('employer.jobs.destroy');
+
+        // Applicant Management
+        Route::get('/employer/applicants', [EmployerApplicantController::class, 'index'])->name('employer.applicants.index');
+        Route::get('/employer/applicants/job/{jobId}', [EmployerApplicantController::class, 'index'])->name('employer.applicants.job');
+        Route::get('/employer/applicants/pipeline', [EmployerApplicantController::class, 'pipeline'])->name('employer.applicants.pipeline.all');
+        Route::get('/employer/applicants/pipeline/job/{jobId}', [EmployerApplicantController::class, 'pipeline'])->name('employer.applicants.pipeline.job');
+        Route::get('/employer/applicants/{id}', [EmployerApplicantController::class, 'show'])->name('employer.applicants.show');
+        Route::post('/employer/applicants/{id}/status', [EmployerApplicantController::class, 'changeStatus'])->name('employer.applicants.status');
+        Route::post('/employer/applicants/{id}/note', [EmployerApplicantController::class, 'addNote'])->name('employer.applicants.note');
+        Route::get('/employer/applicants/{id}/download', [EmployerApplicantController::class, 'downloadResume'])->name('employer.applicants.download');
     });
 });
 

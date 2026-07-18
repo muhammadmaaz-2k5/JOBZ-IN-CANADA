@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreignId('applicant_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('resume_id')->constrained('resumes')->onDelete('cascade');
             $table->text('cover_letter')->nullable();
-            $table->string('status')->default('applied'); // applied, reviewed, shortlisted, interview, offered, rejected, withdrawn
+            $table->string('status')->default('applied'); // applied, pending_review, shortlisted, interview_scheduled, interview_completed, offered, hired, rejected, withdrawn
+            $table->timestamp('applied_at')->useCurrent();
+            $table->timestamp('withdrawn_at')->nullable();
             $table->timestamps();
         });
     }

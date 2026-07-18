@@ -82,10 +82,44 @@
                 </div>
 
                 <div class="flex items-center gap-3 w-full md:w-auto">
-                    <!-- Apply/Saved buttons (we can add functionality in later phases) -->
-                    <button class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition text-sm">
-                        Apply Now
-                    </button>
+                    @guest
+                        <a href="{{ route('login') }}" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md text-center transition text-sm">
+                            Login to Apply
+                        </a>
+                    @else
+                        @if(Auth::user()->hasRole('job_seeker'))
+                            @php
+                                $hasApplied = \App\Models\Application::where('job_id', $job->id)
+                                    ->where('applicant_id', Auth::id())
+                                    ->where('status', '!=', 'withdrawn')
+                                    ->exists();
+                                $isClosed = $job->status === 'closed' || ($job->application_deadline && \Carbon\Carbon::parse($job->application_deadline)->isPast());
+                                $completeness = Auth::user()->jobSeekerProfile ? Auth::user()->jobSeekerProfile->calculateCompletionPercentage() : 0;
+                            @endphp
+
+                            @if($hasApplied)
+                                <button disabled class="w-full md:w-auto px-6 py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed text-sm">
+                                    Already Applied
+                                </button>
+                            @elseif($isClosed)
+                                <button disabled class="w-full md:w-auto px-6 py-3 bg-red-100 text-red-500 font-bold rounded-xl cursor-not-allowed text-sm">
+                                    Application Closed
+                                </button>
+                            @elseif($completeness < 20)
+                                <a href="{{ route('seeker.profile.edit') }}" class="w-full md:w-auto px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center shadow-md transition text-sm" title="Min 20% profile completeness required to apply">
+                                    Profile Incomplete (Min 20%)
+                                </a>
+                            @else
+                                <a href="{{ route('jobs.apply', $job->slug) }}" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-center shadow-md transition text-sm">
+                                    Apply Now
+                                </a>
+                            @endif
+                        @elseif(Auth::user()->hasRole('employer') && $job->employer_id === Auth::id())
+                            <a href="{{ route('employer.applicants.job', $job->id) }}" class="w-full md:w-auto px-6 py-3 bg-indigo-650 hover:bg-indigo-755 text-white font-bold rounded-xl text-center shadow-md transition text-sm">
+                                View Applicants ({{ $job->applications_count }})
+                            </a>
+                        @endif
+                    @endguest
                 </div>
             </div>
 

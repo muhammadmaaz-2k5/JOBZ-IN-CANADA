@@ -179,4 +179,9 @@ class Job extends Model
 
         return $query;
     }
+
+    public function screeningQuestions()
+    {
+        return $this->hasMany(ScreeningQuestion::class);
+    }
 }

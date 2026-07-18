@@ -180,6 +180,36 @@
                         </div>
                     </div>
 
+                    <!-- Section: Screening Questions -->
+                    <div x-data="{ questions: [] }" class="border-t border-gray-100 dark:border-gray-700/50 pt-6">
+                        <h4 class="font-bold text-lg text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2 mb-4">Screening Questions (Optional)</h4>
+                        <p class="text-xs text-gray-500 mb-4">Add up to 5 custom questions for candidates to answer during application.</p>
+                        
+                        <div class="space-y-3 mb-4">
+                            <template x-for="(q, idx) in questions" :key="idx">
+                                <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-150 dark:border-gray-800">
+                                    <div class="flex-grow">
+                                        <x-input-label x-text="'Question #' + (idx + 1)" />
+                                        <input type="text" :name="'questions[' + idx + ']'" x-model="q.text" required class="mt-1 block w-full border-gray-300 dark:border-gray-750 dark:bg-gray-950 dark:text-gray-305 rounded-xl text-sm" placeholder="e.g. How many years of experience do you have with Laravel?" />
+                                    </div>
+                                    <div class="flex flex-col items-center pt-5">
+                                        <span class="text-3xs font-semibold text-gray-400 mb-1">Required</span>
+                                        <input type="checkbox" :name="'questions_required[' + idx + ']'" value="1" x-model="q.required" class="rounded text-indigo-650 focus:ring-indigo-500" />
+                                    </div>
+                                    <div class="pt-5">
+                                        <button type="button" @click="questions.splice(idx, 1)" class="p-2 text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition text-sm">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <button type="button" @click="if (questions.length < 5) questions.push({ text: '', required: true })" :disabled="questions.length >= 5" class="px-4 py-2 bg-indigo-50 dark:bg-indigo-950 text-indigo-650 dark:text-indigo-400 font-bold rounded-xl text-xs hover:bg-indigo-100 transition disabled:opacity-50">
+                            + Add Question
+                        </button>
+                    </div>
+
                     <!-- Section 5: Application Rules & Publishing -->
                     <div>
                         <h4 class="font-bold text-lg text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2 mb-6">Settings & Publishing</h4>

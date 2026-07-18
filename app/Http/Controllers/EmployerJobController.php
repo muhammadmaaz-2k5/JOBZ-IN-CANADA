@@ -74,12 +74,15 @@ class EmployerJobController extends Controller
             'skills' => ['nullable', 'array'],
             'skills.*' => ['exists:skills,id'],
             'status' => ['required', 'string', 'in:draft,published'],
+            'questions' => ['nullable', 'array'],
+            'questions.*' => ['required', 'string', 'max:255'],
+            'questions_required' => ['nullable', 'array'],
         ]);
 
         $user = Auth::user();
         $companyId = $user->employerProfile->company_id;
 
-        $jobData = $request->except(['skills', '_token']);
+        $jobData = $request->except(['skills', '_token', 'questions', 'questions_required']);
         $jobData['company_id'] = $companyId;
         $jobData['employer_id'] = $user->id;
         $jobData['location'] = $request->city;
@@ -100,6 +103,17 @@ class EmployerJobController extends Controller
 
         if ($request->has('skills')) {
             $job->skills()->sync($request->skills);
+        }
+
+        if ($request->has('questions')) {
+            foreach ($request->questions as $index => $qText) {
+                if (!empty($qText)) {
+                    $job->screeningQuestions()->create([
+                        'question_text' => $qText,
+                        'is_required' => isset($request->questions_required[$index]) && $request->questions_required[$index] == '1',
+                    ]);
+                }
+            }
         }
 
         AuditLogHelper::log($user->id, 'job_created', "Employer created job listing: {$job->title}");
@@ -157,12 +171,14 @@ class EmployerJobController extends Controller
             'resume_required' => ['boolean'],
             'portfolio_required' => ['boolean'],
             
-            'skills' => ['nullable', 'array'],
             'skills.*' => ['exists:skills,id'],
             'status' => ['required', 'string', 'in:draft,published,paused,closed,archived'],
+            'questions' => ['nullable', 'array'],
+            'questions.*' => ['required', 'string', 'max:255'],
+            'questions_required' => ['nullable', 'array'],
         ]);
 
-        $jobData = $request->except(['skills', '_token', '_method']);
+        $jobData = $request->except(['skills', '_token', '_method', 'questions', 'questions_required']);
         $jobData['location'] = $request->city;
         
         // Map form parameters to database columns
@@ -185,6 +201,19 @@ class EmployerJobController extends Controller
             $job->skills()->sync($request->skills);
         } else {
             $job->skills()->detach();
+        }
+
+        // Update screening questions
+        $job->screeningQuestions()->delete();
+        if ($request->has('questions')) {
+            foreach ($request->questions as $index => $qText) {
+                if (!empty($qText)) {
+                    $job->screeningQuestions()->create([
+                        'question_text' => $qText,
+                        'is_required' => isset($request->questions_required[$index]) && $request->questions_required[$index] == '1',
+                    ]);
+                }
+            }
         }
 
         AuditLogHelper::log($user->id, 'job_updated', "Employer updated job listing: {$job->title}");
