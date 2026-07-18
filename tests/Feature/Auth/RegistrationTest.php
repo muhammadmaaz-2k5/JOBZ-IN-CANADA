@@ -32,7 +32,8 @@ class RegistrationTest extends TestCase
     {
         $response = $this->post('/register', [
             'role' => 'job_seeker',
-            'name' => 'John Doe',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
             'email' => 'john@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
@@ -45,6 +46,7 @@ class RegistrationTest extends TestCase
         $user = User::where('email', 'john@example.com')->first();
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('job_seeker'));
+        $this->assertEquals('job_seeker', $user->role);
         
         // Assert profile was created
         $this->assertDatabaseHas('job_seeker_profiles', [
@@ -60,7 +62,8 @@ class RegistrationTest extends TestCase
     {
         $response = $this->post('/register', [
             'role' => 'employer',
-            'name' => 'Jane Smith',
+            'first_name' => 'Jane',
+            'last_name' => 'Smith',
             'email' => 'jane@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
@@ -77,6 +80,7 @@ class RegistrationTest extends TestCase
         $user = User::where('email', 'jane@example.com')->first();
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('employer'));
+        $this->assertEquals('employer', $user->role);
 
         // Assert company was created
         $company = Company::where('company_name', 'Canada Tech Corp')->first();

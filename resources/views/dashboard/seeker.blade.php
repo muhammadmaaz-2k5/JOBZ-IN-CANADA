@@ -11,7 +11,7 @@
             <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-xl overflow-hidden text-white p-8">
                 <div class="md:flex md:items-center md:justify-between">
                     <div>
-                        <h1 class="text-3xl font-extrabold tracking-tight">Welcome back, {{ Auth::user()->name }}!</h1>
+                        <h1 class="text-3xl font-extrabold tracking-tight">Welcome back, {{ Auth::user()->first_name }}!</h1>
                         <p class="mt-2 text-indigo-100 max-w-xl">Find and apply for top jobs across Canada. Track your progress, manage resumes, and update your professional profile all in one place.</p>
                     </div>
                     <div class="mt-4 md:mt-0 flex gap-3">
