@@ -1,112 +1,165 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Administrator Dashboard') }}
+        <h2 class="font-semibold text-2xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Platform Admin Dashboard') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            
             <!-- Welcome Header -->
-            <div class="bg-gradient-to-r from-red-500 to-pink-600 rounded-2xl shadow-xl overflow-hidden text-white p-8">
-                <div class="md:flex md:items-center md:justify-between">
+            <div class="bg-gradient-to-r from-red-600 to-pink-600 rounded-3xl shadow-xl overflow-hidden text-white p-8 relative">
+                <div class="absolute -right-16 -top-16 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="md:flex md:items-center md:justify-between relative z-10">
                     <div>
-                        <h1 class="text-3xl font-extrabold tracking-tight">Platform Administration Console</h1>
-                        <p class="mt-2 text-red-100 max-w-xl">Moderate job postings, handle user reports, review company registrations, and configure global master categories and skills.</p>
+                        <h1 class="text-3xl font-extrabold tracking-tight">Platform Management Console</h1>
+                        <p class="mt-2 text-red-100 max-w-xl text-sm">Review companies verification requests, moderate active jobs listings, manage reported contents, handle user status suspension, update categories and broadcast messages.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- Users Card -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
-                    <div class="p-3 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A4.125 4.125 0 0 1 11.062 23H4.938A4.125 4.125 0 0 1 1 19.237v-.109" />
-                        </svg>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 flex items-center gap-3">
+                    <div class="p-2.5 bg-red-50 dark:bg-red-950/30 text-red-650 dark:text-red-400 rounded-xl text-lg">
+                        👥
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">1</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Users</div>
+                        <div class="text-xl font-extrabold text-gray-900 dark:text-white">{{ $metrics['total_users'] }}</div>
+                        <div class="text-3xs font-semibold text-gray-400 uppercase">Total Users</div>
                     </div>
                 </div>
 
-                <!-- Companies Card -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
-                    <div class="p-3 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75" />
-                        </svg>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 flex items-center gap-3">
+                    <div class="p-2.5 bg-blue-50 dark:bg-blue-950/30 text-blue-650 dark:text-blue-400 rounded-xl text-lg">
+                        🏢
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">0</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">Pending Approvals</div>
+                        <div class="text-xl font-extrabold text-gray-900 dark:text-white">{{ $metrics['companies_count'] }}</div>
+                        <div class="text-3xs font-semibold text-gray-400 uppercase">Companies</div>
                     </div>
                 </div>
 
-                <!-- Jobs Card -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
-                    <div class="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .552-.448 1-1 1H4.75c-.552 0-1-.448-1-1v-4.25m16.5 0a1.5 1.5 0 0 0-1.5-1.5H3.75a1.5 1.5 0 0 0-1.5 1.5" />
-                        </svg>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 flex items-center gap-3">
+                    <div class="p-2.5 bg-amber-50 dark:bg-amber-950/30 text-amber-650 dark:text-amber-400 rounded-xl text-lg">
+                        💼
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">0</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Listings</div>
+                        <div class="text-xl font-extrabold text-gray-900 dark:text-white">{{ $metrics['active_jobs'] }}</div>
+                        <div class="text-3xs font-semibold text-gray-400 uppercase">Active Jobs</div>
                     </div>
                 </div>
 
-                <!-- Reports Card -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
-                    <div class="p-3 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
-                        </svg>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 flex items-center gap-3">
+                    <div class="p-2.5 bg-rose-50 dark:bg-rose-950/30 text-rose-650 dark:text-rose-400 rounded-xl text-lg">
+                        ⚠️
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">0</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">Active Reports</div>
+                        <div class="text-xl font-extrabold text-gray-900 dark:text-white">{{ $metrics['reports_count'] }}</div>
+                        <div class="text-3xs font-semibold text-gray-400 uppercase">Pending Reports</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Management Sections -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main Activity -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 lg:col-span-2">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Moderate Reported Jobs</h3>
-                    <div class="flex flex-col items-center justify-center py-10 text-center border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
-                        <svg class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                        </svg>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">No active job reports to review.</p>
+            <!-- Two Column Layout: Main Actions Navigation & Recent Audits -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Actions Dashboard Grid -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 p-6 space-y-4">
+                        <h3 class="font-extrabold text-base text-gray-900 dark:text-white pb-2 border-b border-gray-50 dark:border-gray-700">Administrative Sub-Panels</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <a href="{{ route('admin.users.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">👥</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">User Management</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Suspend, activate, reset user passwords.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.companies.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">🏢</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Company Verifications</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Approve, reject, or verify employer companies.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.jobs.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">💼</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Listing Moderations</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Feature, mark urgent, approve, or hide job postings.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.reports.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">⚠️</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Abuse Moderation Queue</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Investigate duplicate listings, spam, scam reports.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.categories.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">📁</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Master Categories</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Add, edit, or delete parent/child job fields.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.skills.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">🛠️</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Skills Mapping</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Merge duplicate skills, manage master list.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.reviews.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">💬</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Review Moderations</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Approve, hide, or moderate company ratings reviews.</p>
+                                </div>
+                            </a>
+
+                            <a href="{{ route('admin.announcements.index') }}" class="p-5 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 flex items-center gap-4 transition duration-200">
+                                <span class="text-2xl">📢</span>
+                                <div>
+                                    <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">Announcements Broadcast</h4>
+                                    <p class="text-3xs text-gray-500 font-semibold mt-0.5">Send alerts broadcast notifications to all users.</p>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Admin Action Sidebar -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Quick Management</h3>
-                    <ul class="space-y-3">
-                        <li>
-                            <a href="#" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-xl transition duration-150">
-                                <span class="text-sm font-semibold">Verify Employer Companies</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-xl transition duration-150">
-                                <span class="text-sm font-semibold">Manage Categories</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-xl transition duration-150">
-                                <span class="text-sm font-semibold">Manage Skills List</span>
-                            </a>
-                        </li>
-                    </ul>
+                <!-- Right Column: Recent Audits Activity -->
+                <div class="space-y-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 p-6 space-y-4">
+                        <div class="flex justify-between items-center pb-2 border-b border-gray-50 dark:border-gray-700">
+                            <h3 class="font-extrabold text-base text-gray-900 dark:text-white">System Audit Log</h3>
+                            <a href="{{ route('admin.audit-logs.index') }}" class="text-xs font-bold text-indigo-650 hover:underline">View All</a>
+                        </div>
+
+                        <div class="space-y-4">
+                            @forelse($recentAudits as $log)
+                                <div class="border-l-2 border-gray-200 dark:border-gray-700 ps-3 py-0.5 space-y-0.5">
+                                    <p class="text-xs font-bold text-gray-900 dark:text-white uppercase">{{ str_replace('_', ' ', $log->action) }}</p>
+                                    <p class="text-3xs text-gray-500 font-medium leading-relaxed">{{ $log->description }}</p>
+                                    <span class="text-4xs text-gray-400 block">{{ $log->created_at->diffForHumans() }}</span>
+                                </div>
+                            @empty
+                                <p class="text-xs text-gray-400 italic">No audit records found.</p>
+                            @endforelse
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </x-app-layout>

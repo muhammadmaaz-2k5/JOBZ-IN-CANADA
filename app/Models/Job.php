@@ -43,6 +43,17 @@ class Job extends Model
         'published_at',
     ];
 
+    protected $casts = [
+        'featured' => 'boolean',
+        'urgent' => 'boolean',
+        'auto_close_on_deadline' => 'boolean',
+        'allow_cover_letter' => 'boolean',
+        'resume_required' => 'boolean',
+        'portfolio_required' => 'boolean',
+        'application_deadline' => 'datetime',
+        'published_at' => 'datetime',
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class);

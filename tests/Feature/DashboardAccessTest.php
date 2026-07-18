@@ -74,7 +74,7 @@ class DashboardAccessTest extends TestCase
         // Access Employer Dashboard
         $response = $this->actingAs($employer)->get('/employer/dashboard');
         $response->assertStatus(200);
-        $response->assertSee('Employer Dashboard');
+        $response->assertSee('Recruitment Console');
         $response->assertSee('Acme Corp');
 
         // Try accessing Seeker Dashboard
@@ -94,7 +94,7 @@ class DashboardAccessTest extends TestCase
         // Access Admin Dashboard
         $response = $this->actingAs($admin)->get('/admin/dashboard');
         $response->assertStatus(200);
-        $response->assertSee('Administrator Dashboard');
+        $response->assertSee('Platform Admin Dashboard');
 
         // Try accessing Seeker Dashboard
         $response2 = $this->actingAs($admin)->get('/seeker/dashboard');

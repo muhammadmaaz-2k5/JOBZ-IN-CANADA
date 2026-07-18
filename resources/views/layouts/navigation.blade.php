@@ -1,3 +1,15 @@
+@if(session()->has('impersonator_id'))
+    <div class="bg-amber-500 text-white font-extrabold text-xs py-2 px-4 flex justify-between items-center z-50 relative">
+        <span>⚠️ You are currently impersonating another user.</span>
+        <form method="POST" action="{{ route('admin.impersonate.revert') }}">
+            @csrf
+            <button type="submit" class="bg-white text-amber-800 px-3 py-1 rounded-lg hover:bg-amber-50 transition font-bold text-2xs">
+                Revert to Admin
+            </button>
+        </form>
+    </div>
+@endif
+
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -12,9 +24,29 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @auth
+                        @if(Auth::user()->hasRole('admin'))
+                            <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                                {{ __('Users') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                                {{ __('Companies') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.jobs.index')" :active="request()->routeIs('admin.jobs.*')">
+                                {{ __('Jobs') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                                {{ __('Reports') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
+                                {{ __('Categories') }}
+                            </x-nav-link>
+                        @endif
+                    @endauth
                 </div>
             </div>
 

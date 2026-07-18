@@ -6,6 +6,7 @@ use App\Models\Job;
 use App\Models\Category;
 use App\Models\Skill;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
@@ -74,5 +75,33 @@ class JobController extends Controller
             ->get();
 
         return view('jobs.show', compact('job', 'relatedJobs'));
+    }
+
+    public function toggleSave($id)
+    {
+        $user = Auth::user();
+        $job = Job::findOrFail($id);
+
+        if ($user->savedJobs()->where('job_id', $job->id)->exists()) {
+            $user->savedJobs()->detach($job->id);
+            $message = 'Job removed from saved list.';
+            $action = 'job_unsaved';
+        } else {
+            $user->savedJobs()->attach($job->id);
+            $message = 'Job saved successfully.';
+            $action = 'job_saved';
+        }
+
+        \App\Helpers\AuditLogHelper::log($user->id, $action, "Candidate toggled bookmark on job ID {$job->id}");
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'saved' => $user->savedJobs()->where('job_id', $job->id)->exists()
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }
