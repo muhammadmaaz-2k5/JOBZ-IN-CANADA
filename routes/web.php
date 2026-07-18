@@ -7,6 +7,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SeekerProfileController;
 use App\Http\Controllers\EmployerProfileController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\EmployerJobController;
 
 Route::get('/', function () {
     return view('home');
@@ -28,6 +30,10 @@ Route::get('/seeker/dashboard', [DashboardController::class, 'seeker'])
     ->middleware(['auth', 'verified', 'role:job_seeker'])
     ->name('seeker.dashboard');
 
+// Public Job Search & Listings
+Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
+Route::get('/jobs/{slug}', [JobController::class, 'show'])->name('jobs.show');
+
 // Seeker Profile Management
 Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     Route::get('/seeker/profile', [SeekerProfileController::class, 'show'])->name('seeker.profile.edit');
@@ -47,10 +53,24 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     Route::delete('/seeker/profile/certification/{id}', [SeekerProfileController::class, 'deleteCertification'])->name('seeker.certification.delete');
 });
 
-// Employer Profile Management
+// Employer Profile & Job Management
 Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
     Route::get('/employer/profile', [EmployerProfileController::class, 'show'])->name('employer.profile.edit');
     Route::put('/employer/profile', [EmployerProfileController::class, 'update'])->name('employer.profile.update');
+    
+    // View jobs list
+    Route::get('/employer/jobs', [EmployerJobController::class, 'index'])->name('employer.jobs.index');
+    
+    // Create, edit, and state actions (restricted by company_verified middleware)
+    Route::middleware('company_verified')->group(function () {
+        Route::get('/employer/jobs/create', [EmployerJobController::class, 'create'])->name('employer.jobs.create');
+        Route::post('/employer/jobs', [EmployerJobController::class, 'store'])->name('employer.jobs.store');
+        Route::get('/employer/jobs/{id}/edit', [EmployerJobController::class, 'edit'])->name('employer.jobs.edit');
+        Route::put('/employer/jobs/{id}', [EmployerJobController::class, 'update'])->name('employer.jobs.update');
+        Route::post('/employer/jobs/{id}/duplicate', [EmployerJobController::class, 'duplicate'])->name('employer.jobs.duplicate');
+        Route::post('/employer/jobs/{id}/status', [EmployerJobController::class, 'changeStatus'])->name('employer.jobs.status');
+        Route::delete('/employer/jobs/{id}', [EmployerJobController::class, 'destroy'])->name('employer.jobs.destroy');
+    });
 });
 
 // Settings & GDPR Management

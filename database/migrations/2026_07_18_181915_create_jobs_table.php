@@ -40,6 +40,10 @@ return new class extends Migration
             $table->string('status')->default('active'); // draft, active, filled, expired
             $table->boolean('featured')->default(false);
             $table->boolean('urgent')->default(false);
+            $table->boolean('auto_close_on_deadline')->default(true);
+            $table->boolean('allow_cover_letter')->default(true);
+            $table->boolean('resume_required')->default(true);
+            $table->boolean('portfolio_required')->default(false);
             $table->unsignedInteger('views_count')->default(0);
             $table->unsignedInteger('applications_count')->default(0);
             $table->timestamp('published_at')->nullable();
