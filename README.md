@@ -1,11 +1,11 @@
 Suggested tech stack:
 
-Backend: Laravel 11
+Backend: Laravel
 Frontend: Blade + Alpine.js/Livewire (or Vue/React if SPA)
-DB: MySQL/PostgreSQL
+DB: MySQL
 Search: Laravel Scout + Meilisearch
 Auth: Laravel Breeze/Jetstream + Spatie Permissions
-Payments: Laravel Cashier (Stripe)
+Payments: Laravel Cashier (clerk)
 
 # Phase 1: Planning & Setup (Week 1)
 
