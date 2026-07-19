@@ -18,6 +18,14 @@ class ApplicationNotifications
      */
     public static function send(User $recipient, string $type, array $data)
     {
+        $preferences = $recipient->notificationPreferences ?? $recipient->notificationPreferences()->create();
+
+        // Check if target category is enabled
+        $topicEnabled = true;
+        if ($type === 'submitted' || $type === 'status_updated' || $type === 'resume_downloaded' || $type === 'employer_alert') {
+            $topicEnabled = (bool)$preferences->application_updates;
+        }
+
         $title = 'Job Application Update';
         $body = 'There is an update to your job application.';
 
@@ -44,24 +52,28 @@ class ApplicationNotifications
                 break;
         }
 
-        // 1. Create In-App Notification using the custom model & table
-        Notification::create([
-            'user_id' => $recipient->id,
-            'title' => $title,
-            'body' => $body,
-            'type' => $type,
-            'data' => [
+        // 1. Create In-App Notification using the custom model & table if enabled
+        if ($preferences->in_app_enabled && $topicEnabled) {
+            Notification::create([
+                'user_id' => $recipient->id,
+                'title' => $title,
+                'body' => $body,
                 'type' => $type,
-                'job_title' => $data['job_title'] ?? null,
-                'company_name' => $data['company_name'] ?? null,
-                'applicant_name' => $data['applicant_name'] ?? null,
-                'status' => $data['status'] ?? null,
-                'remarks' => $data['remarks'] ?? null,
-            ],
-            'is_read' => false,
-        ]);
+                'data' => [
+                    'type' => $type,
+                    'job_title' => $data['job_title'] ?? null,
+                    'company_name' => $data['company_name'] ?? null,
+                    'applicant_name' => $data['applicant_name'] ?? null,
+                    'status' => $data['status'] ?? null,
+                    'remarks' => $data['remarks'] ?? null,
+                ],
+                'is_read' => false,
+            ]);
+        }
 
-        // 2. Queue Email Mailable
-        Mail::to($recipient->email)->queue(new ApplicationMail($type, $data));
+        // 2. Queue Email Mailable if enabled
+        if ($preferences->email_enabled && $topicEnabled) {
+            Mail::to($recipient->email)->queue(new ApplicationMail($type, $data));
+        }
     }
 }

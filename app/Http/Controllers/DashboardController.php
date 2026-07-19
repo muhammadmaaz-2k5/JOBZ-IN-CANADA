@@ -32,178 +32,177 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        // Platform overview metrics for Admin Dashboard
-        $metrics = [
-            'total_users' => User::count(),
-            'seekers_count' => User::role('job_seeker')->count(),
-            'employers_count' => User::role('employer')->count(),
-            'active_jobs' => Job::where('status', 'published')->count(),
-            'pending_jobs' => Job::where('status', 'draft')->count(),
-            'applications_count' => Application::count(),
-            'companies_count' => Company::count(),
-            'reports_count' => \App\Models\JobReport::where('status', 'pending')->count(),
-        ];
+        $cachedData = \Illuminate\Support\Facades\Cache::remember("dashboard:admin", now()->addMinutes(5), function () {
+            $metrics = [
+                'total_users' => User::count(),
+                'seekers_count' => User::role('job_seeker')->count(),
+                'employers_count' => User::role('employer')->count(),
+                'active_jobs' => Job::where('status', 'published')->count(),
+                'pending_jobs' => Job::where('status', 'draft')->count(),
+                'applications_count' => Application::count(),
+                'companies_count' => Company::count(),
+                'reports_count' => \App\Models\JobReport::where('status', 'pending')->count(),
+            ];
 
-        // Fetch recent audits and logs
-        $recentAudits = AuditLog::with('user')->latest()->take(5)->get();
+            $recentAudits = AuditLog::with('user')->latest()->take(5)->get();
 
-        return view('dashboard.admin', compact('metrics', 'recentAudits'));
+            return compact('metrics', 'recentAudits');
+        });
+
+        return view('dashboard.admin', $cachedData);
     }
 
     public function employer()
     {
         $user = Auth::user();
-        $employerProfile = $user->employerProfile()->with('company')->first();
-        $company = $employerProfile ? $employerProfile->company : null;
+        $userId = $user->id;
 
-        // Insights summary metrics
-        $metrics = [
-            'active_jobs' => Job::where('employer_id', $user->id)->where('status', 'published')->count(),
-            'draft_jobs' => Job::where('employer_id', $user->id)->where('status', 'draft')->count(),
-            'closed_jobs' => Job::where('employer_id', $user->id)->where('status', 'closed')->count(),
-            'total_applications' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->count(),
-            'interviews_scheduled' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'interview_scheduled')->count(),
-            'candidates_hired' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'hired')->count(),
-            'followers_count' => $company ? $company->followers()->count() : 0,
-            'total_views' => Job::where('employer_id', $user->id)->sum('views_count'),
-        ];
+        $cachedData = \Illuminate\Support\Facades\Cache::remember("dashboard:employer:{$userId}", now()->addMinutes(5), function () use ($userId) {
+            $user = User::find($userId);
+            $employerProfile = $user->employerProfile()->with('company')->first();
+            $company = $employerProfile ? $employerProfile->company : null;
 
-        // Recent applications list
-        $recentApplications = Application::with(['job', 'applicant.jobSeekerProfile'])
-            ->whereHas('job', fn($q) => $q->where('employer_id', $user->id))
-            ->latest('applied_at')
-            ->take(5)
-            ->get();
+            $metrics = [
+                'active_jobs' => Job::where('employer_id', $user->id)->where('status', 'published')->count(),
+                'draft_jobs' => Job::where('employer_id', $user->id)->where('status', 'draft')->count(),
+                'closed_jobs' => Job::where('employer_id', $user->id)->where('status', 'closed')->count(),
+                'total_applications' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->count(),
+                'interviews_scheduled' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'interview_scheduled')->count(),
+                'candidates_hired' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'hired')->count(),
+                'followers_count' => $company ? $company->followers()->count() : 0,
+                'total_views' => Job::where('employer_id', $user->id)->sum('views_count'),
+            ];
 
-        // Job Performance list
-        $jobPerformance = Job::where('employer_id', $user->id)
-            ->withCount('savedByUsers')
-            ->latest()
-            ->get();
+            $recentApplications = Application::with(['job', 'applicant.jobSeekerProfile'])
+                ->whereHas('job', fn($q) => $q->where('employer_id', $user->id))
+                ->latest('applied_at')
+                ->take(5)
+                ->get();
 
-        // Group status data for Chart
-        $statusData = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
-            ->selectRaw('status, count(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status')
-            ->toArray();
+            $jobPerformance = Job::where('employer_id', $user->id)
+                ->withCount('savedByUsers')
+                ->latest()
+                ->get();
 
-        // Weekly applications data (last 4 weeks)
-        $weeklyApplications = [];
-        for ($i = 3; $i >= 0; $i--) {
-            $start = now()->subWeeks($i)->startOfWeek();
-            $end = now()->subWeeks($i)->endOfWeek();
-            $count = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
-                ->whereBetween('applied_at', [$start, $end])
-                ->count();
-            $weeklyApplications["Week " . (4 - $i)] = $count;
-        }
+            $statusData = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
 
-        // Reviews analytics
-        $reviewsCount = $company ? $company->reviews()->count() : 0;
-        $averageRating = $company ? $company->reviews()->avg('rating') : 0;
+            $weeklyApplications = [];
+            for ($i = 3; $i >= 0; $i--) {
+                $start = now()->subWeeks($i)->startOfWeek();
+                $end = now()->subWeeks($i)->endOfWeek();
+                $count = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
+                    ->whereBetween('applied_at', [$start, $end])
+                    ->count();
+                $weeklyApplications["Week " . (4 - $i)] = $count;
+            }
 
-        return view('dashboard.employer', compact(
-            'employerProfile', 
-            'metrics', 
-            'recentApplications', 
-            'jobPerformance', 
-            'statusData', 
-            'weeklyApplications', 
-            'reviewsCount', 
-            'averageRating'
-        ));
+            $reviewsCount = $company ? $company->reviews()->count() : 0;
+            $averageRating = $company ? $company->reviews()->avg('rating') : 0;
+
+            return compact(
+                'employerProfile',
+                'metrics',
+                'recentApplications',
+                'jobPerformance',
+                'statusData',
+                'weeklyApplications',
+                'reviewsCount',
+                'averageRating'
+            );
+        });
+
+        return view('dashboard.employer', $cachedData);
     }
 
     public function seeker()
     {
         $user = Auth::user();
-        $seekerProfile = $user->jobSeekerProfile()->first();
+        $userId = $user->id;
 
-        // Statistics cards
-        $metrics = [
-            'applied' => Application::where('applicant_id', $user->id)->where('status', '!=', 'withdrawn')->count(),
-            'saved' => $user->savedJobs()->count(),
-            'interviews' => Application::where('applicant_id', $user->id)->whereIn('status', ['interview_scheduled', 'interview_completed'])->count(),
-            'follows' => $user->companyFollowings()->count(),
-            'alerts' => $user->jobAlerts()->count(),
-            'profile_completion' => $seekerProfile ? $seekerProfile->calculateCompletionPercentage() : 0,
-        ];
+        $cachedData = \Illuminate\Support\Facades\Cache::remember("dashboard:seeker:{$userId}", now()->addMinutes(5), function () use ($userId) {
+            $user = User::find($userId);
+            $seekerProfile = $user->jobSeekerProfile()->first();
 
-        // Improve profile suggestions
-        $suggestions = [];
-        if (!$seekerProfile || empty($seekerProfile->headline)) {
-            $suggestions[] = 'Add a professional headline';
-        }
-        if (!$seekerProfile || empty($seekerProfile->summary)) {
-            $suggestions[] = 'Write a short professional summary';
-        }
-        if (!$user->resumes()->exists()) {
-            $suggestions[] = 'Upload your resume';
-        }
-        if (!$user->experiences()->exists()) {
-            $suggestions[] = 'Add your work experience';
-        }
-        if (!$user->education()->exists()) {
-            $suggestions[] = 'Add your education history';
-        }
-        if (!$user->skills()->exists()) {
-            $suggestions[] = 'Select your core skills';
-        }
-        if (!$user->projects()->exists()) {
-            $suggestions[] = 'Add projects you have completed';
-        }
+            $metrics = [
+                'applied' => Application::where('applicant_id', $user->id)->where('status', '!=', 'withdrawn')->count(),
+                'saved' => $user->savedJobs()->count(),
+                'interviews' => Application::where('applicant_id', $user->id)->whereIn('status', ['interview_scheduled', 'interview_completed'])->count(),
+                'follows' => $user->companyFollowings()->count(),
+                'alerts' => $user->jobAlerts()->count(),
+                'profile_completion' => $seekerProfile ? $seekerProfile->calculateCompletionPercentage() : 0,
+            ];
 
-        // Skill-based job recommendations
-        $userSkills = $user->skills()->pluck('skills.id');
-        $recommendedJobs = Job::with('company')
-            ->where('status', 'published')
-            ->where(function ($q) use ($userSkills) {
-                if ($userSkills->isNotEmpty()) {
-                    $q->whereHas('skills', fn($sk) => $sk->whereIn('skills.id', $userSkills));
-                }
-            })
-            ->latest()
-            ->take(3)
-            ->get();
+            $suggestions = [];
+            if (!$seekerProfile || empty($seekerProfile->headline)) {
+                $suggestions[] = 'Add a professional headline';
+            }
+            if (!$seekerProfile || empty($seekerProfile->summary)) {
+                $suggestions[] = 'Write a short professional summary';
+            }
+            if (!$user->resumes()->exists()) {
+                $suggestions[] = 'Upload your resume';
+            }
+            if (!$user->experiences()->exists()) {
+                $suggestions[] = 'Add your work experience';
+            }
+            if (!$user->education()->exists()) {
+                $suggestions[] = 'Add your education history';
+            }
+            if (!$user->skills()->exists()) {
+                $suggestions[] = 'Select your core skills';
+            }
+            if (!$user->projects()->exists()) {
+                $suggestions[] = 'Add projects you have completed';
+            }
 
-        // Recent applications list
-        $recentApplications = Application::with('job.company')
-            ->where('applicant_id', $user->id)
-            ->latest('applied_at')
-            ->take(5)
-            ->get();
+            $userSkills = $user->skills()->pluck('skills.id');
+            $recommendedJobs = Job::with('company')
+                ->where('status', 'published')
+                ->where(function ($q) use ($userSkills) {
+                    if ($userSkills->isNotEmpty()) {
+                        $q->whereHas('skills', fn($sk) => $sk->whereIn('skills.id', $userSkills));
+                    }
+                })
+                ->latest()
+                ->take(3)
+                ->get();
 
-        // Bookmarked saved jobs list
-        $savedJobs = $user->savedJobs()->with('company')->latest()->take(5)->get();
+            $recentApplications = Application::with('job.company')
+                ->where('applicant_id', $user->id)
+                ->latest('applied_at')
+                ->take(5)
+                ->get();
 
-        // Timelines from user audit logs
-        $timeline = AuditLog::where('user_id', $user->id)
-            ->latest()
-            ->take(5)
-            ->get();
+            $savedJobs = $user->savedJobs()->with('company')->latest()->take(5)->get();
 
-        // Job alerts list
-        $alerts = $user->jobAlerts()->with('category')->get();
+            $timeline = AuditLog::where('user_id', $user->id)
+                ->latest()
+                ->take(5)
+                ->get();
 
-        // Categories list for alerts creation dropdown
-        $categories = Category::whereNull('parent_id')->get();
+            $alerts = $user->jobAlerts()->with('category')->get();
+            $categories = Category::whereNull('parent_id')->get();
+            $notifications = $user->notifications()->latest()->take(5)->get();
 
-        // Recent notifications
-        $notifications = $user->notifications()->latest()->take(5)->get();
+            return compact(
+                'seekerProfile',
+                'metrics',
+                'suggestions',
+                'recommendedJobs',
+                'recentApplications',
+                'savedJobs',
+                'timeline',
+                'alerts',
+                'categories',
+                'notifications'
+            );
+        });
 
-        return view('dashboard.seeker', compact(
-            'seekerProfile', 
-            'metrics', 
-            'suggestions', 
-            'recommendedJobs', 
-            'recentApplications', 
-            'savedJobs', 
-            'timeline', 
-            'alerts',
-            'categories',
-            'notifications'
-        ));
+        return view('dashboard.seeker', $cachedData);
     }
 
     public function storeAlert(Request $request)

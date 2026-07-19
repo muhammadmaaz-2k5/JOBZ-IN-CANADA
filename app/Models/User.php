@@ -34,6 +34,18 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $user->notificationPreferences()->create();
+        });
+    }
+
+    public function notificationPreferences()
+    {
+        return $this->hasOne(NotificationPreference::class);
+    }
+
     public function jobSeekerProfile()
     {
         return $this->hasOne(JobSeekerProfile::class);

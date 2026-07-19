@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'redis_langcache' => [
+        'api_key' => env('REDIS_LANGCACHE_API_KEY'),
+        'cache_id' => env('REDIS_LANGCACHE_CACHE_ID'),
+    ],
+
 ];

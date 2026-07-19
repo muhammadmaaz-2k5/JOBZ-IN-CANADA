@@ -19,6 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Mail\Events\MessageSending::class,
+            [\App\Listeners\MailMessageListener::class, 'handleSending']
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Mail\Events\MessageSent::class,
+            [\App\Listeners\MailMessageListener::class, 'handleSent']
+        );
     }
 }

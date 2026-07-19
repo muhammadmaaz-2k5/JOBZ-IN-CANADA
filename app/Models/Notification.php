@@ -24,4 +24,14 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function read()
+    {
+        return (bool)$this->is_read;
+    }
+
+    public function markAsRead()
+    {
+        $this->update(['is_read' => true]);
+    }
 }

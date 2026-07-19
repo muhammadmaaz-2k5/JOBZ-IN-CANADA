@@ -142,6 +142,15 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     // Seeker Resume Boost
     Route::get('/seeker/boost', [BillingController::class, 'seekerBoost'])->name('seeker.boost.index');
     Route::post('/seeker/boost', [BillingController::class, 'boostProfile'])->name('seeker.boost.submit');
+
+    // Notification Preferences
+    Route::get('/profile/notifications', [\App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('profile.notifications.edit');
+    Route::put('/profile/notifications', [\App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notifications.update');
+
+    // In-App Notifications
+    Route::get('/notifications', [\App\Http\Controllers\InAppNotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{id}/read', [\App\Http\Controllers\InAppNotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\InAppNotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Employer Profile & Job Management

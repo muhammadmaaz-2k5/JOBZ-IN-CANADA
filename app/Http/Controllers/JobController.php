@@ -12,12 +12,23 @@ class JobController extends Controller
 {
     public function index(Request $request)
     {
-        // Setup base query, only retrieve published listings
-        $query = Job::with(['company', 'category', 'skills'])
-            ->where('status', 'published');
+        $cachedJobIds = null;
+        if ($request->filled('keyword') && !$request->filled('location') && !count($request->except(['page', 'sort', 'keyword']))) {
+            $cachedJobIds = \App\Services\SemanticCacheService::search($request->keyword);
+        }
 
-        // Apply advanced search filter scope
-        $query->filter($request->all());
+        if (is_array($cachedJobIds)) {
+            $query = Job::with(['company', 'category', 'skills'])
+                ->whereIn('id', $cachedJobIds)
+                ->where('status', 'published');
+        } else {
+            // Setup base query, only retrieve published listings
+            $query = Job::with(['company', 'category', 'skills'])
+                ->where('status', 'published');
+
+            // Apply advanced search filter scope
+            $query->filter($request->all());
+        }
 
         // Apply Sorting
         $sort = $request->get('sort', 'newest');
@@ -49,6 +60,14 @@ class JobController extends Controller
         $jobs = $query->paginate(10)->withQueryString();
         $endTime = microtime(true);
         $searchTimeMs = round(($endTime - $startTime) * 1000);
+
+        // Save cold search results to LangCache
+        if ($request->filled('keyword') && !is_array($cachedJobIds) && !$request->filled('location') && !count($request->except(['page', 'sort', 'keyword']))) {
+            $jobIds = $jobs->pluck('id')->toArray();
+            if (!empty($jobIds)) {
+                \App\Services\SemanticCacheService::save($request->keyword, $jobIds);
+            }
+        }
 
         // Store Search Query Analytics
         if ($request->filled('keyword') || $request->filled('location') || count($request->except(['page', 'sort']))) {
@@ -86,8 +105,12 @@ class JobController extends Controller
         }
 
         // Get filter inputs for display/checked states
-        $parentCategories = Category::whereNull('parent_id')->with('children')->get();
-        $popularSkills = Skill::take(10)->get();
+        $parentCategories = \Illuminate\Support\Facades\Cache::remember('categories', now()->addDay(), function () {
+            return Category::whereNull('parent_id')->with('children')->get();
+        });
+        $popularSkills = \Illuminate\Support\Facades\Cache::remember('popular_skills', now()->addDay(), function () {
+            return Skill::take(10)->get();
+        });
 
         return view('jobs.index', compact('jobs', 'parentCategories', 'popularSkills', 'recentlyViewed'));
     }
