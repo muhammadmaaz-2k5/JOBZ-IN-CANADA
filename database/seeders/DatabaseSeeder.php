@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CreateRolesAndPermissionsSeeder::class,
             CategoryAndSkillSeeder::class,
             SubscriptionPlanSeeder::class,
+            SampleJobSeeder::class,
         ]);
 
         // User::factory(10)->create();

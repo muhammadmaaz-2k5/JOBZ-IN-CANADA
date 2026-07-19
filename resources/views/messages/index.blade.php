@@ -11,7 +11,7 @@
     <div class="py-6 bg-gray-50 dark:bg-gray-900 min-h-screen"
          x-data="{
             searchQuery: '',
-            activeChannelId: 1,
+            activeChannelId: null,
             isTyping: false,
             messageText: '',
             attachmentName: '',
@@ -61,7 +61,7 @@
             ],
 
             get activeChannel() {
-                return this.channels.find(c => c.id === this.activeChannelId);
+                return this.channels.find(c => c.id === this.activeChannelId) || { name: '', role: '', online: false, messages: [] };
             },
 
             filteredChannels() {
@@ -158,70 +158,82 @@
                 </div>
 
                 <!-- Chat Dialog Pane (Right Column) -->
-                <div class="hidden md:flex md:w-2/3 flex-col justify-between h-full bg-gray-50/50 dark:bg-dark-900/10">
+                <div class="hidden md:flex md:w-2/3 flex-col justify-between h-full bg-gray-50/50 dark:bg-dark-900/10 relative">
                     
-                    <!-- Top Info Header -->
-                    <div class="px-6 py-4 border-b border-gray-150 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center shrink-0">
-                        <div>
-                            <h3 class="font-extrabold text-base text-gray-900 dark:text-white" x-text="activeChannel.name"></h3>
-                            <p class="text-[10px] text-gray-400 font-semibold flex items-center gap-1">
-                                <span :class="activeChannel.online ? 'bg-emerald-500' : 'bg-gray-400'" class="w-1.5 h-1.5 rounded-full"></span>
-                                <span x-text="activeChannel.online ? 'Active Now' : 'Offline'"></span>
-                                <span>&bull;</span>
-                                <span x-text="activeChannel.role"></span>
-                            </p>
+                    <!-- Empty State View -->
+                    <div x-show="activeChannelId === null" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 space-y-4" x-transition>
+                        <div class="w-16 h-16 rounded-3xl bg-primary-50 dark:bg-dark-850 text-primary-500 flex items-center justify-center text-2xl shadow-sm border border-gray-100 dark:border-gray-700/50">
+                            💬
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button type="button" class="p-2 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg text-gray-400 text-xs">📞 Call</button>
-                            <button type="button" class="p-2 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg text-gray-400 text-xs">📝 Profile</button>
-                        </div>
+                        <h3 class="text-sm font-extrabold text-gray-900 dark:text-white">Start a Conversation</h3>
+                        <p class="text-xs text-gray-500 max-w-xs leading-relaxed">Select a candidate or recruiter thread from the list on the left to start message communication.</p>
                     </div>
 
-                    <!-- Scrollable Bubble conversation list -->
-                    <div class="flex-1 p-6 overflow-y-auto space-y-4">
-                        <template x-for="(msg, i) in activeChannel.messages" :key="i">
-                            <div class="flex" :class="msg.sender === 'employer' ? 'justify-end' : 'justify-start'">
-                                <div class="max-w-[70%] space-y-1">
-                                    <div class="p-3.5 rounded-2xl text-xs leading-relaxed"
-                                         :class="msg.sender === 'employer' ? 'bg-primary-500 text-white rounded-tr-none shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none border border-gray-150 dark:border-gray-700'">
-                                        <p x-text="msg.text"></p>
+                    <!-- Active Chat Details -->
+                    <div x-show="activeChannelId !== null" class="flex flex-col justify-between h-full w-full" x-transition style="display: none;">
+                        <!-- Top Info Header -->
+                        <div class="px-6 py-4 border-b border-gray-150 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center shrink-0">
+                            <div>
+                                <h3 class="font-extrabold text-base text-gray-900 dark:text-white" x-text="activeChannel.name"></h3>
+                                <p class="text-[10px] text-gray-400 font-semibold flex items-center gap-1">
+                                    <span :class="activeChannel.online ? 'bg-emerald-500' : 'bg-gray-400'" class="w-1.5 h-1.5 rounded-full"></span>
+                                    <span x-text="activeChannel.online ? 'Active Now' : 'Offline'"></span>
+                                    <span>&bull;</span>
+                                    <span x-text="activeChannel.role"></span>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" class="p-2 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg text-gray-400 text-xs">📞 Call</button>
+                                <button type="button" class="p-2 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-lg text-gray-400 text-xs">📝 Profile</button>
+                            </div>
+                        </div>
+
+                        <!-- Scrollable Bubble conversation list -->
+                        <div class="flex-1 p-6 overflow-y-auto space-y-4">
+                            <template x-for="(msg, i) in activeChannel.messages" :key="i">
+                                <div class="flex" :class="msg.sender === 'employer' ? 'justify-end' : 'justify-start'">
+                                    <div class="max-w-[70%] space-y-1">
+                                        <div class="p-3.5 rounded-2xl text-xs leading-relaxed"
+                                             :class="msg.sender === 'employer' ? 'bg-primary-500 text-white rounded-tr-none shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none border border-gray-150 dark:border-gray-700'">
+                                            <p x-text="msg.text"></p>
+                                        </div>
+                                        <span class="text-[9px] text-gray-400 block px-1" :class="msg.sender === 'employer' ? 'text-right' : 'text-left'" x-text="msg.time"></span>
                                     </div>
-                                    <span class="text-[9px] text-gray-400 block px-1" :class="msg.sender === 'employer' ? 'text-right' : 'text-left'" x-text="msg.time"></span>
+                                </div>
+                            </template>
+
+                            <!-- Typing Animation dots indicator -->
+                            <div x-show="isTyping" class="flex justify-start items-center gap-2" x-transition>
+                                <div class="bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 px-4 py-2.5 rounded-2xl rounded-tl-none flex items-center gap-1 text-xs">
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75"></span>
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150"></span>
                                 </div>
                             </div>
-                        </template>
+                        </div>
 
-                        <!-- Typing Animation dots indicator -->
-                        <div x-show="isTyping" class="flex justify-start items-center gap-2" x-transition>
-                            <div class="bg-white dark:bg-gray-800 border border-gray-150 dark:border-gray-700 px-4 py-2.5 rounded-2xl rounded-tl-none flex items-center gap-1 text-xs">
-                                <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
-                                <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75"></span>
-                                <span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150"></span>
+                        <!-- Progress bar for upload simulator -->
+                        <div x-show="isUploading" class="px-6 py-2 bg-gray-100 dark:bg-dark-850 flex items-center justify-between text-xs text-gray-500 border-t border-gray-150">
+                            <span class="truncate" x-text="'Uploading: ' + attachmentName"></span>
+                            <div class="w-1/3 bg-gray-200 dark:bg-dark-800 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-primary-500 h-full transition-all duration-150" :style="'width: ' + uploadProgress + '%'"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Progress bar for upload simulator -->
-                    <div x-show="isUploading" class="px-6 py-2 bg-gray-100 dark:bg-dark-850 flex items-center justify-between text-xs text-gray-500 border-t border-gray-150">
-                        <span class="truncate" x-text="'Uploading: ' + attachmentName"></span>
-                        <div class="w-1/3 bg-gray-200 dark:bg-dark-800 rounded-full h-1.5 overflow-hidden">
-                            <div class="bg-primary-500 h-full transition-all duration-150" :style="'width: ' + uploadProgress + '%'"></div>
+                        <!-- Bottom message text panel inputs -->
+                        <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-150 dark:border-gray-700/50 flex items-center gap-2 shrink-0">
+                            <!-- Attachment mock inputs -->
+                            <label class="p-2 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-xl cursor-pointer text-gray-400 shrink-0 text-sm flex items-center justify-center" title="Attach file">
+                                📎
+                                <input type="file" @change="triggerAttachment($event)" class="hidden" />
+                            </label>
+                            
+                            <input type="text" x-model="messageText" @keydown.enter.prevent="sendMsg()" placeholder="Type your message..." class="flex-1 px-4 py-2.5 rounded-xl border border-gray-250 dark:border-gray-700 bg-gray-50 dark:bg-dark-850 text-gray-900 dark:text-gray-100 text-xs font-semibold focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500">
+                            
+                            <button type="button" @click="sendMsg()" class="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
+                                Send Message
+                            </button>
                         </div>
-                    </div>
-
-                    <!-- Bottom message text panel inputs -->
-                    <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-150 dark:border-gray-700/50 flex items-center gap-2 shrink-0">
-                        <!-- Attachment mock inputs -->
-                        <label class="p-2 hover:bg-gray-100 dark:hover:bg-dark-800 rounded-xl cursor-pointer text-gray-400 shrink-0 text-sm flex items-center justify-center" title="Attach file">
-                            📎
-                            <input type="file" @change="triggerAttachment($event)" class="hidden" />
-                        </label>
-                        
-                        <input type="text" x-model="messageText" @keydown.enter.prevent="sendMsg()" placeholder="Type your message..." class="flex-1 px-4 py-2.5 rounded-xl border border-gray-250 dark:border-gray-700 bg-gray-50 dark:bg-dark-850 text-gray-900 dark:text-gray-100 text-xs font-semibold focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500">
-                        
-                        <button type="button" @click="sendMsg()" class="px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-xs font-extrabold shadow-sm transition cursor-pointer">
-                            Send Message
-                        </button>
                     </div>
                 </div>
 

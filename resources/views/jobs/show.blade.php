@@ -36,7 +36,18 @@
                     "addressLocality": "{{ $job->city }}",
                     "addressCountry": "{{ $job->country }}"
                 }
+            },
+            @if($job->salary_min)
+            "baseSalary": {
+                "@type": "MonetaryAmount",
+                "currency": "{{ $job->currency ?: 'CAD' }}",
+                "value": {
+                    "@type": "QuantitativeValue",
+                    "value": {{ $job->salary_min }},
+                    "unitText": "{{ strtoupper($job->salary_type ?: 'YEAR') }}"
+                }
             }
+            @endif
         },
         {
             "@context": "https://schema.org",

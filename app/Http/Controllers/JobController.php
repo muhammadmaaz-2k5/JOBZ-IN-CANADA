@@ -105,12 +105,8 @@ class JobController extends Controller
         }
 
         // Get filter inputs for display/checked states
-        $parentCategories = \Illuminate\Support\Facades\Cache::remember('categories', now()->addDay(), function () {
-            return Category::whereNull('parent_id')->with('children')->get();
-        });
-        $popularSkills = \Illuminate\Support\Facades\Cache::remember('popular_skills', now()->addDay(), function () {
-            return Skill::take(10)->get();
-        });
+        $parentCategories = Category::whereNull('parent_id')->with('children')->get();
+        $popularSkills = Skill::take(10)->get();
 
         return view('jobs.index', compact('jobs', 'parentCategories', 'popularSkills', 'recentlyViewed'));
     }

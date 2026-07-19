@@ -279,17 +279,26 @@
                         <div class="space-y-3">
                             <h3 class="text-base font-bold text-gray-900 dark:text-white border-l-4 border-primary-500 pl-3">Office & Team Gallery</h3>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                <div class="h-28 bg-gray-100 dark:bg-dark-850 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex items-center justify-center text-xs text-gray-400 font-bold uppercase relative group">
-                                    Office Space
-                                    <div class="absolute inset-0 bg-primary-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <!-- Office Space Card -->
+                                <div class="h-28 bg-gradient-to-br from-primary-500/5 to-indigo-500/10 border border-gray-250 dark:border-gray-700 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 relative group text-center">
+                                    <span class="text-2xl mb-1">🏢</span>
+                                    <span class="text-[10px] font-extrabold uppercase text-gray-905 dark:text-white">Office Space</span>
+                                    <span class="text-[9px] text-gray-400 mt-0.5">Headquarters</span>
+                                    <div class="absolute inset-0 bg-primary-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 </div>
-                                <div class="h-28 bg-gray-100 dark:bg-dark-850 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex items-center justify-center text-xs text-gray-400 font-bold uppercase relative group">
-                                    Team Meeting
-                                    <div class="absolute inset-0 bg-primary-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <!-- Team Meeting Card -->
+                                <div class="h-28 bg-gradient-to-br from-purple-500/5 to-pink-500/10 border border-gray-250 dark:border-gray-700 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 relative group text-center">
+                                    <span class="text-2xl mb-1">👥</span>
+                                    <span class="text-[10px] font-extrabold uppercase text-gray-905 dark:text-white">Team Meeting</span>
+                                    <span class="text-[9px] text-gray-400 mt-0.5">Collaboration Room</span>
+                                    <div class="absolute inset-0 bg-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 </div>
-                                <div class="h-28 bg-gray-100 dark:bg-dark-850 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden flex items-center justify-center text-xs text-gray-400 font-bold uppercase relative group">
-                                    Collaboration Hub
-                                    <div class="absolute inset-0 bg-primary-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <!-- Collaboration Hub Card -->
+                                <div class="h-28 bg-gradient-to-br from-emerald-500/5 to-teal-500/10 border border-gray-250 dark:border-gray-700 rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 relative group text-center">
+                                    <span class="text-2xl mb-1">☕</span>
+                                    <span class="text-[10px] font-extrabold uppercase text-gray-905 dark:text-white">Breakout Area</span>
+                                    <span class="text-[9px] text-gray-400 mt-0.5">Social Lounge</span>
+                                    <div class="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 </div>
                             </div>
                         </div>
