@@ -12,6 +12,8 @@ use App\Http\Controllers\EmployerJobController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\EmployerApplicantController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SearchSuggestionController;
+use App\Http\Controllers\SearchAnalyticsController;
 
 Route::get('/', function () {
     return view('home');
@@ -70,6 +72,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // Audit logs
     Route::get('/audit-logs', [AdminController::class, 'auditLogs'])->name('audit-logs.index');
+
+    // Search analytics
+    Route::get('/search-analytics', [SearchAnalyticsController::class, 'index'])->name('search-analytics.index');
 });
 
 // Revert impersonation
@@ -168,3 +173,35 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Public Search Suggestions Autocomplete API
+Route::get('/api/jobs/suggestions', [SearchSuggestionController::class, 'index'])->name('api.jobs.suggestions');
+
+// History Session Clearing Actions
+Route::post('/jobs/history/clear-search', [JobController::class, 'clearSearchHistory'])->name('jobs.history.clear-search');
+Route::post('/jobs/history/clear-viewed', [JobController::class, 'clearViewedHistory'])->name('jobs.history.clear-viewed');
+
+// Dynamic XML Sitemap Generator
+Route::get('/sitemap.xml', function () {
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    
+    // Add static/core pages
+    $xml .= '<url><loc>' . url('/') . '</loc><changefreq>daily</changefreq><priority>1.0</priority></url>';
+    $xml .= '<url><loc>' . url('/jobs') . '</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>';
+    
+    // Add active jobs
+    $jobs = \App\Models\Job::where('status', 'published')->get();
+    foreach ($jobs as $j) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . route('jobs.show', $j->slug) . '</loc>';
+        $xml .= '<lastmod>' . ($j->updated_at ? $j->updated_at->toAtomString() : $j->created_at->toAtomString()) . '</lastmod>';
+        $xml .= '<changefreq>weekly</changefreq>';
+        $xml .= '<priority>0.8</priority>';
+        $xml .= '</url>';
+    }
+
+    $xml .= '</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap');

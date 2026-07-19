@@ -188,6 +188,14 @@ class Job extends Model
             });
         });
 
+        $query->when($filters['easy_apply'] ?? null, function ($query) {
+            $query->whereDoesntHave('screeningQuestions');
+        });
+
+        $query->when($filters['salary_visible'] ?? null, function ($query) {
+            $query->whereNotNull('salary_min')->whereNotNull('salary_max');
+        });
+
         return $query;
     }
 

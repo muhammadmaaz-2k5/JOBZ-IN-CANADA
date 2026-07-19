@@ -45,13 +45,51 @@ class JobController extends Controller
                 break;
         }
 
+        $startTime = microtime(true);
         $jobs = $query->paginate(10)->withQueryString();
+        $endTime = microtime(true);
+        $searchTimeMs = round(($endTime - $startTime) * 1000);
+
+        // Store Search Query Analytics
+        if ($request->filled('keyword') || $request->filled('location') || count($request->except(['page', 'sort']))) {
+            \App\Models\SearchQuery::create([
+                'query_string' => $request->get('keyword'),
+                'filters' => $request->except(['page', 'sort', 'keyword']),
+                'results_count' => $jobs->total(),
+                'search_time_ms' => $searchTimeMs,
+                'user_id' => Auth::id(),
+            ]);
+
+            // Save recent search in session
+            if ($request->filled('keyword')) {
+                $recentSearches = session()->get('recent_searches', []);
+                $searchItem = [
+                    'keyword' => $request->get('keyword'),
+                    'location' => $request->get('location'),
+                    'url' => $request->fullUrl()
+                ];
+                $recentSearches = array_filter($recentSearches, fn($item) => $item['keyword'] !== $searchItem['keyword']);
+                array_unshift($recentSearches, $searchItem);
+                session()->put('recent_searches', array_slice($recentSearches, 0, 5));
+            }
+        }
+
+        // Fetch recently viewed jobs details
+        $recentlyViewedIds = session()->get('recently_viewed_jobs', []);
+        $recentlyViewed = [];
+        if (count($recentlyViewedIds) > 0) {
+            $recentlyViewed = Job::whereIn('id', $recentlyViewedIds)
+                ->where('status', 'published')
+                ->with('company')
+                ->get()
+                ->sortBy(fn($j) => array_search($j->id, $recentlyViewedIds));
+        }
 
         // Get filter inputs for display/checked states
         $parentCategories = Category::whereNull('parent_id')->with('children')->get();
         $popularSkills = Skill::take(10)->get();
 
-        return view('jobs.index', compact('jobs', 'parentCategories', 'popularSkills'));
+        return view('jobs.index', compact('jobs', 'parentCategories', 'popularSkills', 'recentlyViewed'));
     }
 
     public function show($slug)
@@ -63,18 +101,34 @@ class JobController extends Controller
         // Increment Views Count
         $job->increment('views_count');
 
+        // Track Viewed Job in Session
+        $viewed = session()->get('recently_viewed_jobs', []);
+        if (!in_array($job->id, $viewed)) {
+            array_unshift($viewed, $job->id);
+            session()->put('recently_viewed_jobs', array_slice($viewed, 0, 5));
+        }
+
         // Related jobs query (recommend jobs in same category or company, excluding current)
         $relatedJobs = Job::where('status', 'published')
             ->where('id', '!=', $job->id)
-            ->where(function ($q) use ($job) {
-                $q->where('category_id', $job->category_id)
-                  ->orWhere('company_id', $job->company_id);
-            })
+            ->where(fn ($q) => $q->where('category_id', $job->category_id)->orWhere('company_id', $job->company_id))
             ->latest()
             ->take(3)
             ->get();
 
         return view('jobs.show', compact('job', 'relatedJobs'));
+    }
+
+    public function clearSearchHistory()
+    {
+        session()->forget('recent_searches');
+        return redirect()->back()->with('success', 'Search history cleared.');
+    }
+
+    public function clearViewedHistory()
+    {
+        session()->forget('recently_viewed_jobs');
+        return redirect()->back()->with('success', 'View history cleared.');
     }
 
     public function toggleSave($id)

@@ -10,33 +10,53 @@
         </div>
     </x-slot>
 
-    <!-- Structured Data (JSON-LD JobPosting Schema) -->
+    <!-- Structured Data (JSON-LD JobPosting & Breadcrumbs Schema) -->
     @push('head')
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "JobPosting",
-        "title": "{{ $job->title }}",
-        "description": "{!! e(strip_tags($job->description)) !!}",
-        "datePosted": "{{ $job->created_at->toIso8601String() }}",
-        @if($job->application_deadline)
-        "validThrough": "{{ \Carbon\Carbon::parse($job->application_deadline)->toIso8601String() }}",
-        @endif
-        "employmentType": "{{ strtoupper($job->employment_type) }}",
-        "hiringOrganization": {
-            "@type": "Organization",
-            "name": "{{ $job->company->company_name }}",
-            "sameAs": "{{ $job->company->website }}"
-        },
-        "jobLocation": {
-            "@type": "Place",
-            "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "{{ $job->city }}",
-                "addressCountry": "{{ $job->country }}"
+    [
+        {
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            "title": "{{ $job->title }}",
+            "description": "{!! e(strip_tags($job->description)) !!}",
+            "datePosted": "{{ $job->created_at->toIso8601String() }}",
+            @if($job->application_deadline)
+            "validThrough": "{{ \Carbon\Carbon::parse($job->application_deadline)->toIso8601String() }}",
+            @endif
+            "employmentType": "{{ strtoupper($job->employment_type) }}",
+            "hiringOrganization": {
+                "@type": "Organization",
+                "name": "{{ $job->company->company_name }}",
+                "sameAs": "{{ $job->company->website }}"
+            },
+            "jobLocation": {
+                "@type": "Place",
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "{{ $job->city }}",
+                    "addressCountry": "{{ $job->country }}"
+                }
             }
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Jobs",
+                    "item": "{{ route('jobs.index') }}"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "{{ $job->title }}",
+                    "item": "{{ route('jobs.show', $job->slug) }}"
+                }
+            ]
         }
-    }
+    ]
     </script>
     @endpush
 
