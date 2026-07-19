@@ -1,4 +1,70 @@
-<x-app-layout>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
+      x-data="{ dark: localStorage.getItem('theme') === 'dark' }" 
+      :class="{ 'dark': dark }"
+      x-init="$watch('dark', val => localStorage.setItem('theme', val ? 'dark' : 'light'))"
+>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Find Your Dream Job - JOBZ IN CANADA</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+    
+    <!-- Scripts & Styles -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="font-sans antialiased bg-gray-50 dark:bg-dark-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+    <!-- Header Navbar (Homepage Style) -->
+    <header class="glass sticky top-0 z-50 h-16 flex items-center justify-between px-6 border-b border-gray-150 dark:border-gray-800/80 shadow-glass">
+        <div class="max-w-7xl mx-auto w-full flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center space-x-2 font-extrabold text-xl tracking-tight text-primary-600 dark:text-white">
+                <span class="grid place-items-center w-8 h-8 rounded-lg bg-primary-500 text-white font-bold">J</span>
+                <span>JOBZ IN <span class="text-accent-500">CANADA</span></span>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                <a href="{{ route('jobs.index') }}" class="text-primary-500 dark:text-white transition-colors">Find Jobs</a>
+                <a href="/#seekers" class="hover:text-primary-500 dark:hover:text-white transition-colors">For Job Seekers</a>
+                <a href="/#employers" class="hover:text-primary-500 dark:hover:text-white transition-colors">For Employers</a>
+            </nav>
+
+            <!-- Actions Panel -->
+            <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <button @click="dark = !dark" type="button" class="p-2 rounded-xl bg-white dark:bg-dark-800 border border-gray-200/50 dark:border-gray-700/50 text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-dark-700/50 transition-colors" title="Toggle Theme">
+                    <span x-show="!dark">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </span>
+                    <span x-show="dark" style="display: none;">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14.5 12a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                        </svg>
+                    </span>
+                </button>
+
+                @auth
+                    <a href="{{ route('dashboard') }}" class="px-4 py-2 text-sm font-semibold rounded-xl text-white bg-primary-500 hover:bg-primary-600 shadow-sm transition-colors">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-primary-500 transition-colors">
+                        Sign In
+                    </a>
+                    <a href="{{ route('register') }}" class="px-4 py-2 text-sm font-semibold rounded-xl text-white bg-primary-500 hover:bg-primary-600 shadow-premium transition-colors">
+                        Register
+                    </a>
+                @endauth
+            </div>
+        </div>
+    </header>
+
     <!-- Visual Gradient Background wave -->
     <div class="relative overflow-hidden pt-12 pb-16 bg-gradient-to-b from-primary-50/50 via-transparent to-transparent dark:from-primary-950/10 no-print">
         <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.04)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
@@ -63,7 +129,7 @@
 
                     <!-- Location input -->
                     <div class="flex-1 w-full flex items-center px-4 py-2 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-700">
-                        <span class="text-gray-450 text-sm">📍</span>
+                        <span class="text-gray-455 text-sm">📍</span>
                         <input id="location" name="location" type="text" 
                                class="w-full bg-transparent border-0 focus:ring-0 focus:outline-none ml-3 text-xs font-semibold dark:placeholder-gray-500 dark:text-gray-200" 
                                placeholder="City, province, or 'Remote'" 
@@ -90,7 +156,7 @@
             <!-- Recent Searches History chips -->
             @if(session()->has('recent_searches') && count(session('recent_searches')) > 0)
                 <div class="flex items-center justify-center flex-wrap gap-2.5 text-xs">
-                    <span class="text-[10px] font-black uppercase text-gray-400">Recent:</span>
+                    <span class="text-[10px] font-black uppercase text-gray-405">Recent:</span>
                     @foreach(session('recent_searches') as $search)
                         <a href="{{ $search['url'] }}" class="px-3 py-1 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-dark-750 text-gray-650 dark:text-gray-300 rounded-full transition border border-gray-150 dark:border-gray-750 font-bold text-3xs">
                             "{{ $search['keyword'] }}" {{ $search['location'] ? 'in ' . $search['location'] : '' }}
@@ -111,7 +177,7 @@
 
             <!-- Recently Viewed list horizontally in head, if exists -->
             @if(count($recentlyViewed) > 0)
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-150 dark:border-gray-700/50 space-y-3 no-print">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-150 dark:border-gray-700/50 space-y-3 no-print mx-4 sm:mx-0">
                     <div class="flex justify-between items-center pb-1.5 border-b border-gray-100 dark:border-gray-750">
                         <h4 class="font-extrabold text-xs text-gray-900 dark:text-white uppercase tracking-wider">Recently Viewed Listings</h4>
                         <form method="POST" action="{{ route('jobs.history.clear-viewed') }}">
@@ -131,7 +197,7 @@
             @endif
 
             <!-- Job listings cards list -->
-            <div class="space-y-4">
+            <div class="space-y-4 mx-4 sm:mx-0">
                 @forelse($jobs as $job)
                     <div class="p-6 bg-white dark:bg-gray-800 rounded-3xl border border-gray-150 dark:border-gray-700/40 hover:border-primary-500/25 hover:shadow-lg transition flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative">
                         @if($job->featured)
@@ -213,9 +279,23 @@
             </div>
 
             <!-- Pagination -->
-            <div class="mt-6">
+            <div class="mt-6 mx-4 sm:mx-0">
                 {{ $jobs->links() }}
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-150 dark:border-gray-850 mt-12 bg-white dark:bg-dark-900/50 no-print">
+        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <p>© {{ date('Y') }} JOBZ IN CANADA. All rights reserved.</p>
+            <div class="flex items-center space-x-6">
+                <a href="#" class="hover:underline">Terms of Service</a>
+                <a href="#" class="hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:underline">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
