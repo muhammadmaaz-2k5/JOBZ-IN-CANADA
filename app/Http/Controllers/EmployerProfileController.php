@@ -122,4 +122,18 @@ class EmployerProfileController extends Controller
 
         return redirect()->route('employer.profile.edit')->with('status', 'profile-updated');
     }
+
+    /**
+     * Display the public company profile view.
+     */
+    public function publicProfile($slug)
+    {
+        $company = Company::where('slug', $slug)->firstOrFail();
+        
+        // Retrieve jobs and reviews
+        $jobs = $company->jobs()->where('status', 'published')->latest()->get();
+        $reviews = $company->reviews()->with('user')->latest()->get();
+        
+        return view('company.show', compact('company', 'jobs', 'reviews'));
+    }
 }

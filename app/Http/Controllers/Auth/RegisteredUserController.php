@@ -28,6 +28,56 @@ class RegisteredUserController extends Controller
     }
 
     /**
+     * Display the job seeker registration view.
+     */
+    public function createSeeker(): View
+    {
+        return view('auth.register-seeker');
+    }
+
+    /**
+     * Display the employer registration view.
+     */
+    public function createEmployer(): View
+    {
+        return view('auth.register-employer');
+    }
+
+    /**
+     * Display the OTP verification form.
+     */
+    public function showOtpForm(): View
+    {
+        return view('auth.verify-otp');
+    }
+
+    /**
+     * Handle verification of the OTP.
+     */
+    public function verifyOtp(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'otp' => ['required', 'string', 'min:6', 'max:6'],
+        ]);
+
+        if ($request->otp === '123456') {
+            return redirect()->route('home')->with('status', 'OTP verified successfully!');
+        }
+
+        throw ValidationException::withMessages([
+            'otp' => ['The provided OTP is incorrect. Try using 123456.'],
+        ]);
+    }
+
+    /**
+     * Display the 2FA settings mock screen.
+     */
+    public function showTwoFactorForm(): View
+    {
+        return view('auth.two-factor');
+    }
+
+    /**
      * Handle an incoming registration request.
      *
      * @throws ValidationException

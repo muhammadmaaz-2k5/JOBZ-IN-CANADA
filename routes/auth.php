@@ -15,7 +15,21 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
+    Route::get('register/seeker', [RegisteredUserController::class, 'createSeeker'])
+        ->name('register.seeker');
+
+    Route::get('register/employer', [RegisteredUserController::class, 'createEmployer'])
+        ->name('register.employer');
+
     Route::post('register', [RegisteredUserController::class, 'store']);
+
+    Route::get('verify-otp', [RegisteredUserController::class, 'showOtpForm'])
+        ->name('otp.verify');
+
+    Route::post('verify-otp', [RegisteredUserController::class, 'verifyOtp']);
+
+    Route::get('two-factor', [RegisteredUserController::class, 'showTwoFactorForm'])
+        ->name('two-factor.verify');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

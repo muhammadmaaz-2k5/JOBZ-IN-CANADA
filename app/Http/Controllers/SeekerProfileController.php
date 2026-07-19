@@ -374,4 +374,23 @@ class SeekerProfileController extends Controller
 
         return redirect()->route('seeker.profile.edit')->with('success', 'Certification deleted.');
     }
+
+    /**
+     * Display the interactive Resume Builder canvas.
+     */
+    public function resumeBuilder()
+    {
+        $user = Auth::user();
+        $seekerProfile = $user->jobSeekerProfile()->firstOrCreate(['user_id' => $user->id]);
+
+        $experiences = $user->experiences()->latest()->get();
+        $education = $user->education()->latest()->get();
+        $skills = $user->skills()->get();
+        $projects = $user->projects()->latest()->get();
+        $certifications = $user->certifications()->latest()->get();
+
+        return view('seeker.resume-builder', compact(
+            'user', 'seekerProfile', 'experiences', 'education', 'skills', 'projects', 'certifications'
+        ));
+    }
 }

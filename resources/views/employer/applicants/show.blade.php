@@ -128,6 +128,15 @@
                         
                         <form method="POST" action="{{ route('employer.applicants.status', $application->id) }}" class="space-y-4">
                             @csrf
+                            
+                            <!-- Quick Action Buttons -->
+                            <div class="grid grid-cols-2 gap-2 mb-2 no-print">
+                                <button type="button" onclick="document.getElementById('status_select').value = 'shortlisted'" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/20 text-indigo-650 dark:text-indigo-400 font-bold rounded-lg text-[10px] uppercase transition">Shortlist</button>
+                                <button type="button" onclick="document.getElementById('status_select').value = 'rejected'" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 text-red-655 dark:text-red-400 font-bold rounded-lg text-[10px] uppercase transition">Reject</button>
+                                <button type="button" onclick="document.getElementById('status_select').value = 'hired'" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/20 text-emerald-650 dark:text-emerald-400 font-bold rounded-lg text-[10px] uppercase transition">Hire</button>
+                                <button type="button" onclick="document.getElementById('status_select').value = 'interview_scheduled'" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/20 text-amber-650 dark:text-amber-400 font-bold rounded-lg text-[10px] uppercase transition">Interview</button>
+                            </div>
+
                             <div>
                                 <x-input-label for="status_select" :value="__('Change Status')" />
                                 <select id="status_select" name="status" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300 text-sm rounded-xl">

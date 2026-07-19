@@ -1,51 +1,109 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Apply for ') }} {{ $job->title }}
-        </h2>
+        <div class="flex items-center justify-between flex-wrap gap-4 no-print">
+            <h2 class="font-semibold text-2xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Apply for Position') }}
+            </h2>
+            <span class="text-xs px-3.5 py-1.5 bg-primary-50 text-primary-800 dark:bg-primary-950/40 dark:text-primary-400 font-bold rounded-xl border border-primary-250/30">
+                💼 Job: {{ $job->title }}
+            </span>
+        </div>
     </x-slot>
 
-    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen" x-data="{ step: 1 }">
+    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen" 
+         x-data="{ 
+            step: 1,
+            isDragging: false,
+            isUploading: false,
+            uploadProgress: 0,
+            uploadedFileName: '',
+            resumeOption: 'library',
+            isSubmitting: false,
+            coverLetterText: '',
+            
+            triggerDrop(e) {
+                this.isDragging = false;
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    this.handleFile(file);
+                }
+            },
+            triggerSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    this.handleFile(file);
+                }
+            },
+            handleFile(file) {
+                this.uploadedFileName = file.name;
+                this.isUploading = true;
+                this.uploadProgress = 0;
+                const interval = setInterval(() => {
+                    if (this.uploadProgress < 100) {
+                        this.uploadProgress += 25;
+                    } else {
+                        clearInterval(interval);
+                        this.isUploading = false;
+                    }
+                }, 100);
+            },
+            submitApp(e) {
+                this.isSubmitting = true;
+                setTimeout(() => {
+                    e.target.submit();
+                }, 1500);
+            }
+         }"
+    >
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Progress Stepper Header -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 p-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-150 dark:border-gray-700/50 p-6 mb-8 no-print">
                 <div class="flex items-center justify-between relative">
                     <!-- Background Connector Line -->
                     <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 dark:bg-gray-700 -translate-y-1/2 z-0"></div>
                     <!-- Dynamic Progress Line -->
-                    <div class="absolute top-1/2 left-0 h-0.5 bg-indigo-600 transition-all duration-300 -translate-y-1/2 z-0" 
+                    <div class="absolute top-1/2 left-0 h-0.5 bg-primary-500 transition-all duration-300 -translate-y-1/2 z-0" 
                          :style="'width: ' + ((step - 1) * 33.33) + '%'"></div>
 
                     <!-- Step 1 -->
                     <div class="z-10 text-center flex flex-col items-center">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition duration-300"
-                             :class="step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600'">1</div>
-                        <span class="text-3xs font-semibold mt-1 uppercase text-gray-400">Resume</span>
+                             :class="step >= 1 ? 'bg-primary-500 text-white shadow-sm' : 'bg-gray-200 dark:bg-gray-700 text-gray-605'">1</div>
+                        <span class="text-[10px] font-semibold mt-1.5 uppercase text-gray-400">Resume</span>
                     </div>
                     <!-- Step 2 -->
                     <div class="z-10 text-center flex flex-col items-center">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition duration-300"
-                             :class="step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600'">2</div>
-                        <span class="text-3xs font-semibold mt-1 uppercase text-gray-400">Cover Letter</span>
+                             :class="step >= 2 ? 'bg-primary-500 text-white shadow-sm' : 'bg-gray-200 dark:bg-gray-700 text-gray-605'">2</div>
+                        <span class="text-[10px] font-semibold mt-1.5 uppercase text-gray-400">Cover Letter</span>
                     </div>
                     <!-- Step 3 -->
                     <div class="z-10 text-center flex flex-col items-center">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition duration-300"
-                             :class="step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600'">3</div>
-                        <span class="text-3xs font-semibold mt-1 uppercase text-gray-400">Screening</span>
+                             :class="step >= 3 ? 'bg-primary-500 text-white shadow-sm' : 'bg-gray-200 dark:bg-gray-700 text-gray-605'">3</div>
+                        <span class="text-[10px] font-semibold mt-1.5 uppercase text-gray-400">Screening</span>
                     </div>
                     <!-- Step 4 -->
                     <div class="z-10 text-center flex flex-col items-center">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition duration-300"
-                             :class="step >= 4 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600'">4</div>
-                        <span class="text-3xs font-semibold mt-1 uppercase text-gray-400">Review</span>
+                             :class="step >= 4 ? 'bg-primary-500 text-white shadow-sm' : 'bg-gray-200 dark:bg-gray-700 text-gray-605'">4</div>
+                        <span class="text-[10px] font-semibold mt-1.5 uppercase text-gray-400">Review</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Loader Skeletons (Shows when processing submission) -->
+            <div x-show="isSubmitting" class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-150 p-12 text-center space-y-6" x-transition>
+                <div class="flex items-center justify-center">
+                    <span class="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></span>
+                </div>
+                <h3 class="font-extrabold text-base text-gray-900 dark:text-white">Submitting your application...</h3>
+                <p class="text-xs text-gray-500">Recruiter is being notified. Please wait.</p>
+            </div>
+
             <!-- Application Form -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700/50 p-8">
+            <div x-show="!isSubmitting" class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-150 dark:border-gray-700/50 p-8">
                 
                 @if ($errors->any())
                     <div class="bg-red-50 dark:bg-red-950/20 border border-red-500/35 text-red-750 dark:text-red-400 p-4 rounded-xl shadow-sm text-sm mb-6">
@@ -57,39 +115,39 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('jobs.apply.submit', $job->slug) }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('jobs.apply.submit', $job->slug) }}" enctype="multipart/form-data" @submit.prevent="submitApp($event)">
                     @csrf
 
                     <!-- STEP 1: RESUME SELECTION -->
-                    <div x-show="step === 1" class="space-y-6">
-                        <h3 class="font-extrabold text-lg text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 1: Select Your Resume</h3>
+                    <div x-show="step === 1" class="space-y-6" x-transition>
+                        <h3 class="font-extrabold text-base text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 1: Select Your Resume</h3>
                         
-                        <div x-data="{ resumeOption: 'library' }" class="space-y-4">
+                        <div class="space-y-4">
                             <div class="flex items-center gap-6">
-                                <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-semibold">
-                                    <input type="radio" name="resume_option" value="library" x-model="resumeOption" checked class="text-indigo-600" />
+                                <label class="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 cursor-pointer font-bold uppercase tracking-wider">
+                                    <input type="radio" name="resume_option" value="library" x-model="resumeOption" checked class="text-primary-500" />
                                     Choose from Library
                                 </label>
-                                <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-semibold">
-                                    <input type="radio" name="resume_option" value="new" x-model="resumeOption" class="text-indigo-600" />
+                                <label class="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 cursor-pointer font-bold uppercase tracking-wider">
+                                    <input type="radio" name="resume_option" value="new" x-model="resumeOption" class="text-primary-500" />
                                     Upload New Resume
                                 </label>
                             </div>
 
                             <!-- Option A: Library Select -->
-                            <div x-show="resumeOption === 'library'" class="space-y-3 pt-2">
+                            <div x-show="resumeOption === 'library'" class="space-y-3 pt-2" x-transition>
                                 <x-input-label for="resume_id" :value="__('Select a Saved Resume')" />
                                 @forelse($resumes as $res)
-                                    <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-950 transition">
+                                    <label class="flex items-center justify-between p-4 bg-gray-50 dark:bg-dark-850 border border-gray-150 dark:border-gray-800 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-dark-800 transition">
                                         <div class="flex items-center gap-3">
-                                            <input type="radio" name="resume_id" value="{{ $res->id }}" @checked($res->is_default) class="text-indigo-600" />
+                                            <input type="radio" name="resume_id" value="{{ $res->id }}" @checked($res->is_default) class="text-primary-500" />
                                             <div>
                                                 <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $res->title }}</p>
                                                 <p class="text-xs text-gray-500">Uploaded on {{ $res->created_at->format('M d, Y') }}</p>
                                             </div>
                                         </div>
                                         @if($res->is_default)
-                                            <span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-3xs font-extrabold rounded-full">Default</span>
+                                            <span class="px-2 py-0.5 bg-primary-100 text-primary-800 text-[10px] font-extrabold rounded-full">Default</span>
                                         @endif
                                     </label>
                                 @empty
@@ -97,48 +155,78 @@
                                 @endforelse
                             </div>
 
-                            <!-- Option B: Upload new -->
-                            <div x-show="resumeOption === 'new'" class="space-y-4 pt-2">
+                            <!-- Option B: Upload new with Drag & Drop -->
+                            <div x-show="resumeOption === 'new'" class="space-y-4 pt-2" x-transition style="display: none;">
                                 <div>
                                     <x-input-label for="resume_title" :value="__('Resume Title')" />
-                                    <x-text-input id="resume_title" name="resume_title" type="text" class="mt-1 block w-full" placeholder="e.g. My General Resume, Dev Resume" />
+                                    <x-text-input id="resume_title" name="resume_title" type="text" class="mt-1 block w-full text-xs font-semibold" placeholder="e.g. My General Resume, Dev Resume" />
                                 </div>
-                                <div>
-                                    <x-input-label for="resume_file" :value="__('Upload File (PDF, DOC, DOCX up to 5MB)')" />
-                                    <input id="resume_file" name="resume_file" type="file" class="mt-1 block w-full text-xs text-gray-500 border border-gray-300 dark:border-gray-700 dark:bg-gray-950 rounded-xl p-2.5" />
+                                
+                                <!-- Drag zone -->
+                                <div class="space-y-2">
+                                    <span class="block text-xs font-semibold text-gray-400">File Attachment (PDF, DOC, DOCX up to 5MB)</span>
+                                    <div @dragover.prevent="isDragging = true" 
+                                         @dragleave.prevent="isDragging = false"
+                                         @drop.prevent="triggerDrop($event)"
+                                         :class="isDragging ? 'border-primary-500 bg-primary-50/10' : 'border-gray-250 dark:border-gray-700 bg-gray-50 dark:bg-dark-850'"
+                                         class="border-2 border-dashed rounded-2xl p-8 text-center transition cursor-pointer relative">
+                                        
+                                        <input type="file" name="resume_file" id="resume_file" @change="triggerSelect($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                        
+                                        <div class="space-y-2">
+                                            <div class="text-3xl">📤</div>
+                                            <p class="text-xs font-bold text-gray-700 dark:text-gray-300">Drag and drop your file here, or click to browse</p>
+                                            <p class="text-[10px] text-gray-400">PDF, DOC, or DOCX formats accepted.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Upload Progress bar -->
+                                <div x-show="isUploading" class="p-4 bg-gray-50 dark:bg-dark-850 rounded-xl border border-gray-150 space-y-2">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="font-bold truncate" x-text="uploadedFileName"></span>
+                                        <span class="font-mono" x-text="uploadProgress + '%'"></span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-dark-800 rounded-full h-1.5 overflow-hidden">
+                                        <div class="bg-primary-500 h-full transition-all duration-150" :style="'width: ' + uploadProgress + '%'"></div>
+                                    </div>
+                                </div>
+
+                                <div x-show="!isUploading && uploadedFileName" class="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/20 text-emerald-800 dark:text-emerald-400 text-xs rounded-xl flex items-center justify-between">
+                                    <span class="font-bold truncate" x-text="'✓ Attached: ' + uploadedFileName"></span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="pt-6 flex justify-end">
-                            <button type="button" @click="step = 2" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-xl text-sm transition">
+                            <button type="button" @click="step = 2" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                                 Continue
                             </button>
                         </div>
                     </div>
 
                     <!-- STEP 2: COVER LETTER -->
-                    <div x-show="step === 2" class="space-y-6">
-                        <h3 class="font-extrabold text-lg text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 2: Cover Letter</h3>
+                    <div x-show="step === 2" class="space-y-6" x-transition style="display: none;">
+                        <h3 class="font-extrabold text-base text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 2: Cover Letter</h3>
                         
                         <div>
                             <x-input-label for="cover_letter" :value="__('Cover Letter (Optional)')" />
-                            <textarea id="cover_letter" name="cover_letter" rows="8" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300 rounded-xl text-sm shadow-sm" placeholder="Write a short pitch or cover letter explaining why you are a great fit..."></textarea>
+                            <textarea id="cover_letter" name="cover_letter" x-model="coverLetterText" rows="8" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-dark-850 dark:text-gray-300 rounded-xl text-sm shadow-sm" placeholder="Write a short pitch or cover letter explaining why you are a great fit..."></textarea>
                         </div>
 
                         <div class="pt-6 flex justify-between">
-                            <button type="button" @click="step = 1" class="px-5 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-sm transition">
+                            <button type="button" @click="step = 1" class="px-5 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                                 Back
                             </button>
-                            <button type="button" @click="step = 3" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-xl text-sm transition">
+                            <button type="button" @click="step = 3" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                                 Continue
                             </button>
                         </div>
                     </div>
 
                     <!-- STEP 3: SCREENING QUESTIONS -->
-                    <div x-show="step === 3" class="space-y-6">
-                        <h3 class="font-extrabold text-lg text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 3: Screening Questions</h3>
+                    <div x-show="step === 3" class="space-y-6" x-transition style="display: none;">
+                        <h3 class="font-extrabold text-base text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 3: Screening Questions</h3>
                         
                         <div class="space-y-4">
                             @forelse($job->screeningQuestions as $q)
@@ -149,7 +237,7 @@
                                             <span class="text-red-500 font-bold">*</span>
                                         @endif
                                     </label>
-                                    <x-text-input name="answers[{{ $q->id }}]" type="text" class="mt-1 block w-full" :required="$q->is_required" placeholder="Your answer here..." />
+                                    <x-text-input name="answers[{{ $q->id }}]" type="text" class="mt-1 block w-full text-xs font-semibold" :required="$q->is_required" placeholder="Your answer here..." />
                                 </div>
                             @empty
                                 <p class="text-xs text-gray-500">No screening questions required for this position.</p>
@@ -157,39 +245,39 @@
                         </div>
 
                         <div class="pt-6 flex justify-between">
-                            <button type="button" @click="step = 2" class="px-5 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-sm transition">
+                            <button type="button" @click="step = 2" class="px-5 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                                 Back
                             </button>
-                            <button type="button" @click="step = 4" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-xl text-sm transition">
+                            <button type="button" @click="step = 4" class="px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                                 Review Application
                             </button>
                         </div>
                     </div>
 
                     <!-- STEP 4: REVIEW & SUBMIT -->
-                    <div x-show="step === 4" class="space-y-6">
-                        <h3 class="font-extrabold text-lg text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 4: Review Your Details</h3>
+                    <div x-show="step === 4" class="space-y-6" x-transition style="display: none;">
+                        <h3 class="font-extrabold text-base text-gray-950 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Step 4: Review Your Details</h3>
                         
-                        <div class="space-y-4 text-sm text-gray-650 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-900 p-6 rounded-xl border border-gray-100 dark:border-gray-800">
+                        <div class="space-y-4 text-xs text-gray-650 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-dark-900 p-6 rounded-2xl border border-gray-150 dark:border-gray-800">
                             <div>
                                 <h4 class="font-bold text-gray-900 dark:text-white">Applying For Position</h4>
-                                <p class="text-xs">{{ $job->title }} at {{ $job->company->company_name }}</p>
+                                <p class="text-gray-500 font-semibold">{{ $job->title }} at {{ $job->company->company_name }}</p>
                             </div>
-                            <div class="border-t border-gray-200 dark:border-gray-800 pt-3">
-                                <h4 class="font-bold text-gray-900 dark:text-white">Profile Readiness</h4>
-                                <p class="text-xs text-emerald-500 font-bold">Verified seeker profile complete</p>
+                            <div class="border-t border-gray-100 dark:border-gray-800 pt-3">
+                                <h4 class="font-bold text-gray-900 dark:text-white">Resume Status</h4>
+                                <p class="text-gray-500 font-semibold" x-text="resumeOption === 'library' ? 'Using resume from profile library' : 'Using newly uploaded resume: ' + uploadedFileName"></p>
                             </div>
-                            <div class="border-t border-gray-200 dark:border-gray-800 pt-3">
+                            <div class="border-t border-gray-100 dark:border-gray-800 pt-3">
                                 <h4 class="font-bold text-gray-900 dark:text-white">Terms of Submission</h4>
-                                <p class="text-xs">By clicking "Submit", you certify that your resume and details are accurate. The employer will be notified immediately.</p>
+                                <p class="text-gray-500 font-semibold">By clicking "Submit", you certify that your resume and details are accurate. The employer will be notified immediately.</p>
                             </div>
                         </div>
 
                         <div class="pt-6 flex justify-between">
-                            <button type="button" @click="step = 3" class="px-5 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-sm transition">
+                            <button type="button" @click="step = 3" class="px-5 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
                                 Back
                             </button>
-                            <button type="submit" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl transition shadow-md">
+                            <button type="submit" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs uppercase tracking-widest transition shadow-premium cursor-pointer">
                                 Submit Application
                             </button>
                         </div>

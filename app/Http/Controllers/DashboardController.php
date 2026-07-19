@@ -252,4 +252,12 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'Job alert deleted.');
     }
+
+    /**
+     * Display the in-app chat messaging interface.
+     */
+    public function messages()
+    {
+        return view('messages.index');
+    }
 }
