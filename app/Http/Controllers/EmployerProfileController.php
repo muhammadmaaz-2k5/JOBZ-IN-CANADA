@@ -63,22 +63,28 @@ class EmployerProfileController extends Controller
             'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'], // 3MB
         ]);
 
-        // Upload Logo
+        // Upload Logo to Cloudinary
         if ($request->hasFile('logo')) {
-            if ($company->logo) {
-                Storage::disk('public')->delete($company->logo);
+            if ($company->logo_public_id) {
+                \App\Services\CloudinaryService::delete($company->logo_public_id);
             }
-            $logoPath = $request->file('logo')->store('company_logos', 'public');
-            $company->logo = $logoPath;
+            $result = \App\Services\CloudinaryService::upload($request->file('logo'), 'job-portal/company-logos');
+            if ($result) {
+                $company->logo = $result['secure_url'];
+                $company->logo_public_id = $result['public_id'];
+            }
         }
 
-        // Upload Cover Image
+        // Upload Cover Image to Cloudinary
         if ($request->hasFile('cover_image')) {
-            if ($company->cover_image) {
-                Storage::disk('public')->delete($company->cover_image);
+            if ($company->cover_image_public_id) {
+                \App\Services\CloudinaryService::delete($company->cover_image_public_id);
             }
-            $coverPath = $request->file('cover_image')->store('company_covers', 'public');
-            $company->cover_image = $coverPath;
+            $result = \App\Services\CloudinaryService::upload($request->file('cover_image'), 'job-portal/company-covers');
+            if ($result) {
+                $company->cover_image = $result['secure_url'];
+                $company->cover_image_public_id = $result['public_id'];
+            }
         }
 
         // Update Company
@@ -92,6 +98,10 @@ class EmployerProfileController extends Controller
             'description' => $request->description,
             'email' => $request->company_email,
             'phone' => $request->company_phone,
+            'logo' => $company->logo,
+            'logo_public_id' => $company->logo_public_id,
+            'cover_image' => $company->cover_image,
+            'cover_image_public_id' => $company->cover_image_public_id,
         ]);
 
         // Update User details

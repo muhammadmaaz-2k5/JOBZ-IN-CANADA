@@ -64,13 +64,16 @@ class SeekerProfileController extends Controller
             'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
-        // Upload Profile Photo
+        // Upload Profile Photo to Cloudinary
         if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo) {
-                Storage::disk('public')->delete($user->profile_photo);
+            if ($user->profile_photo_public_id) {
+                \App\Services\CloudinaryService::delete($user->profile_photo_public_id);
             }
-            $path = $request->file('profile_photo')->store('profile_photos', 'public');
-            $user->profile_photo = $path;
+            $result = \App\Services\CloudinaryService::upload($request->file('profile_photo'), 'job-portal/profile-images');
+            if ($result) {
+                $user->profile_photo = $result['secure_url'];
+                $user->profile_photo_public_id = $result['public_id'];
+            }
         }
 
         $user->update([
@@ -79,6 +82,8 @@ class SeekerProfileController extends Controller
             'phone' => $request->phone,
             'country' => $request->country,
             'city' => $request->city,
+            'profile_photo' => $user->profile_photo,
+            'profile_photo_public_id' => $user->profile_photo_public_id,
         ]);
 
         $seekerProfile->update($request->only([
@@ -103,24 +108,37 @@ class SeekerProfileController extends Controller
         $user = Auth::user();
         $file = $request->file('resume_file');
         
-        // Securely store resume in private app storage
-        $path = $file->store('resumes'); 
+        // Securely store resume in Google Drive service layer
+        $driveService = app(\App\Services\Storage\StorageManager::class)->drive();
+        $uploadResult = $driveService->uploadDocument($file);
+
+        if (!$uploadResult) {
+            return redirect()->back()->withErrors(['resume_file' => 'Failed to upload document to Google Drive storage.']);
+        }
 
         // If it's the first resume, make it default
         $isFirst = !$user->resumes()->exists();
+
+        $path = $uploadResult['google_drive_file_id'] 
+            ? 'resumes/' . $uploadResult['google_drive_file_id'] 
+            : $uploadResult['file_path'];
 
         Resume::create([
             'user_id' => $user->id,
             'title' => $request->title,
             'file_path' => $path,
-            'original_name' => $file->getClientOriginalName(),
-            'file_size' => $file->getSize(),
+            'google_drive_file_id' => $uploadResult['google_drive_file_id'],
+            'original_name' => $uploadResult['original_name'],
+            'mime_type' => $uploadResult['mime_type'],
+            'extension' => $uploadResult['extension'],
+            'file_size' => $uploadResult['file_size'],
             'is_default' => $isFirst,
+            'uploaded_at' => now(),
         ]);
 
         $user->jobSeekerProfile->calculateCompletionPercentage();
 
-        AuditLogHelper::log($user->id, 'resume_uploaded', 'Seeker uploaded a new resume: ' . $file->getClientOriginalName());
+        AuditLogHelper::log($user->id, 'resume_uploaded', 'Seeker uploaded a new resume: ' . $uploadResult['original_name']);
 
         return redirect()->route('seeker.profile.edit')->with('success', 'Resume uploaded successfully.');
     }
@@ -130,13 +148,26 @@ class SeekerProfileController extends Controller
         $user = Auth::user();
         $resume = $user->resumes()->findOrFail($id);
 
-        if (!Storage::exists($resume->file_path)) {
+        if ($resume->google_drive_file_id) {
+            $driveService = app(\App\Services\Storage\StorageManager::class)->drive();
+            $content = $driveService->downloadDocument($resume->google_drive_file_id);
+            if (!$content) {
+                abort(404, 'Resume file not found on Google Drive.');
+            }
+            AuditLogHelper::log($user->id, 'resume_downloaded', 'Seeker downloaded resume: ' . $resume->original_name);
+            return response($content, 200, [
+                'Content-Type' => $resume->mime_type ?: 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $resume->original_name . '"',
+            ]);
+        }
+
+        if (!Storage::disk('private')->exists($resume->file_path)) {
             abort(404, 'Resume file not found.');
         }
 
         AuditLogHelper::log($user->id, 'resume_downloaded', 'Seeker downloaded resume: ' . $resume->original_name);
 
-        return Storage::download($resume->file_path, $resume->original_name);
+        return Storage::disk('private')->download($resume->file_path, $resume->original_name);
     }
 
     public function deleteResume($id)
@@ -144,8 +175,14 @@ class SeekerProfileController extends Controller
         $user = Auth::user();
         $resume = $user->resumes()->findOrFail($id);
 
-        // Delete from storage
-        Storage::delete($resume->file_path);
+        // Delete from Google Drive or local storage
+        if ($resume->google_drive_file_id) {
+            $driveService = app(\App\Services\Storage\StorageManager::class)->drive();
+            $driveService->deleteDocument($resume->google_drive_file_id);
+        } else {
+            Storage::disk('private')->delete($resume->file_path);
+        }
+
         $resume->delete();
 
         // If default was deleted, make another one default

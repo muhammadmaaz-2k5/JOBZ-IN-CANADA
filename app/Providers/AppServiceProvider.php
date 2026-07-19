@@ -11,7 +11,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\Storage\CloudinaryStorageService::class);
+        $this->app->singleton(\App\Services\Storage\GoogleDriveStorageService::class);
+        $this->app->singleton(\App\Services\Storage\LocalDocumentStorageService::class);
+        $this->app->singleton(\App\Services\Storage\StorageManager::class);
     }
 
     /**

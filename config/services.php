@@ -40,4 +40,17 @@ return [
         'cache_id' => env('REDIS_LANGCACHE_CACHE_ID'),
     ],
 
+    'cloudinary' => [
+        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+        'api_key' => env('CLOUDINARY_API_KEY'),
+        'api_secret' => env('CLOUDINARY_API_SECRET'),
+        'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+    ],
+
+    'google' => [
+        'service_account_json' => env('GOOGLE_SERVICE_ACCOUNT_JSON') ? base_path(env('GOOGLE_SERVICE_ACCOUNT_JSON')) : null,
+        'root_folder_id' => env('GOOGLE_DRIVE_ROOT_FOLDER_ID'),
+        'document_driver' => env('DOCUMENT_STORAGE_DRIVER', 'local'),
+    ],
+
 ];

@@ -158,10 +158,6 @@ class EmployerApplicantController extends Controller
         $application = Application::with(['job', 'resume'])->whereIn('job_id', $jobIds)->findOrFail($id);
         $resume = $application->resume;
 
-        if (!Storage::disk('private')->exists($resume->file_path)) {
-            abort(404, 'File not found');
-        }
-
         // Track download
         ResumeDownload::create([
             'employer_id' => Auth::id(),
@@ -177,6 +173,22 @@ class EmployerApplicantController extends Controller
             'job_title' => $application->job->title,
             'company_name' => $application->job->company->company_name,
         ]);
+
+        if ($resume->google_drive_file_id) {
+            $driveService = app(\App\Services\Storage\StorageManager::class)->drive();
+            $content = $driveService->downloadDocument($resume->google_drive_file_id);
+            if (!$content) {
+                abort(404, 'Resume file not found on Google Drive.');
+            }
+            return response($content, 200, [
+                'Content-Type' => $resume->mime_type ?: 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $resume->original_name . '"',
+            ]);
+        }
+
+        if (!Storage::disk('private')->exists($resume->file_path)) {
+            abort(404, 'File not found');
+        }
 
         return Storage::disk('private')->download($resume->file_path, $resume->title);
     }

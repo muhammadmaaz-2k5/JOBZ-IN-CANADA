@@ -4,30 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Resume extends Model
+class Document extends Model
 {
     protected $fillable = [
         'user_id',
-        'title',
-        'file_path',
+        'type',
         'google_drive_file_id',
-        'folder_id',
         'original_name',
-        'stored_name',
         'mime_type',
-        'extension',
-        'file_size',
-        'is_default',
+        'status',
         'uploaded_at',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function applications()
-    {
-        return $this->hasMany(Application::class);
     }
 }
