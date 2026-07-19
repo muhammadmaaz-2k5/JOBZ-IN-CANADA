@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CreateRolesAndPermissionsSeeder::class,
             CategoryAndSkillSeeder::class,
             SubscriptionPlanSeeder::class,
+            UserCredentialsSeeder::class,
             SampleJobSeeder::class,
         ]);
 

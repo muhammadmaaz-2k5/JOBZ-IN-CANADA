@@ -185,11 +185,17 @@
 
                             <div class="space-y-4">
                                 @forelse($recentAudits as $log)
-                                    <div class="border-l-2 border-red-500 ps-3 py-0.5 space-y-0.5">
-                                        <p class="text-xs font-bold text-gray-900 dark:text-white uppercase">{{ str_replace('_', ' ', $log->action) }}</p>
-                                        <p class="text-[10px] text-gray-500 font-medium leading-relaxed">{{ $log->description }}</p>
-                                        <span class="text-[9px] text-gray-400 block">{{ $log->created_at->diffForHumans() }}</span>
-                                    </div>
+                                    @if(is_object($log) && isset($log->action))
+                                        <div class="border-l-2 border-red-500 ps-3 py-0.5 space-y-0.5">
+                                            <p class="text-xs font-bold text-gray-900 dark:text-white uppercase">{{ str_replace('_', ' ', $log->action) }}</p>
+                                            <p class="text-[10px] text-gray-500 font-medium leading-relaxed">{{ $log->description }}</p>
+                                            <span class="text-[9px] text-gray-400 block">{{ $log->created_at->diffForHumans() }}</span>
+                                        </div>
+                                    @elseif(is_string($log))
+                                        <div class="border-l-2 border-gray-300 ps-3 py-0.5">
+                                            <p class="text-xs text-gray-700 dark:text-gray-300">{{ $log }}</p>
+                                        </div>
+                                    @endif
                                 @empty
                                     <p class="text-xs text-gray-400 italic">No audit records found.</p>
                                 @endforelse
@@ -310,7 +316,7 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-150 dark:border-gray-700/50 space-y-4">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-base text-gray-900 dark:text-white">Revenue Analytics Breakdown</h3>
-                        <a href="{{ route('admin.revenue-analytics') }}" class="text-xs font-bold text-primary-500 hover:underline">Full Analytics Page</a>
+                        <a href="{{ route('admin.revenue-analytics.index') }}" class="text-xs font-bold text-primary-500 hover:underline">Full Analytics Page</a>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="p-4 bg-gray-50 dark:bg-dark-850 rounded-xl">

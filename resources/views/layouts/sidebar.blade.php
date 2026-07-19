@@ -84,11 +84,6 @@
                     </a>
                 @endrole
             @endauth
-            
-            <div class="px-3 my-4 border-t border-gray-100 dark:border-gray-800"></div>
-            <a href="/design-system" class="flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl text-primary-500 bg-primary-50/50 dark:bg-primary-950/10 hover:bg-primary-50 dark:hover:bg-primary-950/20 transition-colors">
-                Design System
-            </a>
         </nav>
 
         <!-- User Profile Footer -->
