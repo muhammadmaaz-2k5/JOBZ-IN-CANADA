@@ -36,12 +36,8 @@
          }"
     >
         <div class="mb-6 text-center">
-            <a href="/" class="inline-flex items-center space-x-2 font-extrabold text-xl tracking-tight text-primary-600 dark:text-white mb-4">
-                <span class="grid place-items-center w-7 h-7 rounded-lg bg-primary-500 text-white font-bold text-sm">J</span>
-                <span>JOBZ IN <span class="text-accent-500">CANADA</span></span>
-            </a>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Create Seeker Account</h2>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Join top candidates hiring in Canada</p>
+            <h2 class="text-xl font-extrabold text-gray-900 dark:text-gray-100">Create Seeker Account</h2>
+            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">Join top candidates hiring in Canada</p>
         </div>
 
         <!-- Social Login Buttons Component -->

@@ -31,7 +31,6 @@
                 <a href="{{ route('jobs.index') }}" class="hover:text-primary-500 dark:hover:text-white transition-colors">Find Jobs</a>
                 <a href="#seekers" class="hover:text-primary-500 dark:hover:text-white transition-colors">For Job Seekers</a>
                 <a href="#employers" class="hover:text-primary-500 dark:hover:text-white transition-colors">For Employers</a>
-                <a href="{{ route('design-system') }}" class="hover:text-primary-500 dark:hover:text-white transition-colors">Design System</a>
             </nav>
 
             <!-- Actions Panel -->

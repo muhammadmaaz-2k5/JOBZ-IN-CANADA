@@ -1,12 +1,8 @@
 <x-guest-layout>
     <div class="w-full max-w-md mx-auto py-4">
-        <div class="mb-8 text-center">
-            <a href="/" class="inline-flex items-center space-x-2 font-extrabold text-2xl tracking-tight text-primary-600 dark:text-white mb-6">
-                <span class="grid place-items-center w-8 h-8 rounded-lg bg-primary-500 text-white font-bold text-base">J</span>
-                <span>JOBZ IN <span class="text-accent-500">CANADA</span></span>
-            </a>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Join the Platform</h2>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-450">Choose your registration pathway below to begin</p>
+        <div class="mb-6 text-center">
+            <h2 class="text-xl font-extrabold text-gray-900 dark:text-gray-100">Join the Platform</h2>
+            <p class="mt-1.5 text-xs text-gray-600 dark:text-gray-400">Choose your registration pathway below to begin</p>
         </div>
 
         <div class="space-y-4">
