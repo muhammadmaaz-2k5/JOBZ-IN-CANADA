@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'company_verified' => \App\Http\Middleware\CompanyVerifiedMiddleware::class,
             'profile_completed' => \App\Http\Middleware\ProfileCompletedMiddleware::class,
+            'premium_search' => \App\Http\Middleware\CandidateSearchAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

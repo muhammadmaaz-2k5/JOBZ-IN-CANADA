@@ -84,6 +84,11 @@
 
                             <!-- Actions Row -->
                             <div class="flex items-center gap-3 flex-wrap">
+                                @if(!$job->featured)
+                                    <a href="{{ route('employer.jobs.promote', $job->id) }}" class="text-xs font-bold text-emerald-600 hover:underline">⭐ Promote</a>
+                                @else
+                                    <span class="text-xs text-yellow-500 font-extrabold" title="Active Premium Placement">&#9733; Promoted</span>
+                                @endif
                                 <a href="{{ route('employer.jobs.edit', $job->id) }}" class="text-xs font-semibold text-gray-600 dark:text-gray-400 hover:underline">Edit</a>
                                 
                                 <form method="POST" action="{{ route('employer.jobs.duplicate', $job->id) }}">

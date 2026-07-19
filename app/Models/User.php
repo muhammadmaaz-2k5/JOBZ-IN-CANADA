@@ -110,4 +110,33 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(ReportsLog::class);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class, 'employer_id');
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class, 'employer_id')
+            ->where('status', 'active')
+            ->latestOfMany();
+    }
+
+    public function resumeBoosts()
+    {
+        return $this->hasMany(ResumeBoost::class);
+    }
+
+    public function activeResumeBoost()
+    {
+        return $this->hasOne(ResumeBoost::class)
+            ->where('expires_at', '>=', now())
+            ->latestOfMany();
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

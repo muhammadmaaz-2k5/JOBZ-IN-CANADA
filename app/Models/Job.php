@@ -203,4 +203,11 @@ class Job extends Model
     {
         return $this->hasMany(ScreeningQuestion::class);
     }
+
+    public function activePromotion()
+    {
+        return $this->hasOne(FeaturedJob::class)
+            ->where('expires_at', '>=', now())
+            ->latestOfMany();
+    }
 }

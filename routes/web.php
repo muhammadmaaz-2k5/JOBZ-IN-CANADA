@@ -14,6 +14,9 @@ use App\Http\Controllers\EmployerApplicantController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SearchSuggestionController;
 use App\Http\Controllers\SearchAnalyticsController;
+use App\Http\Controllers\BillingController;
+use App\Http\Controllers\CouponController;
+use App\Http\Controllers\RevenueAnalyticsController;
 
 Route::get('/', function () {
     return view('home');
@@ -75,6 +78,15 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // Search analytics
     Route::get('/search-analytics', [SearchAnalyticsController::class, 'index'])->name('search-analytics.index');
+
+    // Coupons CRUD
+    Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
+    Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
+    Route::post('/coupons/{id}/toggle', [CouponController::class, 'toggleStatus'])->name('coupons.toggle');
+    Route::delete('/coupons/{id}', [CouponController::class, 'destroy'])->name('coupons.destroy');
+
+    // Revenue analytics
+    Route::get('/revenue-analytics', [RevenueAnalyticsController::class, 'index'])->name('revenue-analytics.index');
 });
 
 // Revert impersonation
@@ -126,6 +138,10 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
 
     // Save/Bookmark Job
     Route::post('/jobs/{id}/save', [JobController::class, 'toggleSave'])->name('jobs.save');
+
+    // Seeker Resume Boost
+    Route::get('/seeker/boost', [BillingController::class, 'seekerBoost'])->name('seeker.boost.index');
+    Route::post('/seeker/boost', [BillingController::class, 'boostProfile'])->name('seeker.boost.submit');
 });
 
 // Employer Profile & Job Management
@@ -155,7 +171,21 @@ Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
         Route::post('/employer/applicants/{id}/status', [EmployerApplicantController::class, 'changeStatus'])->name('employer.applicants.status');
         Route::post('/employer/applicants/{id}/note', [EmployerApplicantController::class, 'addNote'])->name('employer.applicants.note');
         Route::get('/employer/applicants/{id}/download', [EmployerApplicantController::class, 'downloadResume'])->name('employer.applicants.download');
+
+        // Premium Candidate Database Search
+        Route::get('/employer/candidates', [EmployerApplicantController::class, 'searchCandidates'])->middleware('premium_search')->name('employer.candidates.search');
+        Route::get('/employer/candidates/{id}', [EmployerApplicantController::class, 'showCandidate'])->middleware('premium_search')->name('employer.candidates.show');
+        Route::get('/employer/candidates/{id}/download-resume', [EmployerApplicantController::class, 'downloadCandidateResume'])->middleware('premium_search')->name('employer.candidates.download-resume');
     });
+
+    // Employer Billing & Subscriptions
+    Route::get('/employer/billing', [BillingController::class, 'employerBilling'])->name('employer.billing.index');
+    Route::post('/employer/billing/subscribe', [BillingController::class, 'subscribe'])->name('employer.billing.subscribe');
+    Route::post('/employer/billing/cancel', [BillingController::class, 'cancelSubscription'])->name('employer.billing.cancel');
+    
+    // Job Promotions
+    Route::get('/employer/jobs/{id}/promote', [BillingController::class, 'showPromoteForm'])->name('employer.jobs.promote');
+    Route::post('/employer/jobs/{id}/promote', [BillingController::class, 'promoteJob'])->name('employer.jobs.promote.submit');
 });
 
 // Settings & GDPR Management
@@ -205,3 +235,6 @@ Route::get('/sitemap.xml', function () {
 
     return response($xml, 200, ['Content-Type' => 'application/xml']);
 })->name('sitemap');
+
+// Secure Invoice Details Page
+Route::get('/invoices/{invoice_number}', [BillingController::class, 'showInvoice'])->middleware('auth')->name('invoices.show');

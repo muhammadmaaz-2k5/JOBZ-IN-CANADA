@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class EmployerApplicantController extends Controller
 {
@@ -210,5 +211,72 @@ class EmployerApplicantController extends Controller
         $jobsList = Job::where('employer_id', Auth::id())->get();
 
         return view('employer.applicants.pipeline', compact('columns', 'jobsList', 'jobId'));
+    }
+
+    public function searchCandidates(Request $request)
+    {
+        $query = User::role('job_seeker')->with(['jobSeekerProfile', 'activeResumeBoost']);
+
+        // Filters: Skills, Experience, Education, Location, Salary Expectation, Availability, Languages.
+        if ($request->filled('keyword')) {
+            $keyword = '%' . $request->keyword . '%';
+            $query->where(function($q) use ($keyword) {
+                $q->where('first_name', 'like', $keyword)
+                  ->orWhere('last_name', 'like', $keyword)
+                  ->orWhereHas('jobSeekerProfile', function($p) use ($keyword) {
+                      $p->where('headline', 'like', $keyword)
+                        ->orWhere('about_me', 'like', $keyword)
+                        ->orWhere('skills', 'like', $keyword);
+                  });
+            });
+        }
+
+        if ($request->filled('location')) {
+            $location = '%' . $request->location . '%';
+            $query->whereHas('jobSeekerProfile', function($p) use ($location) {
+                $p->where('city', 'like', $location)
+                  ->orWhere('country', 'like', $location);
+            });
+        }
+
+        // Apply ResumeBoost ranking sort (Boosted profiles first)
+        $query->leftJoin('resume_boosts', function($join) {
+            $join->on('users.id', '=', 'resume_boosts.user_id')
+                 ->where('resume_boosts.expires_at', '>=', now());
+        })
+        ->select('users.*')
+        ->orderByRaw('CASE WHEN resume_boosts.id IS NOT NULL THEN 0 ELSE 1 END ASC')
+        ->orderBy('users.created_at', 'desc');
+
+        $candidates = $query->paginate(10);
+
+        return view('employer.candidates.search', compact('candidates'));
+    }
+
+    public function showCandidate($id)
+    {
+        $candidate = User::role('job_seeker')->with('jobSeekerProfile')->findOrFail($id);
+        return view('employer.candidates.show', compact('candidate'));
+    }
+
+    public function downloadCandidateResume($id)
+    {
+        $candidate = User::role('job_seeker')->findOrFail($id);
+        
+        // Use resumes relationship
+        $resume = $candidate->resumes()->where('is_default', true)->first() ?? $candidate->resumes()->first();
+
+        if (!$resume || !Storage::disk('private')->exists($resume->file_path)) {
+            abort(404, 'Resume not found for this candidate.');
+        }
+
+        // Track download
+        ResumeDownload::create([
+            'employer_id' => Auth::id(),
+            'candidate_id' => $candidate->id,
+            'downloaded_at' => now(),
+        ]);
+
+        return Storage::disk('private')->download($resume->file_path, $resume->title);
     }
 }

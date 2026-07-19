@@ -99,6 +99,14 @@ class EmployerJobController extends Controller
         $jobData['portfolio_required'] = $request->has('portfolio_required');
         $jobData['published_at'] = $request->status === 'published' ? now() : null;
 
+        if ($request->status === 'published') {
+            $activeJobsCount = Job::where('employer_id', $user->id)->where('status', 'published')->count();
+            $planLimit = $user->activeSubscription ? $user->activeSubscription->plan->job_limit : 3;
+            if ($planLimit !== -1 && $activeJobsCount >= $planLimit) {
+                return redirect()->back()->withInput()->with('error', "You have reached your active job posts limit of {$planLimit}. Please upgrade your subscription plan.");
+            }
+        }
+
         $job = Job::create($jobData);
 
         if ($request->has('skills')) {
@@ -252,6 +260,14 @@ class EmployerJobController extends Controller
 
         $user = Auth::user();
         $job = Job::where('employer_id', $user->id)->findOrFail($id);
+
+        if ($request->status === 'published' && $job->status !== 'published') {
+            $activeJobsCount = Job::where('employer_id', $user->id)->where('status', 'published')->count();
+            $planLimit = $user->activeSubscription ? $user->activeSubscription->plan->job_limit : 3;
+            if ($planLimit !== -1 && $activeJobsCount >= $planLimit) {
+                return redirect()->back()->with('error', "You have reached your active job posts limit of {$planLimit}. Please upgrade your subscription plan.");
+            }
+        }
 
         $job->update([
             'status' => $request->status,

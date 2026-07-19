@@ -45,6 +45,12 @@
                             <x-nav-link :href="route('admin.categories.index')" :active="request()->routeIs('admin.categories.*')">
                                 {{ __('Categories') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.coupons.index')" :active="request()->routeIs('admin.coupons.*')">
+                                {{ __('Coupons') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.revenue-analytics.index')" :active="request()->routeIs('admin.revenue-analytics.*')">
+                                {{ __('Revenue') }}
+                            </x-nav-link>
                         @endif
                     @endauth
                 </div>
@@ -71,9 +77,15 @@
                             <x-dropdown-link :href="route('seeker.profile.edit')">
                                 {{ __('My Profile') }}
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('seeker.boost.index')">
+                                {{ __('Boost Profile') }}
+                            </x-dropdown-link>
                         @elseif(Auth::user()->hasRole('employer'))
                             <x-dropdown-link :href="route('employer.profile.edit')">
                                 {{ __('Company Profile') }}
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('employer.billing.index')">
+                                {{ __('Billing & Plans') }}
                             </x-dropdown-link>
                         @else
                             <x-dropdown-link :href="route('profile.edit')">
