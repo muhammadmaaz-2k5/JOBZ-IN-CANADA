@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-      x-data="{ dark: localStorage.getItem('theme') === 'dark', sidebarOpen: false }"
+      x-data="{ dark: localStorage.getItem('theme') === 'dark', sidebarOpen: window.innerWidth >= 1024 }"
       :class="{ 'dark': dark }"
       x-init="$watch('dark', val => localStorage.setItem('theme', val ? 'dark' : 'light'))"
 >
@@ -28,14 +28,16 @@
                 <!-- Top Navbar Header -->
                 <header class="glass sticky top-0 z-30 h-16 flex items-center justify-between px-6 border-b border-gray-100 dark:border-gray-850 shadow-glass">
                     <div class="flex items-center space-x-4">
-                        <button @click="sidebarOpen = true" class="lg:hidden p-1.5 rounded-xl bg-white dark:bg-dark-800 border border-gray-150 dark:border-gray-800 text-gray-600 dark:text-gray-300">
+                        <button @click="sidebarOpen = !sidebarOpen" class="p-1.5 rounded-xl bg-white dark:bg-dark-800 border border-gray-150 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition">
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
                         </button>
                         
                         @isset($header)
-                            <h1 class="text-lg font-bold text-gray-900 dark:text-white">{{ $header }}</h1>
+                            <span class="text-sm md:text-base font-extrabold text-gray-900 dark:text-white leading-none">
+                                {{ strip_tags($header) }}
+                            </span>
                         @endisset
                     </div>
 

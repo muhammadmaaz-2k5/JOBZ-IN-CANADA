@@ -1,12 +1,12 @@
-<aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 w-64 glass border-r border-gray-100 dark:border-gray-800 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:h-screen lg:flex-shrink-0">
-    <div class="flex flex-col h-full">
+<aside :class="sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full lg:translate-x-0 lg:w-0'" class="fixed inset-y-0 left-0 z-40 glass border-r border-gray-100 dark:border-gray-800 transition-all duration-300 ease-in-out lg:static lg:h-screen lg:flex-shrink-0 overflow-hidden">
+    <div class="flex flex-col h-full w-64">
         <!-- Logo Header -->
         <div class="flex items-center justify-between h-16 px-6 border-b border-gray-100 dark:border-gray-800/80">
             <a href="{{ route('home') }}" class="flex items-center space-x-3">
                 <x-application-logo class="w-8 h-8 text-primary-500" />
                 <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">JOBZ <span class="text-primary-500">CA</span></span>
             </a>
-            <button @click="sidebarOpen = false" class="lg:hidden p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <button @click="sidebarOpen = false" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>

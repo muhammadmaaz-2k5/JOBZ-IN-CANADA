@@ -122,17 +122,28 @@
                         
                         <div class="space-y-3">
                             @forelse($recommendedJobs as $recJob)
-                                <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-150 dark:border-gray-800 flex justify-between items-center gap-4 flex-wrap">
-                                    <div>
-                                        <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">
-                                            <a href="{{ route('jobs.show', $recJob->slug) }}" class="hover:text-indigo-650 transition">{{ $recJob->title }}</a>
-                                        </h4>
-                                        <p class="text-xs text-gray-500 font-semibold">{{ $recJob->company->company_name }} &bull; {{ $recJob->city }}, {{ $recJob->country }}</p>
+                                @if(is_object($recJob) && isset($recJob->slug))
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-150 dark:border-gray-800 flex justify-between items-center gap-4 flex-wrap">
+                                        <div>
+                                            <h4 class="font-extrabold text-sm text-gray-900 dark:text-white">
+                                                <a href="{{ route('jobs.show', $recJob->slug) }}" class="hover:text-indigo-650 transition">{{ $recJob->title }}</a>
+                                            </h4>
+                                            <p class="text-xs text-gray-500 font-semibold">
+                                                @if($recJob->company)
+                                                    {{ $recJob->company->company_name }} &bull;
+                                                @endif
+                                                {{ $recJob->city }}, {{ $recJob->country }}
+                                            </p>
+                                        </div>
+                                        <a href="{{ route('jobs.show', $recJob->slug) }}" class="px-3.5 py-1.5 bg-indigo-650 hover:bg-indigo-750 text-white font-bold rounded-xl text-2xs transition">
+                                            Apply Now
+                                        </a>
                                     </div>
-                                    <a href="{{ route('jobs.show', $recJob->slug) }}" class="px-3.5 py-1.5 bg-indigo-650 hover:bg-indigo-750 text-white font-bold rounded-xl text-2xs transition">
-                                        Apply Now
-                                    </a>
-                                </div>
+                                @elseif(is_string($recJob))
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-150 dark:border-gray-800 flex justify-between items-center">
+                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ $recJob }}</p>
+                                    </div>
+                                @endif
                             @empty
                                 <p class="text-xs text-gray-400 italic py-3 text-center">No recommended jobs found. Update your profile skills to view recommendations.</p>
                             @endforelse
@@ -148,29 +159,40 @@
                         
                         <div class="divide-y divide-gray-100 dark:divide-gray-750">
                             @forelse($recentApplications as $app)
-                                <div class="py-4 flex justify-between items-center gap-4 flex-wrap first:pt-0 last:pb-0">
-                                    <div>
-                                        <h4 class="font-bold text-sm text-gray-900 dark:text-white hover:text-indigo-650 transition">
-                                            <a href="{{ route('seeker.applications.show', $app->id) }}">{{ $app->job->title }}</a>
-                                        </h4>
-                                        <p class="text-xs text-gray-500 font-semibold">{{ $app->job->company->company_name }} &bull; Applied {{ $app->applied_at->diffForHumans() }}</p>
+                                @if(is_object($app) && isset($app->id) && $app->job)
+                                    <div class="py-4 flex justify-between items-center gap-4 flex-wrap first:pt-0 last:pb-0">
+                                        <div>
+                                            <h4 class="font-bold text-sm text-gray-900 dark:text-white hover:text-indigo-650 transition">
+                                                <a href="{{ route('seeker.applications.show', $app->id) }}">{{ $app->job->title }}</a>
+                                            </h4>
+                                            <p class="text-xs text-gray-500 font-semibold">
+                                                @if($app->job->company)
+                                                    {{ $app->job->company->company_name }} &bull;
+                                                @endif
+                                                Applied {{ $app->applied_at ? $app->applied_at->diffForHumans() : 'recently' }}
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <span class="px-2.5 py-0.5 rounded-full text-3xs font-extrabold uppercase 
+                                                @if($app->status === 'applied') bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300
+                                                @elseif($app->status === 'pending_review') bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300
+                                                @elseif($app->status === 'shortlisted') bg-indigo-100 text-indigo-850 dark:bg-indigo-950 dark:text-indigo-300
+                                                @elseif(str_contains($app->status, 'interview')) bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300
+                                                @elseif($app->status === 'offered') bg-pink-100 text-pink-855 dark:bg-pink-950 dark:text-pink-300
+                                                @elseif($app->status === 'hired') bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300
+                                                @elseif($app->status === 'withdrawn') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
+                                                @else bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300
+                                                @endif">
+                                                {{ str_replace('_', ' ', $app->status) }}
+                                            </span>
+                                            <a href="{{ route('seeker.applications.show', $app->id) }}" class="text-2xs font-semibold text-gray-500 hover:underline">View</a>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <span class="px-2.5 py-0.5 rounded-full text-3xs font-extrabold uppercase 
-                                            @if($app->status === 'applied') bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300
-                                            @elseif($app->status === 'pending_review') bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300
-                                            @elseif($app->status === 'shortlisted') bg-indigo-100 text-indigo-850 dark:bg-indigo-950 dark:text-indigo-300
-                                            @elseif(str_contains($app->status, 'interview')) bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300
-                                            @elseif($app->status === 'offered') bg-pink-100 text-pink-855 dark:bg-pink-950 dark:text-pink-300
-                                            @elseif($app->status === 'hired') bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300
-                                            @elseif($app->status === 'withdrawn') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
-                                            @else bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300
-                                            @endif">
-                                            {{ str_replace('_', ' ', $app->status) }}
-                                        </span>
-                                        <a href="{{ route('seeker.applications.show', $app->id) }}" class="text-2xs font-semibold text-gray-500 hover:underline">View</a>
+                                @elseif(is_string($app))
+                                    <div class="py-4 flex justify-between items-center first:pt-0 last:pb-0">
+                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ $app }}</p>
                                     </div>
-                                </div>
+                                @endif
                             @empty
                                 <p class="text-xs text-gray-400 italic py-6 text-center">You haven't submitted any job applications yet.</p>
                             @endforelse
@@ -183,21 +205,32 @@
                         
                         <div class="divide-y divide-gray-100 dark:divide-gray-750">
                             @forelse($savedJobs as $sv)
-                                <div class="py-4 flex justify-between items-center gap-4 flex-wrap first:pt-0 last:pb-0">
-                                    <div>
-                                        <h4 class="font-bold text-sm text-gray-900 dark:text-white">
-                                            <a href="{{ route('jobs.show', $sv->slug) }}" class="hover:text-indigo-650 transition">{{ $sv->title }}</a>
-                                        </h4>
-                                        <p class="text-xs text-gray-500 font-semibold">{{ $sv->company->company_name }} &bull; Saved {{ $sv->pivot->created_at ? $sv->pivot->created_at->diffForHumans() : '' }}</p>
+                                @if(is_object($sv) && isset($sv->slug))
+                                    <div class="py-4 flex justify-between items-center gap-4 flex-wrap first:pt-0 last:pb-0">
+                                        <div>
+                                            <h4 class="font-bold text-sm text-gray-900 dark:text-white">
+                                                <a href="{{ route('jobs.show', $sv->slug) }}" class="hover:text-indigo-650 transition">{{ $sv->title }}</a>
+                                            </h4>
+                                            <p class="text-xs text-gray-500 font-semibold">
+                                                @if($sv->company)
+                                                    {{ $sv->company->company_name }} &bull;
+                                                @endif
+                                                Saved {{ $sv->pivot && $sv->pivot->created_at ? $sv->pivot->created_at->diffForHumans() : 'recently' }}
+                                            </p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <form method="POST" action="{{ route('jobs.save', $sv->id) }}">
+                                                @csrf
+                                                <button type="submit" class="text-2xs text-red-500 font-bold hover:underline">Remove</button>
+                                            </form>
+                                            <a href="{{ route('jobs.show', $sv->slug) }}" class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-650 dark:text-indigo-400 font-bold text-2xs rounded-lg transition">Apply</a>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <form method="POST" action="{{ route('jobs.save', $sv->id) }}">
-                                            @csrf
-                                            <button type="submit" class="text-2xs text-red-500 font-bold hover:underline">Remove</button>
-                                        </form>
-                                        <a href="{{ route('jobs.show', $sv->slug) }}" class="px-3 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-650 dark:text-indigo-400 font-bold text-2xs rounded-lg transition">Apply</a>
+                                @elseif(is_string($sv))
+                                    <div class="py-4 flex justify-between items-center first:pt-0 last:pb-0">
+                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ $sv }}</p>
                                     </div>
-                                </div>
+                                @endif
                             @empty
                                 <p class="text-xs text-gray-400 italic py-6 text-center">No saved job listings bookmarks found.</p>
                             @endforelse
@@ -210,12 +243,19 @@
                         
                         <div class="relative border-s border-gray-200 dark:border-gray-700 ms-3 space-y-6 pt-2 pb-2">
                             @forelse($timeline as $timeItem)
-                                <div class="mb-4 ms-4 relative">
-                                    <div class="absolute -left-6 top-1.5 w-3 h-3 bg-indigo-600 rounded-full border border-white dark:border-gray-800"></div>
-                                    <p class="text-3xs text-gray-400">{{ $timeItem->created_at->format('M d, Y - h:i A') }}</p>
-                                    <h5 class="text-xs font-bold text-gray-900 dark:text-white uppercase mt-0.5">{{ str_replace('_', ' ', $timeItem->action) }}</h5>
-                                    <p class="text-xs text-gray-500 italic mt-0.5">"{{ $timeItem->description }}"</p>
-                                </div>
+                                @if(is_object($timeItem) && isset($timeItem->created_at))
+                                    <div class="mb-4 ms-4 relative">
+                                        <div class="absolute -left-6 top-1.5 w-3 h-3 bg-indigo-600 rounded-full border border-white dark:border-gray-800"></div>
+                                        <p class="text-3xs text-gray-400">{{ $timeItem->created_at->format('M d, Y - h:i A') }}</p>
+                                        <h5 class="text-xs font-bold text-gray-900 dark:text-white uppercase mt-0.5">{{ str_replace('_', ' ', $timeItem->action) }}</h5>
+                                        <p class="text-xs text-gray-500 italic mt-0.5">"{{ $timeItem->description }}"</p>
+                                    </div>
+                                @elseif(is_string($timeItem))
+                                    <div class="mb-4 ms-4 relative">
+                                        <div class="absolute -left-6 top-1.5 w-3 h-3 bg-gray-400 rounded-full border border-white dark:border-gray-800"></div>
+                                        <p class="text-xs text-gray-700 dark:text-gray-300 font-semibold">{{ $timeItem }}</p>
+                                    </div>
+                                @endif
                             @empty
                                 <p class="text-xs text-gray-400 italic py-3 text-center">No timeline events logged.</p>
                             @endforelse
