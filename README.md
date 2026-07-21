@@ -1,1083 +1,298 @@
-# Phase 9: Testing, Security & Optimization (Week 7–8)
+# JOBZ IN CANADA — Complete Project Analysis
 
-## Goal
+## Overview
 
-Prepare the platform for production by ensuring it is reliable, secure, scalable, and performant through comprehensive testing, database optimization, security hardening, caching, monitoring, and deployment readiness.
+**JOBZ IN CANADA** is a full-featured, multi-role Canadian job board platform built on **Laravel 13 + Vite + Tailwind CSS v4 + Alpine.js**. The application is actively running (`php artisan serve`) and uses an SQLite database for local development.
 
 ---
 
-# Phase Overview
+## Tech Stack
 
-```text id="phase9-flow"
-Development Complete
-        │
-        ▼
-Automated Testing
-        │
-        ▼
-Performance Optimization
-        │
-        ▼
-Security Hardening
-        │
-        ▼
-Storage & File Security
-        │
-        ▼
-Monitoring & Logging
-        │
-        ▼
-Production Deployment
+| Layer | Technology |
+|---|---|
+| Backend Framework | Laravel 13 (PHP ^8.3) |
+| Frontend Bundler | Vite 8 + Laravel Vite Plugin |
+| CSS Framework | Tailwind CSS v4 (via `@tailwindcss/vite`) |
+| JS Interactivity | Alpine.js v3 |
+| Database (dev) | SQLite |
+| Auth | Laravel Breeze (email verification required) |
+| Roles & Permissions | `spatie/laravel-permission` v8 |
+| Storage | Cloudinary (via `CloudinaryService`) |
+| Search | Laravel Scout v11 + Semantic Cache (Redis/Predis v3) |
+| Payments | Mock / in-house `PaymentService` (no real gateway yet) |
+| Fonts | Bunny Fonts — Poppins (300–800 weights) |
+| Email | Laravel Mailable classes (SMTP) |
+| Queue | Laravel Queue (used for notifications) |
+
+---
+
+## User Roles
+
+Three distinct roles enforced via Spatie Permission:
+
+| Role | Route Prefix | Description |
+|---|---|---|
+| `admin` | `/admin` | Platform super-administrator |
+| `employer` | `/employer` | Company that posts jobs |
+| `job_seeker` | `/seeker` | Candidate looking for jobs |
+
+> All protected routes require `auth` + `verified` middleware.
+
+---
+
+## Application Architecture
+
+### Directory Tree
+
+```
+app/
+├── Console/
+├── Helpers/          ← AuditLogHelper
+├── Http/
+│   ├── Controllers/  ← 19 controllers
+│   ├── Middleware/   ← 3 custom middleware
+│   └── Requests/     ← Form request classes
+├── Jobs/             ← Queued jobs (background tasks)
+├── Listeners/
+├── Mail/             ← 5 Mailable classes
+├── Models/           ← 40 Eloquent models
+├── Notifications/    ← ApplicationNotifications
+├── Providers/
+├── Services/
+│   ├── CloudinaryService.php
+│   ├── PaymentService.php
+│   ├── SemanticCacheService.php
+│   └── Storage/
+└── View/
 ```
 
 ---
 
-# 1. Automated Testing
+## Database Layer
 
-Implement a comprehensive testing strategy.
+**42 migrations** covering a very comprehensive schema:
 
----
+### Core Entities
 
-## Unit Tests
+| Model | Key Fields | Relationships |
+|---|---|---|
+| `User` | name, email, role, phone, country, city, status | HasMany: resumes, experiences, education, certifications, projects, applications, savedJobs, jobAlerts, notifications; BelongsToMany: skills, companies |
+| `Company` | company_name, verification_status, slug | HasMany: jobs, locations, reviews; BelongsToMany: followers |
+| `Job` | title, slug, status, featured, urgent, salary, location, employment_type | BelongsTo: company, employer, category; BelongsToMany: skills; HasMany: applications, screeningQuestions |
+| `Application` | status, cover_letter, resume_id | BelongsTo: job, applicant; HasMany: notes, statusHistory |
 
-Test individual components.
+### Profile / Portfolio
 
-Examples
+- `JobSeekerProfile` — headline, summary, open_to_work, availability
+- `EmployerProfile` — linked to company
+- `Resume` — file upload (Cloudinary), is_default, version
+- `Experience` — job history
+- `Education` — degree, institution, dates
+- `Certification` — issuer, credential URL
+- `Project` — title, URL, description
+- `Skill` — global skill list; linked via pivot to both jobs and users
 
-* User Registration
-* Login
-* Password Reset
-* Job Creation
-* Resume Upload
-* Job Search
-* Application Submission
-* Notifications
-* Payment Logic
+### Engagement
 
----
+- `SavedJob` pivot
+- `JobAlert` — keyword/location triggers for email notifications
+- `RecentSearch` + `SearchQuery` — analytics
+- `CompanyReview` — rating + body
+- `CompanyFollower` pivot
+- `JobReport` — abuse reporting
+- `Interview` — interview scheduling
 
-## Feature Tests
+### Messaging
 
-Test complete user workflows.
+- `Conversation` + `Message` — direct messaging system
 
-### Job Seeker
+### Billing / Monetization
 
-* Register
-* Verify Email
-* Complete Profile
-* Upload Resume
-* Search Jobs
-* Apply
-* Save Job
-* Receive Notification
+- `SubscriptionPlan` + `Subscription` — employer plans (monthly/yearly)
+- `Payment` + `Invoice` — full financial ledger
+- `FeaturedJob` — time-limited job spotlight promotions
+- `ResumeBoost` — time-limited seeker visibility boosts
+- `Coupon` — discount codes with percentage/fixed support
 
----
+### Platform Admin / Audit
 
-### Employer
-
-* Register
-* Create Company
-* Post Job
-* Edit Job
-* View Applicants
-* Change Application Status
-* Schedule Interview
-
----
-
-### Admin
-
-* Login
-* Approve Company
-* Moderate Jobs
-* Manage Categories
-* Review Reports
+- `AuditLog` — action tracking
+- `ReportsLog` — moderation queue
+- `EmailLog` — sent mail history
+- `Notification` — in-app notifications
+- `NotificationPreference` — per-user email alert settings
+- `Document` — Cloudinary document storage metadata
 
 ---
 
-## Browser / End-to-End Tests (Recommended)
+## Controllers (19 total)
 
-Validate full application flows.
-
-Scenarios
-
-* Registration
-* Login
-* Job Search
-* Job Application
-* Employer Hiring Workflow
-* Subscription Purchase
-* Admin Moderation
-
----
-
-## API Tests
-
-Validate all API endpoints.
-
-Test:
-
-* Authentication
-* Authorization
-* Validation
-* Error Responses
-* Pagination
-* Rate Limiting
+| Controller | Responsibility |
+|---|---|
+| `AdminController` | Users, companies, jobs, categories, skills, reports, reviews, announcements, audit logs |
+| `ApplicationController` | Job applications (seeker side) |
+| `BillingController` | Subscriptions, job promotions, resume boosts, invoices |
+| `CouponController` | Admin coupon CRUD |
+| `DashboardController` | Role-based dashboards (admin/employer/seeker), messages, alerts |
+| `DesignSystemController` | Design system showcase page |
+| `EmployerApplicantController` | Applicant pipeline, candidate search (premium) |
+| `EmployerJobController` | Job CRUD, duplicate, status changes |
+| `EmployerProfileController` | Employer profile + public company directory |
+| `InAppNotificationController` | Notification center |
+| `JobController` | Public job listing, show, save, history |
+| `NotificationPreferenceController` | Per-user alert settings |
+| `ProfileController` | Generic profile edit/delete |
+| `RevenueAnalyticsController` | Admin revenue charts |
+| `SearchAnalyticsController` | Admin search data |
+| `SearchSuggestionController` | Autocomplete API endpoint |
+| `SeekerProfileController` | Seeker profile, resume builder, experience/education/skills/projects/certifications |
+| `SettingsController` | Account settings, sessions, GDPR data export, deactivation |
 
 ---
 
-# 2. Database Optimization
+## Custom Middleware
 
-Optimize database performance.
-
----
-
-## Indexing
-
-Add indexes on frequently queried columns.
-
-Examples
-
-* email
-* role
-* company_id
-* category_id
-* status
-* city
-* country
-* published_at
-* application_deadline
+| Middleware | Purpose |
+|---|---|
+| `CompanyVerifiedMiddleware` | Blocks unverified employers from posting jobs |
+| `CandidateSearchAccess` | Restricts candidate DB search to premium subscribers |
+| `ProfileCompletedMiddleware` | Ensures profile is filled before key actions |
 
 ---
 
-## Eager Loading
+## Services
 
-Avoid N+1 query issues.
-
-Example relationships
-
-* Job → Company
-* Job → Category
-* Job → Skills
-* Application → Candidate
-* Company → Jobs
+| Service | Purpose |
+|---|---|
+| `PaymentService` | Processes subscriptions, featured job promotions, resume boosts; applies coupons, calculates 13% HST tax, creates payments/invoices/notifications atomically |
+| `CloudinaryService` | File upload/management to Cloudinary CDN |
+| `SemanticCacheService` | Redis-backed semantic query caching for search |
 
 ---
 
-## Query Optimization
+## Routes Summary (web.php — 256 lines)
 
-* Pagination
-* Select only required columns
-* Chunk large datasets
-* Cursor pagination for APIs
-* Optimize joins
-
----
-
-## Database Monitoring
-
-Track:
-
-* Slow Queries
-* Query Count
-* Execution Time
-* Missing Indexes
+| Group | Count | Key Routes |
+|---|---|---|
+| Public | ~8 | `/`, `/jobs`, `/jobs/{slug}`, `/companies`, `/companies/{slug}`, sitemap |
+| Admin | ~25 | Dashboard, users, companies, jobs, categories, skills, reports, reviews, coupons, analytics |
+| Employer | ~18 | Profile, job CRUD, applicant pipeline, candidate search, billing |
+| Seeker | ~20 | Profile, resume builder, applications, alerts, notifications, boost |
+| Shared Auth | ~5 | Settings, messages, profile |
+| API | ~1 | `/api/jobs/suggestions` (autocomplete) |
 
 ---
 
-# 3. Caching Strategy
+## Frontend / Views
 
-Use Redis for high-performance caching.
+### Layout System
 
----
+- `layouts/app.blade.php` — Authenticated shell with sidebar + header + footer, dark mode toggle (Alpine.js localStorage)
+- `layouts/guest.blade.php` — Unauthenticated layout
+- `layouts/sidebar.blade.php` — Role-aware side navigation (14.8 KB)
+- `layouts/navigation.blade.php` — Top navigation
+- `layouts/footer.blade.php`
 
-## Cache
+### Blade Components (18)
 
-* Categories
-* Skills
-* Featured Jobs
-* Homepage Data
-* Popular Companies
-* Search Suggestions
-* Configuration Settings
+`alert`, `application-logo`, `auth-session-status`, `card`, `danger-button`, `dropdown`, `dropdown-link`, `empty-state`, `input-error`, `input-label`, `modal`, `nav-link`, `primary-button`, `responsive-nav-link`, `secondary-button`, `skeleton`, `text-input`, `toast`
 
----
+### View Groups
 
-## Cache Invalidation
-
-Automatically clear cache when:
-
-* Job Updated
-* Company Updated
-* Category Changed
-* Skill Added
-* Featured Job Expires
-
----
-
-# 4. Queue System
-
-Move heavy operations to background jobs.
-
-Queue:
-
-* Email Notifications
-* Job Alerts
-* Resume Processing
-* Image Processing
-* Analytics Updates
-* Search Index Updates
+| Group | Views |
+|---|---|
+| `home.blade.php` | Public landing page (721 lines, data-fetching in @php block) |
+| `jobs/` | index, show (29KB!), apply |
+| `admin/` | 12 management views (users, jobs, companies, categories, skills, coupons, reports, reviews, analytics, audit logs, announcements) |
+| `employer/` | billing, invoice, promote_job, applicants/, candidates/, jobs/ |
+| `seeker/` | resume-builder (34KB), boost, applications/ |
+| `company/` | company profiles |
+| `messages/` | messaging UI |
+| `notifications/` | in-app notification center |
+| `profile/` | profile edit |
+| `emails/` | email templates |
+| `design_system/` | design showcase |
+| `components/` | reusable blade components |
+| `auth/` | login, register, etc. |
 
 ---
 
-# 5. Security Hardening
+## Email / Notification System
+
+| Mailable | Trigger |
+|---|---|
+| `WelcomeMail` | User registration |
+| `VerificationMail` | Email verification |
+| `ApplicationMail` | New job application submitted |
+| `ApplicationStatusUpdateMail` | Status change (shortlisted, rejected, etc.) |
+| `AlertMatchNotificationMail` | Job alert match found |
+
+In-app notifications are stored in the `notifications` table and served via `InAppNotificationController`.
 
 ---
 
-## Authentication
+## Current State / Observations
 
-* Secure password hashing
-* Email verification
-* Password reset tokens
-* Session expiration
-* Optional Two-Factor Authentication
+### ✅ Strengths
+- **Very comprehensive schema** — 40 models covering nearly every feature of a production job board
+- **Role-based access control** — Clean Spatie permission integration
+- **Full billing system** — Subscriptions, promotions, boosts, coupons, invoicing, HST tax
+- **Audit trail** — `AuditLog` on all sensitive actions
+- **GDPR compliance** — Data export + account deactivation in settings
+- **SEO** — Dynamic XML sitemap generator built into routes
+- **Analytics** — Search analytics, revenue analytics dashboards for admin
+- **Dark mode** — Alpine.js + localStorage persisted
 
----
+### ⚠️ Gaps / Issues to Address
 
-## CSRF Protection
+1. **`app.css` is completely empty (0 bytes)** — The active CSS file the user has open has no content. All styling likely lives in Tailwind utility classes inline in Blade templates, but any custom CSS/design tokens are missing.
 
-Enable CSRF protection on all forms and state-changing requests.
+2. **`layouts/app.blade.php` has no CSS classes** — The main authenticated layout has raw semantic HTML tags with no Tailwind classes applied. This means the authenticated dashboard shell has no visual styling.
 
----
+3. **`PaymentService` uses a mock gateway** — `payment_gateway => 'mock'` with no real payment processor integration (Stripe, PayPal, etc.).
 
-## XSS Protection
+4. **`home.blade.php` does DB queries directly in `@php` block** — Should move to a controller or dedicated View Composer for cleaner MVC separation.
 
-* Escape user-generated content
-* Sanitize rich text inputs
-* Validate HTML where applicable
+5. **No API routes file** — The autocomplete API endpoint lives in `web.php`; should be in `api.php` with proper rate limiting.
 
----
+6. **No tests written** — `tests/` directory exists but likely has only the Laravel defaults.
 
-## SQL Injection Prevention
+7. **`SemanticCacheService` depends on Redis** — Predis is configured but in local SQLite dev environment, caching may not be active.
 
-* Parameterized queries
-* ORM / Query Builder
-* Input validation
+8. **`google/apiclient` in composer** — Google API client is a dependency but its usage isn't visible in the reviewed files; unclear what feature uses it.
 
----
-
-## Rate Limiting
-
-Protect:
-
-* Login
-* Registration
-* Password Reset
-* Job Applications
-* API Requests
-* Contact Forms
+9. **Impersonation security** — Admin can impersonate any user; the revert route only checks `auth` (not `admin`), which could be a security surface.
 
 ---
 
-## Authorization
+## Monetization Model
 
-Role-based permissions.
+| Feature | Pricing (CAD) |
+|---|---|
+| Featured Job — 7 days | $10 + 13% HST |
+| Featured Job — 15 days | $18 + 13% HST |
+| Featured Job — 30 days | $30 + 13% HST |
+| Featured Job — 60 days | $50 + 13% HST |
+| Resume Boost — 7 days | $5 + 13% HST |
+| Resume Boost — 15 days | $9 + 13% HST |
+| Resume Boost — 30 days | $15 + 13% HST |
+| Employer Subscription | Plans stored in `subscription_plans` table (monthly/yearly) |
 
-Validate ownership before:
-
-* Editing jobs
-* Downloading resumes
-* Viewing applications
-* Managing companies
-
----
-
-# 6. File Upload Security
-
-Supported Files
-
-Resume:
-
-* PDF
-* DOC
-* DOCX
-
-Images:
-
-* JPG
-* PNG
-* WEBP
+Discount coupons supported (percentage or fixed amount).
 
 ---
 
-Validation
+## Running the Project
 
-* MIME type
-* Extension
-* Maximum file size
-* Virus scanning (optional)
-* Secure file names
+```bash
+# Dev server (currently running)
+php artisan serve
 
----
+# Full dev environment (queue + vite + logs)
+composer dev
 
-Storage
-
-* Local Storage (Development)
-* Amazon S3 / Compatible Object Storage (Production)
-* Private storage for resumes
-* Public storage for company logos and profile images
-
----
-
-Access Control
-
-### Public
-
-* Company Logo
-* Cover Image
-* Public Profile Images
-
----
-
-### Private
-
-* Resume Files
-* Premium Documents
-* Internal Attachments
-
-Use signed or temporary URLs for private downloads where supported.
-
----
-
-# 7. Logging & Monitoring
-
-Track:
-
-* Authentication Events
-* Job Creation
-* Applications
-* Payments
-* Errors
-* Queue Failures
-* Failed Logins
-
----
-
-## Error Monitoring
-
-Capture:
-
-* Exceptions
-* 404 Errors
-* Queue Failures
-* Database Errors
-* Payment Failures
-
----
-
-## Audit Logs
-
-Record:
-
-* User Login
-* Job Published
-* Job Deleted
-* Company Approved
-* Admin Actions
-* Permission Changes
-
----
-
-# 8. Performance Optimization
-
----
-
-## Frontend
-
-* Image Lazy Loading
-* Asset Minification
-* Code Splitting
-* Browser Caching
-* Compression (Gzip/Brotli)
-
----
-
-## Backend
-
-* Redis Cache
-* Optimized Queries
-* Queue Workers
-* Database Connection Pooling
-* API Response Caching
-
----
-
-## Search Optimization
-
-* Search Indexes
-* Full-Text Search
-* Cached Popular Searches
-* Search Suggestions
-
----
-
-# 9. Backup & Recovery
-
-Automated backups.
-
-Backup:
-
-* Database
-* Uploaded Files
-* Configuration
-* Environment Variables (stored securely)
-
-Recovery:
-
-* Restore Database
-* Restore Files
-* Verify Backup Integrity
-
----
-
-# 10. Production Readiness Checklist
-
-## Application
-
-* Environment Variables Configured
-* Debug Mode Disabled
-* HTTPS Enabled
-* Queue Workers Running
-* Scheduler Running
-* Cache Warmed
-* Search Index Built
-
----
-
-## Server
-
-* SSL Certificate
-* Firewall
-* Automated Backups
-* Monitoring
-* Log Rotation
-* Security Updates
-
----
-
-## Storage
-
-* Private Resume Storage
-* Public Asset Storage
-* CDN (Optional)
-* Object Storage Lifecycle Rules (Optional)
-
----
-
-# 11. Recommended Technology Stack
-
-| Component          | Recommendation                                       |
-| ------------------ | ---------------------------------------------------- |
-| Testing            | PHPUnit or Pest                                      |
-| Browser Testing    | Laravel Dusk or Playwright                           |
-| Cache              | Redis                                                |
-| Queue              | Redis                                                |
-| Search             | Laravel Scout + Meilisearch                          |
-| Storage            | Amazon S3 / Cloudflare R2 / MinIO                    |
-| Image Optimization | Intervention Image                                   |
-| Monitoring         | Laravel Telescope (Development), Sentry (Production) |
-| Logging            | Monolog                                              |
-| Scheduler          | Laravel Scheduler                                    |
-| Backup             | Laravel Backup Package                               |
-
----
-
-# 12. Acceptance Testing Checklist
-
-## Job Seeker
-
-* Register/Login
-* Verify Email
-* Update Profile
-* Upload Resume
-* Search Jobs
-* Apply Once
-* Save Job
-* Receive Notifications
-
----
-
-## Employer
-
-* Register Company
-* Create/Edit/Delete Jobs
-* View Applicants
-* Update Application Status
-* View Analytics
-
----
-
-## Admin
-
-* Manage Users
-* Approve Companies
-* Moderate Jobs
-* Manage Categories
-* Review Reports
-* View Platform Analytics
-
----
-
-# Deliverables (End of Phase 9)
-
-By the end of this phase, the platform should provide:
-
-* Comprehensive unit, feature, API, and end-to-end test coverage
-* Optimized database queries with eager loading and indexing
-* Redis caching and background queue processing
-* Secure authentication and authorization
-* CSRF, XSS, SQL injection, and rate-limiting protection
-* Secure file upload validation and access control
-* Private resume storage with signed download access
-* Public image storage with CDN compatibility
-* Logging, monitoring, and audit trails
-* Automated backups and disaster recovery procedures
-* Production-ready configuration and deployment checklist
-* Performance optimizations for scalability and reliability
-
-----------------------------------
-
-# Phase 10: Deployment & Production Launch (Week 8)
-
-## Goal
-
-Deploy the platform to a secure, scalable production environment with automated deployments, background workers, monitoring, backups, and a zero-downtime release process.
-
----
-
-# Phase Overview
-
-```text id="deploy-flow"
-Development Complete
-        │
-        ▼
-Staging Deployment
-        │
-        ▼
-Automated Testing
-        │
-        ▼
-Production Deployment
-        │
-        ▼
-Monitoring & Alerts
-        │
-        ▼
-Maintenance & Scaling
+# Build frontend
+npm run build
 ```
 
----
-
-# 1. Production Infrastructure
-
-Choose a deployment strategy based on your budget and scalability needs.
-
-## Recommended Stack (Laravel + Node.js + MySQL)
-
-### Application Server
-
-* Ubuntu 24.04 LTS
-* Nginx
-* PHP 8.3+
-* Node.js 22 LTS
-* Composer
-* Supervisor
-* Redis
-* MySQL 8 / MariaDB 11
-
----
-
-## Hosting Options
-
-### Option 1 (Recommended for MVP)
-
-* VPS (Hetzner, Hostinger VPS, Contabo, DigitalOcean, Vultr)
-* Laravel Forge for server provisioning and deployments
-
----
-
-### Option 2
-
-* Laravel Forge + DigitalOcean
-* Managed deployments
-* SSL automation
-* Queue management
-
----
-
-### Option 3
-
-* Laravel Vapor (AWS Serverless)
-
-Suitable for high-scale production.
-
----
-
-# 2. Environment Configuration
-
-Configure production environment variables.
-
-Examples
-
-* APP_ENV
-* APP_DEBUG=false
-* APP_URL
-* DB_HOST
-* DB_DATABASE
-* DB_USERNAME
-* DB_PASSWORD
-* REDIS_HOST
-* QUEUE_CONNECTION
-* CACHE_STORE
-* MAIL_MAILER
-* AWS_ACCESS_KEY_ID
-* AWS_SECRET_ACCESS_KEY
-* AWS_BUCKET
-* SENTRY_DSN
-
-Store secrets securely and never commit them to source control.
-
----
-
-# 3. CI/CD Pipeline
-
-Automate deployments using GitHub Actions.
-
-## Pipeline
-
-```text id="cicd"
-Developer Push
-
-↓
-
-GitHub
-
-↓
-
-Run Tests
-
-↓
-
-Build Assets
-
-↓
-
-Deploy
-
-↓
-
-Run Migrations
-
-↓
-
-Clear Cache
-
-↓
-
-Restart Queue Workers
-
-↓
-
-Health Check
-```
-
----
-
-## CI Steps
-
-* Install Dependencies
-* Run Static Analysis
-* Execute Unit Tests
-* Execute Feature Tests
-* Build Frontend Assets
-* Package Release
-* Deploy to Server
-
----
-
-## CD Steps
-
-* Pull Latest Code
-* Install Composer Dependencies
-* Install Node Dependencies
-* Build Production Assets
-* Run Database Migrations
-* Optimize Laravel
-* Restart Queue Workers
-* Clear/Refresh Cache
-* Verify Health Endpoint
-
----
-
-# 4. SSL & Security
-
-Enable HTTPS for all traffic.
-
-## Configure
-
-* SSL Certificate (Let's Encrypt)
-* Force HTTPS
-* HSTS
-* Secure Cookies
-* HTTP Security Headers
-
----
-
-## Security Headers
-
-* Content Security Policy (CSP)
-* X-Frame-Options
-* X-Content-Type-Options
-* Referrer-Policy
-* Permissions-Policy
-
----
-
-# 5. Queue Workers
-
-Run background jobs continuously.
-
-Queue handles:
-
-* Email Notifications
-* Job Alerts
-* Resume Processing
-* Image Processing
-* Search Index Updates
-* Analytics Processing
-
-Manage workers using Supervisor or systemd to ensure automatic restarts.
-
----
-
-# 6. Scheduled Tasks (Cron)
-
-Configure Laravel Scheduler.
-
-Run every minute:
-
-```text id="scheduler"
-* * * * *
-
-↓
-
-Laravel Scheduler
-
-↓
-
-Scheduled Jobs
-```
-
-### Scheduled Jobs
-
-* Send Job Alerts
-* Expire Old Listings
-* Close Expired Applications
-* Clean Temporary Files
-* Generate Reports
-* Refresh Analytics
-* Subscription Renewals
-* Clear Expired Cache
-* Database Backups
-
----
-
-# 7. Storage Configuration
-
-## Public Storage
-
-* Company Logos
-* Cover Images
-* Profile Pictures
-
----
-
-## Private Storage
-
-* Resumes
-* Premium Documents
-* Employer Attachments
-
-Use S3-compatible object storage (or local storage for smaller deployments) with signed or temporary URLs for private files.
-
----
-
-# 8. Cache Optimization
-
-Production cache:
-
-* Configuration Cache
-* Route Cache
-* View Cache
-* Event Cache
-* Redis Data Cache
-
-Warm critical caches during deployment.
-
----
-
-# 9. Monitoring
-
-## Staging
-
-Use Laravel Telescope for:
-
-* Requests
-* Queries
-* Queues
-* Cache
-* Exceptions
-
-Never expose Telescope publicly in production.
-
----
-
-## Production
-
-Use Sentry (or similar) to monitor:
-
-* Exceptions
-* Performance
-* Failed Jobs
-* Release Health
-
-Alerts should notify the development team for critical failures.
-
----
-
-# 10. Logging
-
-Centralize application logs.
-
-Track:
-
-* User Authentication
-* Job Creation
-* Applications
-* Payments
-* Queue Failures
-* Exceptions
-* Admin Activity
-
-Rotate logs automatically to prevent disk exhaustion.
-
----
-
-# 11. Health Checks
-
-Create application health endpoints.
-
-Verify:
-
-* Database Connection
-* Redis
-* Queue Status
-* Storage Access
-* Mail Service
-* Search Service
-
-Return an overall application health status for monitoring tools.
-
----
-
-# 12. Backup Strategy
-
-Automate backups.
-
-## Database
-
-* Daily Incremental
-* Weekly Full Backup
-
----
-
-## Uploaded Files
-
-* Daily Backup
-* Versioned Storage
-
----
-
-## Configuration
-
-Securely back up:
-
-* Environment configuration
-* SSL certificates (where applicable)
-* Deployment scripts
-
-Regularly test restoration procedures.
-
----
-
-# 13. Production Security Checklist
-
-* HTTPS enforced
-* APP_DEBUG disabled
-* Strong application key
-* Database credentials secured
-* Firewall configured
-* SSH key authentication
-* Disable root login
-* Automatic security updates
-* Rate limiting enabled
-* File upload validation
-* Queue monitoring
-* Regular dependency updates
-
----
-
-# 14. Scaling Strategy
-
-As traffic grows:
-
-### Application
-
-* Horizontal scaling
-* Load Balancer
-* Multiple Queue Workers
-
----
-
-### Database
-
-* Read Replicas
-* Connection Pooling
-* Query Optimization
-
----
-
-### Cache
-
-* Redis Cluster
-
----
-
-### Storage
-
-* Object Storage
-* CDN
-
----
-
-### Search
-
-* Dedicated Meilisearch or managed search service
-
----
-
-# 15. Launch Checklist
-
-## Application
-
-* All tests passing
-* Production assets built
-* Environment variables configured
-* Queues operational
-* Scheduler configured
-* SSL active
-
----
-
-## Infrastructure
-
-* Firewall configured
-* Monitoring enabled
-* Backups scheduled
-* DNS configured
-* Domain verified
-
----
-
-## Business
-
-* Test employer registration
-* Test job posting
-* Test candidate registration
-* Test applications
-* Test emails
-* Test notifications
-* Test premium features (if enabled)
-
----
-
-# 16. Recommended Production Architecture
-
-```text id="architecture"
-Internet
-    │
-    ▼
-Cloudflare (Optional CDN/WAF)
-    │
-    ▼
-Nginx
-    │
-    ▼
-Laravel Application
-    │
- ┌──┴─────────────┐
- │                │
- ▼                ▼
-Redis         MySQL/MariaDB
- │                │
- ▼                ▼
-Queue        Application Data
- │
- ▼
-Workers
- │
- ▼
-Email / Notifications
-
-Storage
- │
- ├── Public Assets
- └── Private Resumes
-```
-
----
-
-# Deliverables (End of Phase 10)
-
-By the end of this phase, the platform should provide:
-
-* Production-ready VPS or managed cloud deployment
-* Automated CI/CD pipeline with GitHub Actions
-* Zero or near-zero downtime deployments
-* HTTPS with SSL enforcement
-* Background queue workers for emails, notifications, and processing jobs
-* Laravel Scheduler configured for recurring tasks
-* Redis caching and queue management
-* Secure public/private file storage
-* Monitoring with Laravel Telescope (staging) and Sentry (production)
-* Centralized logging and health checks
-* Automated backups and disaster recovery procedures
-* Hardened production security configuration
-* Scalable infrastructure ready for future growth
-* Complete launch checklist and post-deployment verification
-
-## Final Project Timeline
-
-| Phase                | Duration | Focus                            |
-| -------------------- | -------- | -------------------------------- |
-| Phase 1              | Week 1   | Planning & System Architecture   |
-| Phase 2              | Week 1–2 | Database Design (ERD)            |
-| Phase 3              | Week 1–2 | Authentication & User Roles      |
-| Phase 4              | Week 2–3 | Core Job Module                  |
-| Phase 5              | Week 3–4 | Applications (ATS)               |
-| Phase 6              | Week 4–5 | Dashboards & Admin Panel         |
-| Phase 7              | Week 5–6 | Search, Filters & UX             |
-| Phase 8 *(Optional)* | Week 6–7 | Payments & Premium Features      |
-| Phase 9              | Week 7–8 | Testing, Security & Optimization |
-| Phase 10             | Week 8   | Deployment & Production Launch   |
-
+> **Database**: SQLite at `database/database.sqlite` (98 KB, contains data)
