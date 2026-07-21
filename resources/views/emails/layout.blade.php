@@ -73,14 +73,14 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div>
+        <div>
             <h1>JOBZ IN CANADA</h1>
         </div>
-        <div class="content">
+        <div>
             @yield('content')
         </div>
-        <div class="footer">
+        <div>
             <p>&copy; 2026 JOBZ IN CANADA. All rights reserved.</p>
             <p>You received this email because you registered on our platform.</p>
         </div>

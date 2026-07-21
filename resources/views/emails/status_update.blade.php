@@ -12,7 +12,7 @@
         <p>Thank you for taking the time to apply. Unfortunately, they have decided to move forward with other candidates at this stage.</p>
     @endif
 
-    <div style="text-align: center;">
-        <a href="{{ route('seeker.applications.index') }}" class="btn">View Application Status</a>
+    <div>
+        <a href="{{ route('seeker.applications.index') }}">View Application Status</a>
     </div>
 @endsection

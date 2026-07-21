@@ -3,7 +3,7 @@
         {{ __('Platform Admin Dashboard') }}
     </x-slot>
 
-    <div class="space-y-8 animate-fade-in"
+    <div
          x-data="{ 
             currentTab: 'overview',
             cmsPage: 'terms',
@@ -33,20 +33,20 @@
          }"
     >
         @if(session('success'))
-            <x-alert type="success" class="mb-4">
+            <x-alert type="success">
                 {{ session('success') }}
             </x-alert>
         @endif
 
         <!-- Welcome Header banner -->
-        <x-card variant="gradient" color="rose" padding="lg" class="relative overflow-hidden shadow-xl border-0">
-            <div class="relative z-10 md:flex md:items-center md:justify-between">
-                <div class="space-y-2">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur-sm">
+        <x-card variant="gradient" color="rose" padding="lg">
+            <div>
+                <div>
+                    <span>
                         Platform Control Center
                     </span>
-                    <h1 class="text-3xl font-extrabold tracking-tight text-white">Platform Management Console</h1>
-                    <p class="text-rose-100 max-w-xl text-sm leading-relaxed">
+                    <h1>Platform Management Console</h1>
+                    <p>
                         Review companies verification requests, moderate active jobs listings, manage reported contents, handle user status suspension, update categories and broadcast messages.
                     </p>
                 </div>
@@ -54,20 +54,20 @@
         </x-card>
 
         <!-- Tab Navigation Links -->
-        <div class="tab-bar no-print">
-            <button @click="currentTab = 'overview'" :class="currentTab === 'overview' ? 'tab-btn active' : 'tab-btn'">System Overview</button>
-            <button @click="currentTab = 'cms'" :class="currentTab === 'cms' ? 'tab-btn active' : 'tab-btn'">CMS &amp; Pages</button>
-            <button @click="currentTab = 'media'" :class="currentTab === 'media' ? 'tab-btn active' : 'tab-btn'">Media Library</button>
-            <button @click="currentTab = 'payments'" :class="currentTab === 'payments' ? 'tab-btn active' : 'tab-btn'">Coupons &amp; Pricing</button>
+        <div>
+            <button @click="currentTab = 'overview'" :>System Overview</button>
+            <button @click="currentTab = 'cms'" :>CMS &amp; Pages</button>
+            <button @click="currentTab = 'media'" :>Media Library</button>
+            <button @click="currentTab = 'payments'" :>Coupons &amp; Pricing</button>
         </div>
 
         <!-- 1. SYSTEM OVERVIEW TAB -->
-        <div x-show="currentTab === 'overview'" class="space-y-8" x-transition>
+        <div x-show="currentTab === 'overview'" x-transition>
             <!-- Stats Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+            <div>
                 <x-card variant="stat" label="Total Users" value="{{ $metrics['total_users'] }}" color="rose" padding="sm">
                     <x-slot name="icon">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                     </x-slot>
@@ -75,7 +75,7 @@
 
                 <x-card variant="stat" label="Companies" value="{{ $metrics['companies_count'] }}" color="blue" padding="sm">
                     <x-slot name="icon">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </x-slot>
@@ -83,7 +83,7 @@
 
                 <x-card variant="stat" label="Active Jobs" value="{{ $metrics['active_jobs'] }}" color="amber" padding="sm">
                     <x-slot name="icon">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" />
                         </svg>
                     </x-slot>
@@ -91,7 +91,7 @@
 
                 <x-card variant="stat" label="Pending Reports" value="{{ $metrics['reports_count'] }}" color="rose" padding="sm">
                     <x-slot name="icon">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </x-slot>
@@ -99,74 +99,74 @@
             </div>
 
             <!-- Two Column Layout: Main Actions Navigation & Recent Audits -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div>
                 <!-- Left Column: Actions Dashboard Grid -->
-                <div class="lg:col-span-2">
+                <div>
                     <x-card variant="default">
                         <x-slot name="header">Administrative Sub-Panels</x-slot>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <a href="{{ route('admin.users.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">👥</span>
+                        <div>
+                            <a href="{{ route('admin.users.index') }}">
+                                <span>👥</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">User Management</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Suspend, activate, reset user credentials.</p>
+                                    <h4>User Management</h4>
+                                    <p>Suspend, activate, reset user credentials.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.companies.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">🏢</span>
+                            <a href="{{ route('admin.companies.index') }}">
+                                <span>🏢</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Company Verifications</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Approve, reject, or verify employer accounts.</p>
+                                    <h4>Company Verifications</h4>
+                                    <p>Approve, reject, or verify employer accounts.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.jobs.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">💼</span>
+                            <a href="{{ route('admin.jobs.index') }}">
+                                <span>💼</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Listing Moderations</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Feature, mark urgent, approve, or hide postings.</p>
+                                    <h4>Listing Moderations</h4>
+                                    <p>Feature, mark urgent, approve, or hide postings.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.reports.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">⚠️</span>
+                            <a href="{{ route('admin.reports.index') }}">
+                                <span>⚠️</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Abuse Moderation Queue</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Investigate duplicate listings, spam, scam reports.</p>
+                                    <h4>Abuse Moderation Queue</h4>
+                                    <p>Investigate duplicate listings, spam, scam reports.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.categories.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">📁</span>
+                            <a href="{{ route('admin.categories.index') }}">
+                                <span>📁</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Master Categories</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Add, edit, or delete parent/child fields.</p>
+                                    <h4>Master Categories</h4>
+                                    <p>Add, edit, or delete parent/child fields.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.skills.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">🛠️</span>
+                            <a href="{{ route('admin.skills.index') }}">
+                                <span>🛠️</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Skills Mapping</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Merge duplicate skills, manage master list.</p>
+                                    <h4>Skills Mapping</h4>
+                                    <p>Merge duplicate skills, manage master list.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.reviews.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">💬</span>
+                            <a href="{{ route('admin.reviews.index') }}">
+                                <span>💬</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Review Moderations</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Approve, hide, or moderate company reviews.</p>
+                                    <h4>Review Moderations</h4>
+                                    <p>Approve, hide, or moderate company reviews.</p>
                                 </div>
                             </a>
 
-                            <a href="{{ route('admin.announcements.index') }}" class="p-5 bg-gray-50 dark:bg-gray-800/40 hover:border-rose-500/30 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center gap-4 transition duration-200">
-                                <span class="text-2xl">📢</span>
+                            <a href="{{ route('admin.announcements.index') }}">
+                                <span>📢</span>
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Announcements Broadcast</h4>
-                                    <p class="text-4xs text-gray-500 mt-1">Send alerts broadcast notifications to all users.</p>
+                                    <h4>Announcements Broadcast</h4>
+                                    <p>Send alerts broadcast notifications to all users.</p>
                                 </div>
                             </a>
                         </div>
@@ -174,30 +174,30 @@
                 </div>
 
                 <!-- Right Column: Recent Audits Activity -->
-                <div class="space-y-6">
+                <div>
                     <x-card variant="default">
                         <x-slot name="header">
-                            <div class="flex justify-between items-center w-full">
+                            <div>
                                 <span>System Audit Log</span>
-                                <a href="{{ route('admin.audit-logs.index') }}" class="text-xs font-bold text-primary-500 hover:underline">View All</a>
+                                <a href="{{ route('admin.audit-logs.index') }}">View All</a>
                             </div>
                         </x-slot>
 
-                        <div class="space-y-4">
+                        <div>
                             @forelse($recentAudits as $log)
                                 @if(is_object($log) && isset($log->action))
-                                    <div class="border-s-2 border-rose-500 ps-3 py-0.5 space-y-0.5">
-                                        <p class="text-xs font-bold text-gray-900 dark:text-white uppercase leading-none">{{ str_replace('_', ' ', $log->action) }}</p>
-                                        <p class="text-4xs text-gray-500 dark:text-gray-450 leading-relaxed mt-1">{{ $log->description }}</p>
-                                        <span class="text-4xs text-gray-400 block pt-0.5">{{ $log->created_at->diffForHumans() }}</span>
+                                    <div>
+                                        <p>{{ str_replace('_', ' ', $log->action) }}</p>
+                                        <p>{{ $log->description }}</p>
+                                        <span>{{ $log->created_at->diffForHumans() }}</span>
                                     </div>
                                 @elseif(is_string($log))
-                                    <div class="border-s-2 border-gray-300 ps-3 py-0.5">
-                                        <p class="text-xs text-gray-750 dark:text-gray-300">{{ $log }}</p>
+                                    <div>
+                                        <p>{{ $log }}</p>
                                     </div>
                                 @endif
                             @empty
-                                <p class="text-xs text-gray-400 italic py-2">No audit records found.</p>
+                                <p>No audit records found.</p>
                             @endforelse
                         </div>
                     </x-card>
@@ -206,14 +206,14 @@
         </div>
 
         <!-- 2. CMS & PAGES TAB -->
-        <div x-show="currentTab === 'cms'" x-transition style="display: none;">
+        <div x-show="currentTab === 'cms'" x-transition>
             <x-card variant="default">
                 <x-slot name="header">
-                    <div class="flex justify-between items-center w-full">
+                    <div>
                         <span>Page Contents Moderation (CMS)</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Page:</span>
-                            <select x-model="cmsPage" class="text-xs py-1.5 min-w-[150px]">
+                        <div>
+                            <span>Page:</span>
+                            <select x-model="cmsPage">
                                 <option value="terms">Terms of Service</option>
                                 <option value="privacy">Privacy Policy</option>
                                 <option value="about">About Us</option>
@@ -223,13 +223,13 @@
                     </div>
                 </x-slot>
 
-                <div class="space-y-4">
+                <div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Editor Console</label>
-                        <textarea rows="8" x-model="cmsContent" class="w-full"></textarea>
+                        <label>Editor Console</label>
+                        <textarea rows="8" x-model="cmsContent"></textarea>
                     </div>
                     
-                    <button type="button" @click="saveCms()" class="btn btn-primary">
+                    <button type="button" @click="saveCms()">
                         Publish Updates
                     </button>
                 </div>
@@ -237,30 +237,30 @@
         </div>
 
         <!-- 3. MEDIA LIBRARY TAB -->
-        <div x-show="currentTab === 'media'" x-transition style="display: none;">
+        <div x-show="currentTab === 'media'" x-transition>
             <x-card variant="default">
                 <x-slot name="header">Assets &amp; Media Directory</x-slot>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-100 dark:border-gray-800 flex flex-col justify-between h-40">
-                        <div class="text-3xl text-center py-2">📄</div>
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-xs truncate text-gray-900 dark:text-white">maaz_resume_2026.pdf</h4>
-                            <p class="text-4xs text-gray-400">PDF &bull; 412 KB</p>
+                <div>
+                    <div>
+                        <div>📄</div>
+                        <div>
+                            <h4>maaz_resume_2026.pdf</h4>
+                            <p>PDF &bull; 412 KB</p>
                         </div>
                     </div>
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-100 dark:border-gray-800 flex flex-col justify-between h-40">
-                        <div class="text-3xl text-center py-2">🖼️</div>
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-xs truncate text-gray-900 dark:text-white">company_cover_default.jpg</h4>
-                            <p class="text-4xs text-gray-400">JPEG &bull; 1.2 MB</p>
+                    <div>
+                        <div>🖼️</div>
+                        <div>
+                            <h4>company_cover_default.jpg</h4>
+                            <p>JPEG &bull; 1.2 MB</p>
                         </div>
                     </div>
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-100 dark:border-gray-800 flex flex-col justify-between h-40">
-                        <div class="text-3xl text-center py-2">🏢</div>
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-xs truncate text-gray-900 dark:text-white">techcorp_logo.png</h4>
-                            <p class="text-4xs text-gray-400">PNG &bull; 95 KB</p>
+                    <div>
+                        <div>🏢</div>
+                        <div>
+                            <h4>techcorp_logo.png</h4>
+                            <p>PNG &bull; 95 KB</p>
                         </div>
                     </div>
                 </div>
@@ -268,28 +268,28 @@
         </div>
 
         <!-- 4. COUPONS & PRICING TAB -->
-        <div x-show="currentTab === 'payments'" class="space-y-6" x-transition style="display: none;">
+        <div x-show="currentTab === 'payments'" x-transition>
             
             <!-- Coupon Builder -->
             <x-card variant="default">
                 <x-slot name="header">Active Promo Coupons</x-slot>
                 
-                <div class="flex flex-wrap gap-3 items-end border-b border-gray-100 dark:border-gray-850 pb-5">
+                <div>
                     <div>
-                        <label class="block text-4xs font-bold text-gray-400 uppercase tracking-wider mb-2">Coupon Code</label>
-                        <input type="text" x-model="newCouponCode" placeholder="e.g. HALIFAX20" class="uppercase text-xs" />
+                        <label>Coupon Code</label>
+                        <input type="text" x-model="newCouponCode" placeholder="e.g. HALIFAX20" />
                     </div>
                     <div>
-                        <label class="block text-4xs font-bold text-gray-400 uppercase tracking-wider mb-2">Discount %</label>
-                        <input type="text" x-model="newCouponDiscount" placeholder="e.g. 20%" class="text-xs" />
+                        <label>Discount %</label>
+                        <input type="text" x-model="newCouponDiscount" placeholder="e.g. 20%" />
                     </div>
-                    <button type="button" @click="addCoupon()" class="btn btn-primary">
+                    <button type="button" @click="addCoupon()">
                         Create Coupon
                     </button>
                 </div>
 
-                <div class="overflow-x-auto -mx-6 pt-2">
-                    <table class="data-table">
+                <div>
+                    <table>
                         <thead>
                             <tr>
                                 <th>Coupon Code</th>
@@ -302,12 +302,12 @@
                         <tbody>
                             <template x-for="(coupon, i) in coupons" :key="i">
                                 <tr>
-                                    <td class="font-mono font-bold" x-text="coupon.code"></td>
-                                    <td class="text-primary-500 font-bold" x-text="coupon.discount"></td>
+                                    <td x-text="coupon.code"></td>
+                                    <td x-text="coupon.discount"></td>
                                     <td x-text="coupon.limit"></td>
                                     <td x-text="coupon.claims"></td>
                                     <td>
-                                        <span :class="coupon.status === 'Active' ? 'status-badge status-active' : 'status-badge status-draft'" 
+                                        <span : 
                                               x-text="coupon.status"></span>
                                     </td>
                                 </tr>
@@ -320,19 +320,19 @@
             <!-- Revenue details -->
             <x-card variant="default">
                 <x-slot name="header">
-                    <div class="flex justify-between items-center w-full">
+                    <div>
                         <span>Revenue Analytics Breakdown</span>
-                        <a href="{{ route('admin.revenue-analytics.index') }}" class="text-xs font-bold text-primary-500 hover:underline">Full Analytics Page</a>
+                        <a href="{{ route('admin.revenue-analytics.index') }}">Full Analytics Page</a>
                     </div>
                 </x-slot>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-gray-100 dark:border-gray-800">
-                        <span class="text-4xs font-bold text-gray-450 uppercase tracking-wider block">Total Subscription Earnings</span>
-                        <p class="text-xl font-black mt-1 text-emerald-500">$24,850 CAD</p>
+                <div>
+                    <div>
+                        <span>Total Subscription Earnings</span>
+                        <p>$24,850 CAD</p>
                     </div>
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-gray-100 dark:border-gray-800">
-                        <span class="text-4xs font-bold text-gray-455 uppercase tracking-wider block">Active Paid Corporate Subscriptions</span>
-                        <p class="text-xl font-black mt-1 text-primary-500">182 Active Plans</p>
+                    <div>
+                        <span>Active Paid Corporate Subscriptions</span>
+                        <p>182 Active Plans</p>
                     </div>
                 </div>
             </x-card>

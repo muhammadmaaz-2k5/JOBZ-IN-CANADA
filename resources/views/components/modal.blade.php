@@ -44,8 +44,6 @@ $maxWidth = [
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
-    class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 overflow-y-auto"
-    style="display: {{ $show ? 'flex' : 'none' }};"
     role="dialog"
     aria-modal="true"
 >
@@ -59,7 +57,6 @@ $maxWidth = [
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
     ></div>
 
     {{-- Modal Panel --}}
@@ -71,13 +68,12 @@ $maxWidth = [
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-        class="relative z-10 w-full {{ $maxWidth }} bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden"
     >
         @if($title)
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ $title }}</h3>
-                <button x-on:click="show = false" class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div>
+                <h3>{{ $title }}</h3>
+                <button x-on:click="show = false">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>

@@ -22,18 +22,18 @@
 <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" {{ $attributes->merge([
     'class' => "flex items-start p-4 rounded-xl border {$classes}"
 ]) }}>
-    <span class="mr-3 mt-0.5">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+    <span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             {!! $icon !!}
         </svg>
     </span>
-    <div class="flex-1 text-sm font-medium">
+    <div>
         {{ $slot }}
     </div>
     @if($dismissible)
-        <button @click="show = false" type="button" class="ml-3 -mx-1.5 -my-1.5 p-1.5 rounded-lg inline-flex items-center justify-center opacity-70 hover:opacity-100 focus:outline-none transition-colors duration-150">
-            <span class="sr-only">Dismiss</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <button @click="show = false" type="button">
+            <span>Dismiss</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>

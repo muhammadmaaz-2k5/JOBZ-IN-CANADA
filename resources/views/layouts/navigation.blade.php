@@ -1,29 +1,29 @@
 @if(session()->has('impersonator_id'))
-    <div class="bg-amber-500 text-white font-extrabold text-xs py-2 px-4 flex justify-between items-center z-50 relative">
+    <div>
         <span>⚠️ You are currently impersonating another user.</span>
         <form method="POST" action="{{ route('admin.impersonate.revert') }}">
             @csrf
-            <button type="submit" class="bg-white text-amber-800 px-3 py-1 rounded-lg hover:bg-amber-50 transition font-bold text-2xs">
+            <button type="submit">
                 Revert to Admin
             </button>
         </form>
     </div>
 @endif
 
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false }">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
+    <div>
+        <div>
+            <div>
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
+                <div>
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                        <x-application-logo />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div>
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard') || request()->routeIs('admin.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
@@ -57,15 +57,15 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div>
                 @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                        <button>
                             <div>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
 
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </div>
@@ -110,19 +110,19 @@
                     </x-slot>
                 </x-dropdown>
                 @else
-                <div class="flex gap-4">
-                    <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-500 hover:text-gray-705 dark:text-gray-400 dark:hover:text-gray-200">Log In</a>
-                    <a href="{{ route('register') }}" class="text-sm font-semibold text-indigo-650 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-350">Register</a>
+                <div>
+                    <a href="{{ route('login') }}">Log In</a>
+                    <a href="{{ route('register') }}">Register</a>
                 </div>
                 @endauth
             </div>
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <div>
+                <button @click="open = ! open">
+                    <svg stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path : stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path : stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -130,8 +130,8 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
+    <div :>
+        <div>
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
@@ -139,13 +139,13 @@
 
         @auth
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+        <div>
+            <div>
+                <div>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                <div>{{ Auth::user()->email }}</div>
             </div>
 
-            <div class="mt-3 space-y-1">
+            <div>
                 @if(Auth::user()->hasRole('job_seeker'))
                     <x-responsive-nav-link :href="route('seeker.profile.edit')">
                         {{ __('My Profile') }}
@@ -177,7 +177,7 @@
             </div>
         </div>
         @else
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600 space-y-1">
+        <div>
             <x-responsive-nav-link :href="route('login')">{{ __('Log In') }}</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('register')">{{ __('Register') }}</x-responsive-nav-link>
         </div>
