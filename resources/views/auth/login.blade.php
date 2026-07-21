@@ -10,7 +10,7 @@
     <title>Sign In - JOBZ IN CANADA</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=poppins:300,400,500,600,700,800&display=swap" rel="stylesheet" />
     
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -167,8 +167,8 @@
                         <label for="remember_me" class="flex items-center cursor-pointer select-none">
                             <div class="relative flex items-center">
                                 <input id="remember_me" type="checkbox" name="remember" class="peer sr-only">
-                                <div class="w-5 h-5 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-800 flex items-center justify-center peer-checked:bg-primary-500 peer-checked:border-primary-500 transition-all duration-200 shadow-sm">
-                                    <svg class="w-3.5 h-3.5 text-white scale-0 peer-checked:scale-100 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                <div class="w-5 h-5 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-800 flex items-center justify-center peer-checked:bg-primary-500 peer-checked:border-primary-500 peer-checked:[&_svg]:scale-100 transition-all duration-200 shadow-sm">
+                                    <svg class="w-3.5 h-3.5 text-white scale-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>

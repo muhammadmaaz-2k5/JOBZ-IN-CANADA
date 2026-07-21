@@ -13,12 +13,12 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=poppins:300,400,500,600,700,800&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-gray-50/50 dark:bg-dark-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300">
+    <body class="font-sans antialiased bg-gray-50/50 dark:bg-dark-950 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300">
         <div class="flex h-screen overflow-hidden">
             <!-- Sidebar Navigation -->
             @include('layouts.sidebar')

@@ -136,4 +136,13 @@ class EmployerProfileController extends Controller
         
         return view('company.show', compact('company', 'jobs', 'reviews'));
     }
+
+    /**
+     * Display the public company listings view.
+     */
+    public function publicIndex()
+    {
+        $companies = Company::where('verification_status', 'verified')->latest()->get();
+        return view('company.index', compact('companies'));
+    }
 }

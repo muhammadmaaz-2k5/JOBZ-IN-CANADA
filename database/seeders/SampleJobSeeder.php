@@ -44,11 +44,38 @@ class SampleJobSeeder extends Seeder
             [
                 'name' => 'TechNorth Solutions',
                 'website' => 'https://www.technorth.ca',
-                'industry' => 'Software & IT Consulting',
-                'company_size' => '100-250 employees',
-                'founded_year' => 2015,
+                'industry' => 'Software & Cloud',
+                'company_size' => '500-1000 employees',
+                'founded_year' => 2012,
                 'headquarters' => 'Vancouver, BC',
-                'description' => 'TechNorth Solutions designs and develops customized cloud applications, DevOps pipelines, and enterprise systems for Canadian startups.',
+                'description' => 'TechNorth Solutions is a premier Canadian technology firm specializing in cloud infrastructure, DevOps automation, and enterprise software delivery.',
+            ],
+            [
+                'name' => 'Maple Finance Group',
+                'website' => 'https://www.maplefinance.ca',
+                'industry' => 'Finance & Banking',
+                'company_size' => '1000-5000 employees',
+                'founded_year' => 2010,
+                'headquarters' => 'Toronto, ON',
+                'description' => 'Maple Finance Group is a modern financial technology institution offering secure banking services, investment solutions, and commercial financing across Canada.',
+            ],
+            [
+                'name' => 'Northern Health Systems',
+                'website' => 'https://www.northernhealth.ca',
+                'industry' => 'Healthcare',
+                'company_size' => '5000+ employees',
+                'founded_year' => 1998,
+                'headquarters' => 'Prince George, BC',
+                'description' => 'Northern Health Systems provides premium medical care, telehealth services, and hospital management solutions to northern Canadian communities.',
+            ],
+            [
+                'name' => 'CanBridge Engineering',
+                'website' => 'https://www.canbridge.ca',
+                'industry' => 'Engineering & Construction',
+                'company_size' => '200-500 employees',
+                'founded_year' => 2008,
+                'headquarters' => 'Calgary, AB',
+                'description' => 'CanBridge Engineering is an infrastructure development firm focusing on sustainable civil engineering, bridge design, and urban transport projects.',
             ]
         ];
 

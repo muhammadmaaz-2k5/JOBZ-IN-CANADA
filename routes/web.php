@@ -102,9 +102,9 @@ Route::get('/seeker/dashboard', [DashboardController::class, 'seeker'])
     ->middleware(['auth', 'verified', 'role:job_seeker'])
     ->name('seeker.dashboard');
 
-// Public Job Search & Listings
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{slug}', [JobController::class, 'show'])->name('jobs.show');
+Route::get('/companies', [EmployerProfileController::class, 'publicIndex'])->name('companies.index');
 Route::get('/companies/{slug}', [EmployerProfileController::class, 'publicProfile'])->name('companies.show');
 
 // Seeker Profile Management
