@@ -17,6 +17,7 @@ class Job extends Model
         'requirements',
         'benefits',
         'employment_type',
+        'language',
         'workplace_type',
         'experience_level',
         'education_level',
@@ -114,11 +115,47 @@ class Job extends Model
             $query->whereIn('category_id', $categoryIds);
         });
 
-        $query->when($filters['location'] ?? null, function ($query, $location) {
-            $query->where(function ($q) use ($location) {
-                $q->where('city', 'like', '%' . $location . '%')
-                  ->orWhere('country', 'like', '%' . $location . '%');
-            });
+        $query->when($filters['location'] ?? null, function ($query, $location) use ($filters) {
+            $distance = $filters['distance'] ?? null;
+            if ($distance && is_numeric($distance) && $distance > 0) {
+                // Approximate center point based on existing jobs in this location
+                $centerJob = \App\Models\Job::whereNotNull('latitude')
+                    ->whereNotNull('longitude')
+                    ->where(function($q) use ($location) {
+                        $q->where('city', 'like', '%' . $location . '%')
+                          ->orWhere('country', 'like', '%' . $location . '%');
+                    })->first();
+
+                if ($centerJob) {
+                    $lat = $centerJob->latitude;
+                    $lng = $centerJob->longitude;
+
+                    // Haversine formula
+                    $query->whereRaw(
+                        "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= ?",
+                        [$lat, $lng, $lat, $distance]
+                    );
+                } else {
+                    // Fallback to text match
+                    $query->where(function ($q) use ($location) {
+                        $q->where('city', 'like', '%' . $location . '%')
+                          ->orWhere('country', 'like', '%' . $location . '%');
+                    });
+                }
+            } else {
+                $query->where(function ($q) use ($location) {
+                    $q->where('city', 'like', '%' . $location . '%')
+                      ->orWhere('country', 'like', '%' . $location . '%');
+                });
+            }
+        });
+
+        $query->when($filters['language'] ?? null, function ($query, $language) {
+            if (is_array($language)) {
+                $query->whereIn('language', $language);
+            } else {
+                $query->where('language', $language);
+            }
         });
 
         $query->when($filters['workplace_type'] ?? null, function ($query, $workplace) {
@@ -165,8 +202,8 @@ class Job extends Model
             $date = match($postedDate) {
                 '24h' => now()->subDay(),
                 '3d' => now()->subDays(3),
-                'week' => now()->subWeek(),
-                'month' => now()->subMonth(),
+                '7d' => now()->subDays(7),
+                '14d' => now()->subDays(14),
                 default => null
             };
             if ($date) {

@@ -1,35 +1,17 @@
 @php
     try {
-        $featuredJobs = \App\Models\Job::with(['company', 'skills', 'screeningQuestions'])
-            ->where('status', 'published')->where('featured', true)->latest()->take(4)->get();
-        if ($featuredJobs->count() < 4) {
-            $extra = \App\Models\Job::with(['company', 'skills', 'screeningQuestions'])
-                ->where('status', 'published')->where('featured', false)
-                ->latest()->take(4 - $featuredJobs->count())->get();
-            $featuredJobs = $featuredJobs->concat($extra);
-        }
-        $recentJobs = \App\Models\Job::with(['company', 'skills', 'screeningQuestions'])
-            ->where('status', 'published')->latest()->take(6)->get();
-        if ($recentJobs->count() > 0 && $recentJobs->count() < 6) {
-            $needed = 6 - $recentJobs->count();
-            for ($i = 0; $i < $needed; $i++) {
-                $recentJobs->push($recentJobs[$i % $recentJobs->count()]);
-            }
-        }
+        $latestJobs = \App\Models\Job::with(['company', 'skills', 'screeningQuestions'])
+            ->where('status', 'published')->latest()->paginate(6);
+        
         $companies  = \App\Models\Company::with('jobs')->where('verification_status', 'verified')->latest()->take(5)->get();
         $jobsCount  = \App\Models\Job::where('status', 'published')->count();
     } catch (\Throwable $e) {
-        $featuredJobs = collect(); $recentJobs = collect(); $companies = collect(); $jobsCount = 0;
+        $latestJobs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 6);
+        $companies = collect(); $jobsCount = 0;
     }
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-      x-data="{ dark: true }"
-      x-init="
-        if(localStorage.getItem('theme') !== null){ dark = localStorage.getItem('theme') === 'dark'; }
-        $watch('dark', v => localStorage.setItem('theme', v ? 'dark' : 'light'));
-      "
-      :class="{ 'dark': dark }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -77,19 +59,7 @@
                 </svg>
             </button>
 
-            {{-- Theme toggle --}}
-            <button @click="dark = !dark" type="button" class="icon-btn" title="Toggle theme">
-                <span x-show="!dark" class="icon-wrap">
-                    <svg width=".9rem" height=".9rem" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9 0 0012 21a9.003 9 0 008.354-5.646z"/>
-                    </svg>
-                </span>
-                <span x-show="dark" class="icon-wrap">
-                    <svg width=".9rem" height=".9rem" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14.5 12a2.5 2 5 0 11-5 0 2.5 2 5 0 015 0z"/>
-                    </svg>
-                </span>
-            </button>
+
 
             <a href="{{ route('register') }}" class="nav-post">
                 Sign In
@@ -107,15 +77,10 @@
 {{-- ══════════════════════════════════════
      HERO
 ══════════════════════════════════════ --}}
-<section class="hero">
+<section class="hero !pb-8">
     <div class="hero-inner">
 
-        {{-- Pill --}}
-        <div class="hero-badge">
-            🇨🇦 Canada Wide Jobs &bull;
-            <span class="text-white font-bold">{{ $jobsCount > 0 ? number_format($jobsCount) : '12,480' }}+</span>
-            Active Roles
-        </div>
+
 
         {{-- H1 --}}
         <h1 class="hero-title">
@@ -129,34 +94,146 @@
         </p>
 
         {{-- Search bar --}}
-        <form class="search-form" action="{{ route('jobs.index') }}" method="GET">
-
-            {{-- What --}}
-            <div class="search-input-wrap">
-                <svg width="1rem" height="1rem" class="text-indigo" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" name="search" class="search-input" placeholder="Job title, keywords or company...">
-            </div>
-
-            <div class="search-divider"></div>
-
-            {{-- Where --}}
-            <div class="search-input-wrap">
-                <svg width="1rem" height="1rem" class="text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <input type="text" name="location" class="search-input" placeholder="City, province or Remote...">
-            </div>
-
-            {{-- Button --}}
-            <div class="search-actions">
-                <button type="submit" class="search-btn">
-                    <svg width=".875rem" height=".875rem" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <form action="{{ route('jobs.index') }}" method="GET" 
+              class="mt-10 flex w-full max-w-5xl mx-auto items-center bg-white border border-gray-300 rounded-full shadow-sm relative p-0.5 z-50">
+            
+            <!-- What -->
+            <div x-data="{
+                    query: '',
+                    suggestions: [],
+                    showSuggestions: false,
+                    fetchSuggestions() {
+                        if(this.query.length < 2) {
+                            this.suggestions = [];
+                            this.showSuggestions = false;
+                            return;
+                        }
+                        fetch('/api/jobs/suggestions?query=' + encodeURIComponent(this.query))
+                            .then(res => res.json())
+                            .then(data => {
+                                this.suggestions = data;
+                                this.showSuggestions = data.length > 0;
+                            });
+                    },
+                    selectSuggestion(text) {
+                        this.query = text;
+                        this.showSuggestions = false;
+                    }
+                 }"
+                 @click.away="showSuggestions = false"
+                 class="relative flex-1 flex items-center focus-within:ring-2 focus-within:ring-[#1650e1] focus-within:z-10 rounded-l-full transition-all">
+                
+                <div class="pl-6 pr-3 text-gray-700">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    Search
+                </div>
+                <input type="text" name="keyword" 
+                       x-model="query"
+                       @input.debounce.250ms="fetchSuggestions"
+                       @focus="if(suggestions.length > 0) showSuggestions = true"
+                       autocomplete="off"
+                       class="w-full py-4 pr-4 text-base text-gray-900 bg-transparent border-none focus:ring-0 outline-none placeholder-gray-500" 
+                       placeholder="Job title, keywords, or company">
+                       
+                <!-- Dropdown -->
+                <div x-cloak x-show="showSuggestions"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute top-full left-0 w-[120%] sm:w-[150%] md:w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50">
+                    <ul class="py-2">
+                        <template x-for="(sugg, index) in suggestions" :key="index">
+                            <li>
+                                <button type="button" @click="selectSuggestion(sugg.text)" 
+                                        class="w-full text-left px-5 py-3 hover:bg-blue-50 flex items-center gap-3 transition-colors">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                    <span x-text="sugg.text" class="text-gray-900 text-base font-medium"></span>
+                                </button>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="h-8 w-px bg-gray-300 relative z-0"></div>
+
+            <!-- Where -->
+            <div x-data="{
+                    query: '',
+                    suggestions: [],
+                    showSuggestions: false,
+                    fetchSuggestions() {
+                        if(this.query.length < 2) {
+                            this.suggestions = [];
+                            this.showSuggestions = false;
+                            return;
+                        }
+                        fetch('/api/jobs/suggestions?query=' + encodeURIComponent(this.query))
+                            .then(res => res.json())
+                            .then(data => {
+                                let locs = data.filter(s => s.type === 'location');
+                                // Hardcode Remote if it matches query
+                                if ('remote'.includes(this.query.toLowerCase()) && !locs.find(s => s.text.toLowerCase() === 'remote')) {
+                                    locs.unshift({ text: 'Remote', type: 'location' });
+                                }
+                                this.suggestions = locs;
+                                this.showSuggestions = this.suggestions.length > 0;
+                            });
+                    },
+                    selectSuggestion(text) {
+                        this.query = text;
+                        this.showSuggestions = false;
+                    }
+                 }"
+                 @click.away="showSuggestions = false"
+                 class="relative flex-1 flex items-center focus-within:ring-2 focus-within:ring-[#1650e1] focus-within:z-10 transition-all">
+                
+                <div class="pl-4 pr-3 text-gray-700">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                
+                <input type="text" name="location" 
+                       x-model="query"
+                       @input.debounce.250ms="fetchSuggestions"
+                       @focus="if(suggestions.length > 0) showSuggestions = true"
+                       autocomplete="off"
+                       class="w-full py-4 pr-4 text-base text-gray-900 bg-transparent border-none focus:ring-0 outline-none placeholder-gray-500" 
+                       placeholder='City, state, zip code, or "remote"'>
+                       
+                <!-- Dropdown -->
+                <div x-cloak x-show="showSuggestions"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute top-full left-0 w-[120%] sm:w-[150%] md:w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50">
+                    <ul class="py-2">
+                        <template x-for="(sugg, index) in suggestions" :key="index">
+                            <li>
+                                <button type="button" @click="selectSuggestion(sugg.text)" 
+                                        class="w-full text-left px-5 py-3 hover:bg-blue-50 flex items-center gap-3 transition-colors">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span x-text="sugg.text" class="text-gray-900 text-base font-medium"></span>
+                                </button>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="pr-1.5 pl-1 shrink-0 relative z-20">
+                <button type="submit" class="bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-3.5 px-8 rounded-full transition-colors whitespace-nowrap text-base">
+                    Find jobs
                 </button>
             </div>
         </form>
@@ -171,265 +248,94 @@
     </div>
 </section>
 
-{{-- ══════════════════════════════════════
-     STATS
-═════════════════════════════════════ --}}
-<section class="section">
-    <div class="section-inner">
-        <div class="stats-grid">
-            @php
-                $stats = [
-                    ['val' => number_format($jobsCount ?: 12480).'+', 'label' => 'Jobs Posted',       'color' => '#6366f1'],
-                    ['val' => '3,200+',                               'label' => 'Companies',          'color' => '#f43f5e'],
-                    ['val' => '450K+',                                'label' => 'Job Seekers',        'color' => '#34d399'],
-                    ['val' => '8,000+',                               'label' => 'Monthly Applies',    'color' => '#f59e0b'],
-                ];
-            @endphp
-            @foreach($stats as $s)
-                <div class="stat-card">
-                    <div class="stat-value stat-value-dynamic">{{ $s['val'] }}</div>
-                    <div class="stat-label">{{ $s['label'] }}</div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
+
 
 {{-- ══════════════════════════════════════
-     BROWSE BY CATEGORY
+     LATEST JOBS
 ══════════════════════════════════════ --}}
-<section class="section">
-    <div class="section-inner">
-        <div class="section-header">
-            <div class="section-title">
-                <span class="section-accent accent-indigo"></span>
-                <h2 class="section-heading">Browse by Category</h2>
-            </div>
-            <a href="{{ route('jobs.index') }}" class="chip chip-link">
-                View All &rarr;
-            </a>
-        </div>
-
-        @php
-            $cats = [
-                ['title'=>'Tech & Dev',   'icon'=>'💻','count'=>'1,420','val'=>'Software Development','from'=>'#6366f1','to'=>'#818cf8'],
-                ['title'=>'Healthcare',   'icon'=>'🩺','count'=>'850',  'val'=>'Healthcare',          'from'=>'#10b981','to'=>'#34d399'],
-                ['title'=>'Finance',      'icon'=>'💵','count'=>'640',  'val'=>'Finance',             'from'=>'#f59e0b','to'=>'#fbbf24'],
-                ['title'=>'Marketing',    'icon'=>'📣','count'=>'420',  'val'=>'Marketing',           'from'=>'#f43f5e','to'=>'#fb7185'],
-                ['title'=>'Construction', 'icon'=>'🏗️','count'=>'310', 'val'=>'Construction',        'from'=>'#8b5cf6','to'=>'#a78bfa'],
-                ['title'=>'Remote',       'icon'=>'🏠','count'=>'980',  'val'=>'Remote',              'from'=>'#0ea5e9','to'=>'#38bdf8'],
-            ];
-        @endphp
-        <div class="cat-grid">
-            @foreach($cats as $c)
-                <a href="{{ route('jobs.index', ['category' => $c['val']]) }}" class="cat-card">
-                  <div class="cat-icon cat-icon-dynamic">{{ $c['icon'] }}</div>
-                    <div>
-                        <div class="cat-title">{{ $c['title'] }}</div>
-                        <div class="cat-count">{{ $c['count'] }} jobs</div>
-                    </div>
-                </a>
-            @endforeach
-        </div>
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════
-     FEATURED JOBS
-══════════════════════════════════════ --}}
-<section class="section">
+<section class="section !pt-4 md:!pt-8" id="latest-jobs">
     <div class="section-inner">
         <div class="section-header">
             <div class="section-title">
                 <span class="section-accent accent-rose"></span>
-                <h2 class="section-heading">⭐ Featured Jobs</h2>
-                <span class="text-muted-xs">Promoted opportunities from certified partners</span>
+                <h2 class="section-heading">Latest Jobs</h2>
+                <span class="text-muted-xs">Recently posted opportunities across Canada</span>
             </div>
-            <a href="{{ route('jobs.index', ['featured'=>1]) }}" class="chip chip-link">
-                View All &rarr;
-            </a>
         </div>
 
-        <div class="feat-grid">
-            @forelse($featuredJobs as $job)
+        <div class="feat-grid" id="latest-jobs-grid">
+            @forelse($latestJobs as $job)
                 <x-job-card :job="$job" />
             @empty
                 <div class="feat-empty">
-                    No featured jobs right now &mdash;
+                    No latest jobs right now &mdash;
                     <a href="{{ route('jobs.index') }}" class="text-indigo">browse all jobs</a>
                 </div>
             @endforelse
         </div>
-    </div>
-</section>
+        <div x-data="{
+                 loading: false,
+                 nextPageUrl: '{{ $latestJobs->nextPageUrl() }}',
+                 loadMore() {
+                     if(this.loading || !this.nextPageUrl) return;
+                     this.loading = true;
+                     
+                     fetch(this.nextPageUrl)
+                        .then(res => res.text())
+                        .then(html => {
+                            let parser = new DOMParser();
+                            let doc = parser.parseFromString(html, 'text/html');
+                            
+                            let newGrid = doc.querySelector('#latest-jobs-grid');
+                            if (newGrid) {
+                                document.querySelector('#latest-jobs-grid').insertAdjacentHTML('beforeend', newGrid.innerHTML);
+                            }
+                            
+                            let newTrigger = doc.querySelector('#load-more-trigger');
+                            if (newTrigger && newTrigger.getAttribute('data-url')) {
+                                this.nextPageUrl = newTrigger.getAttribute('data-url');
+                            } else {
+                                this.nextPageUrl = null;
+                            }
+                            this.loading = false;
+                        })
+                        .catch(() => this.loading = false);
+                 }
+             }"
+             x-init="
+                 let observer = new IntersectionObserver((entries) => {
+                     if (entries[0].isIntersecting) {
+                         loadMore();
+                     }
+                 }, { rootMargin: '400px' });
+                 observer.observe($el);
+             "
+             class="mt-12 flex justify-center py-8"
+             id="load-more-trigger"
+             data-url="{{ $latestJobs->nextPageUrl() }}">
+             
+             <!-- Loading State -->
+             <div x-show="loading" class="flex flex-col items-center gap-3">
+                 <div class="relative w-10 h-10">
+                     <div class="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
+                     <div class="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
+                 </div>
+                 <span class="text-sm font-medium text-indigo-600 tracking-wide animate-pulse">Fetching more opportunities...</span>
+             </div>
 
-{{-- ══════════════════════════════════════
-     HOW IT WORKS
-══════════════════════════════════════ --}}
-<section class="section">
-    <div class="section-inner">
-        <div class="text-center mt-8">
-            <h2 class="section-heading">How JOBZINCANADA Works</h2>
-            <p class="text-muted-sm m-0">Three simple steps to your next role</p>
-        </div>
-
-        <div class="step-grid">
-            @php
-                $steps = [
-                    ['n'=>'1','title'=>'Create Your Profile',     'desc'=>'Sign up and build a professional profile. Upload your resume, skills, experience and preferences.', 'color'=>'#6366f1'],
-                    ['n'=>'2','title'=>'Discover Opportunities',  'desc'=>'Search and filter thousands of verified Canadian jobs by role, location, salary and work type.', 'color'=>'#f43f5e'],
-                    ['n'=>'3','title'=>'Apply & Get Hired',       'desc'=>'Apply with one click using your saved profile. Track your applications and land your dream job.', 'color'=>'#34d399'],
-                ];
-            @endphp
-            @foreach($steps as $step)
-                <div class="step-card">
-                    <div class="step-row">
-                        <div class="step-icon">
-                            <span class="step-n">{{ $step['n'] }}</span>
-                        </div>
-                        <h3 class="step-title">{{ $step['title'] }}</h3>
-                    </div>
-                    <p class="step-desc">{{ $step['desc'] }}</p>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════
-     WHY CHOOSE — gradient banner
-══════════════════════════════════════ --}}
-<section class="section">
-    <div class="section-inner">
-        <div class="portal-card portal-card-candidate">
-            <div class="portal-card-glow portal-glow-candidate"></div>
-
-            <div class="why-inner">
-                {{-- Left text --}}
-                <div class="why-visual">
-                    <h2 class="why-title">Why choose JOBZINCANADA?</h2>
-                    <p class="why-desc">
-                        Built with candidates and local employers in mind. Trusted by thousands of Canadians every month.
-                    </p>
-                    <a href="{{ route('register') }}" class="why-link">
-                        Get Started Free &rarr;
-                    </a>
-                </div>
-
-                {{-- Right features --}}
-                <div class="why-features">
-                    @php
-                        $whys = [
-                            ['icon'=>'✔️','title'=>'Verified Employers',    'desc'=>'All job posts are double-checked for corporate credentials.'],
-                            ['icon'=>'📍','title'=>'Canada-Wide Positions', 'desc'=>'Remote roles plus local jobs in Toronto, Vancouver & Montreal.'],
-                            ['icon'=>'💵','title'=>'Salary Transparency',   'desc'=>'See salary ranges and full benefits before applying.'],
-                        ];
-                    @endphp
-                    @foreach($whys as $w)
-                        <div class="why-feature">
-                            <div class="why-feature-icon">{{ $w['icon'] }}</div>
-                            <div class="why-feature-title">{{ $w['title'] }}</div>
-                            <div class="why-feature-desc">{{ $w['desc'] }}</div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+             <!-- End State -->
+             <div x-cloak x-show="!nextPageUrl && !loading" class="flex flex-col items-center gap-2 opacity-60">
+                 <div class="w-16 h-1 bg-gray-200 rounded-full mb-2"></div>
+                 <span class="text-sm font-medium text-gray-500">You've reached the end!</span>
+                 <span class="text-xs text-gray-400">No more jobs to load.</span>
+             </div>
         </div>
     </div>
 </section>
 
-{{-- ══════════════════════════════════════
-     PORTAL OPTIONS
-══════════════════════════════════════ --}}
-<section class="section">
-    <div class="section-inner">
-        <div class="portal-grid">
 
-            {{-- Job Seeker --}}
-            <div class="portal-card">
-                <div class="portal-card-glow portal-glow-candidate2"></div>
-                <div class="portal-icon">👨‍💻</div>
-                <div>
-                            <span class="pill-indigo">FOR CANDIDATES</span>
-                    <h2 class="portal-title">I am a Job Seeker</h2>
-                    <p class="portal-desc">
-                        Create a professional profile, upload multiple resumes, set real-time job alerts,
-                        and apply to top Canadian vacancies in seconds.
-                    </p>
-                </div>
-                <ul class="portal-list">
-                    @foreach(['Build a stunning profile','Upload & manage resumes','Set smart job alerts','One-click applications'] as $f)
-                        <li>
-                            <span class="portal-list-dot dot-indigo">✓</span>
-                            {{ $f }}
-                        </li>
-                    @endforeach
-                </ul>
-                <div class="portal-actions">
-                    <a href="{{ route('register') }}" class="portal-btn-primary">
-                        Get Started Free
-                    </a>
-                    <a href="{{ route('jobs.index') }}" class="portal-btn-secondary">
-                        Browse Jobs &rarr;
-                    </a>
-                </div>
-            </div>
 
-            {{-- Employer --}}
-            <div class="portal-card portal-card-employer">
-                <div class="portal-card-glow portal-glow-employer"></div>
-                <div class="portal-icon">🏢</div>
-                <div>
-                            <span class="pill-rose">FOR EMPLOYERS</span>
-                    <h2 class="portal-title">I am a Canadian Employer</h2>
-                    <p class="portal-desc">
-                        Publish roles, screen applicants via our pipeline dashboard, access premium
-                        candidate search, and verify your brand credentials.
-                    </p>
-                </div>
-                <ul class="portal-list">
-                    @foreach(['Post unlimited job listings','Applicant pipeline kanban','Premium candidate database','Company verification badge'] as $f)
-                        <li>
-                            <span class="portal-list-dot dot-rose">✓</span>
-                            {{ $f }}
-                        </li>
-                    @endforeach
-                </ul>
-                <div class="portal-actions">
-                    <a href="{{ route('register') }}" class="portal-btn-primary btn-rose">
-                        Post a Job
-                    </a>
-                    <a href="{{ route('login') }}" class="portal-btn-secondary text-white-60">
-                        Employer Sign-In &rarr;
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-{{-- ══════════════════════════════════════
-     NEWSLETTER
-══════════════════════════════════════ --}}
-<section class="section">
-    <div class="section-inner">
-        <div class="newsletter-wrap">
-            <div class="newsletter-bg"></div>
-            <div class="newsletter-inner">
-                <div class="newsletter-icon">📬</div>
-                <h3 class="newsletter-title">Subscribe to Job Alerts</h3>
-                <p class="newsletter-desc">
-                    Get weekly updates on new vacancies, salary reports and hiring companies across Canada.
-                </p>
-                <form class="newsletter-form">
-                    <input type="email" class="newsletter-input" placeholder="Enter your email address...">
-                    <button type="submit" class="newsletter-btn">Subscribe</button>
-                </form>
-                <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
-            </div>
-        </div>
-    </div>
-</section>
 
 <x-footer />
 

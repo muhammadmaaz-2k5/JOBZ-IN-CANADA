@@ -22,6 +22,14 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/how-it-works', function () {
+    return view('how-it-works');
+})->name('how-it-works');
+
+Route::get('/why-choose-us', function () {
+    return view('why-choose-us');
+})->name('why-choose-us');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
