@@ -12,7 +12,10 @@
     <link href="https://fonts.bunny.net/css?family=poppins:300,400,500,600,700,800" rel="stylesheet" />
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/app.js'])
+
+    <!-- Firebase Init -->
+    <x-firebase-init />
 </head>
 <body class="bg-[#f8fafc] text-slate-800 selection:bg-[#1650e1] selection:text-white font-sans">
     <div class="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">

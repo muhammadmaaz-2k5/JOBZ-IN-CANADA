@@ -1,18 +1,17 @@
-<x-mail::message>
-# {{ $subjectLine }}
+@extends('emails.layout', ['subject' => $subjectLine ?? 'Application Notification'])
 
-{{ $line1 }}
-
-@if(isset($line2))
-{{ $line2 }}
-@endif
-
-@if(isset($actionUrl))
-<x-mail::button :url="$actionUrl">
-{{ $actionText }}
-</x-mail::button>
-@endif
-
-Thanks,<br>
-{{ config('app.name') }}
-</x-mail::message>
+@section('content')
+    <h2>{{ $subjectLine }}</h2>
+    
+    <p>{{ $line1 }}</p>
+    
+    @if(isset($line2))
+        <p>{{ $line2 }}</p>
+    @endif
+    
+    @if(isset($actionUrl))
+        <div class="button-wrap">
+            <a href="{{ $actionUrl }}" class="button">{{ $actionText }}</a>
+        </div>
+    @endif
+@endsection

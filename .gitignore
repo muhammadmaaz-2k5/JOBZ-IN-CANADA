@@ -26,3 +26,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /public/*.json
+/storage/app/firebase-adminsdk.json
+/public/google-services.json
+/storage/app/google-services.json

@@ -14,7 +14,10 @@
     <link href="https://fonts.bunny.net/css?family=poppins:300,400,500,600,700,800" rel="stylesheet" />
     
     <!-- Scripts & Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/app.js'])
+
+    <!-- Firebase Init -->
+    <x-firebase-init />
 </head>
 <body class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans">
 
@@ -119,7 +122,7 @@
 
                     <!-- Social Signin Component -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
-                        <a href="#" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
+                        <button type="button" id="google-login-btn" onclick="handleGoogleLogin()" class="flex w-full items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
                             <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                                 <g transform="matrix(1, 0, 0, 1, 0, 0)">
                                     <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.38C21.68,11.96 21.56,11.5 21.35,11.1z" fill="#4285F4" />
@@ -129,8 +132,8 @@
                                 </g>
                             </svg>
                             Google
-                        </a>
-                        <a href="#" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
+                        </button>
+                        <button type="button" class="flex w-full items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
                             <svg class="text-[#0a66c2]" fill="currentColor" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                             </svg>
@@ -203,5 +206,48 @@
 
     </div>
 
+    <script>
+        async function handleGoogleLogin() {
+            try {
+                if (!window.firebaseAuth) {
+                    console.error("Firebase auth not initialized");
+                    return;
+                }
+                
+                const { auth, signInWithPopup, googleProvider } = window.firebaseAuth;
+                
+                // Show a loading state (optional)
+                document.getElementById('google-login-btn').innerHTML = 'Logging in...';
+
+                const result = await signInWithPopup(auth, googleProvider);
+                const idToken = await result.user.getIdToken();
+
+                // Send the ID token to the backend
+                const response = await fetch('{{ route('firebase.callback') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ idToken })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    console.error("Backend auth failed:", data.error);
+                    alert("Authentication failed: " + (data.error || "Unknown error"));
+                    document.getElementById('google-login-btn').innerHTML = 'Google';
+                }
+
+            } catch (error) {
+                console.error("Firebase Login Error:", error);
+                alert("Login was cancelled or failed.");
+                document.getElementById('google-login-btn').innerHTML = 'Google';
+            }
+        }
+    </script>
 </body>
 </html>

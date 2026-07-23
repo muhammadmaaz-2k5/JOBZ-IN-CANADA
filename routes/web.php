@@ -230,6 +230,9 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+// Firebase Authentication Callback
+Route::post('/auth/firebase/callback', [\App\Http\Controllers\Auth\FirebaseAuthController::class, 'callback'])->name('firebase.callback');
+
 // Public Search Suggestions Autocomplete API
 Route::get('/api/jobs/suggestions', [SearchSuggestionController::class, 'index'])->name('api.jobs.suggestions');
 

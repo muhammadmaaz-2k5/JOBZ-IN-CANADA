@@ -151,4 +151,16 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Payment::class);
     }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $code = random_int(100000, 999999);
+        \Illuminate\Support\Facades\Cache::put('email_verification_' . $this->id, $code, now()->addMinutes(15));
+        $this->notify(new \App\Notifications\VerifyEmailOtp($code));
+    }
 }
