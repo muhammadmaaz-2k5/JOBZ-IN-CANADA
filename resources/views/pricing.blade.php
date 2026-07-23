@@ -10,7 +10,6 @@
     <link href="https://fonts.bunny.net/css?family=poppins:300,400,500,600,700,800" rel="stylesheet" />
     
     <!-- Scripts/Styles -->
-    @vite('resources/css/app.css')
     @vite('resources/js/app.js')
 </head>
 <body class="antialiased bg-[#f8fafc] text-slate-800 transition-colors duration-300" x-data="{ dark: false }" :class="{'dark bg-slate-900 text-slate-100': dark}">
