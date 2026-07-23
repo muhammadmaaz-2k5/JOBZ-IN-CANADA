@@ -81,80 +81,105 @@
         <!-- Company Cover & Logo Header Card -->
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
             <!-- Cover Image -->
-            <div class="h-48 md:h-64 bg-gray-200 relative">
+            <div class="h-48 md:h-64 bg-gray-100 relative overflow-hidden">
                 @if($company->cover_image)
                     <img src="{{ $company->cover_image }}" alt="Cover" class="w-full h-full object-cover">
                 @else
-                    <div class="w-full h-full bg-gradient-to-r from-blue-600 to-indigo-700"></div>
+                    <!-- Branded Fallback Banner -->
+                    <div class="w-full h-full bg-[#1650e1] relative flex items-center justify-center overflow-hidden">
+                        <!-- Abstract shapes for premium look -->
+                        <div class="absolute inset-0 opacity-10">
+                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                        <path d="M0 40L40 0H20L0 20M40 40V20L20 40" fill="none" stroke="currentColor" stroke-width="2"/>
+                                    </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill="url(#grid)" />
+                            </svg>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#1650e1] to-[#0f3ea6] opacity-90"></div>
+                        
+                        <!-- Branded Text -->
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-white text-[#1650e1] text-3xl font-bold mb-3 shadow-lg">
+                                J
+                            </div>
+                            <span class="text-white text-2xl font-bold tracking-wider opacity-90">JOBZ IN <span class="text-amber-400">CANADA</span></span>
+                        </div>
+                    </div>
                 @endif
             </div>
 
             <!-- Profile Header Details -->
             <div class="px-6 sm:px-8 pb-6">
-                <div class="flex flex-col md:flex-row md:items-end justify-between -mt-16 md:-mt-20 gap-6">
-                    <!-- Logo & Basic Info -->
-                    <div class="flex flex-col sm:flex-row items-start sm:items-end gap-6">
-                        <!-- Logo -->
-                        @php
-                            $bgColors = [
-                                'Shopify Canada' => 'bg-blue-600',
-                                'TechNorth Solutions' => 'bg-teal-600',
-                                'Maple Finance Group' => 'bg-amber-600',
-                                'Northern Health Systems' => 'bg-emerald-600',
-                                'CanBridge Engineering' => 'bg-indigo-600',
-                            ];
-                            $bgClass = $bgColors[$company->company_name] ?? 'bg-[#1650e1]';
-                            $avg = $company->reviews()->avg('rating') ?: 4.5;
-                        @endphp
-                        <div class="w-32 h-32 rounded-2xl border-4 border-white shadow-md flex-shrink-0 flex items-center justify-center text-4xl font-bold text-white {{ $company->logo ? 'bg-white' : $bgClass }} relative z-10">
-                            @if($company->logo)
-                                <img src="{{ $company->logo }}" alt="{{ $company->company_name }}" class="w-full h-full object-cover rounded-xl">
-                            @else
-                                {{ strtoupper(substr($company->company_name, 0, 2)) }}
-                            @endif
-                        </div>
-
-                        <!-- Brand Info -->
-                        <div class="pt-2">
-                            <div class="flex items-center gap-2">
-                                <h1 class="text-3xl font-bold text-gray-900">
-                                    {{ $company->company_name }}
-                                </h1>
-                                @if($company->verification_status === 'verified')
-                                    <svg class="w-6 h-6 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Verified Employer">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                    </svg>
-                                @endif
-                            </div>
-
-                            <p class="text-gray-600 mt-2 flex items-center gap-2 text-sm sm:text-base">
-                                <span>📍 {{ $company->headquarters ?: 'Canada' }}</span>
-                                <span class="text-gray-300">&bull;</span>
-                                <span>🏷️ {{ $company->industry ?: 'Industry' }}</span>
-                            </p>
-
-                            <!-- Rating summary -->
-                            <div class="flex items-center gap-2 mt-2">
-                                <div class="flex text-amber-400 text-lg">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span>{{ $i <= round($avg) ? '★' : '☆' }}</span>
-                                    @endfor
-                                </div>
-                                <span class="text-sm font-medium text-gray-600">({{ number_format($avg, 1) }})</span>
-                            </div>
-                        </div>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Logo -->
+                    @php
+                        $bgColors = [
+                            'Shopify Canada' => 'bg-blue-600',
+                            'TechNorth Solutions' => 'bg-teal-600',
+                            'Maple Finance Group' => 'bg-amber-600',
+                            'Northern Health Systems' => 'bg-emerald-600',
+                            'CanBridge Engineering' => 'bg-indigo-600',
+                        ];
+                        $bgClass = $bgColors[$company->company_name] ?? 'bg-[#1650e1]';
+                        $avg = $company->reviews()->avg('rating') ?: 4.5;
+                    @endphp
+                    
+                    <div class="-mt-12 md:-mt-16 w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-white shadow-md flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-white {{ $company->logo ? 'bg-white' : $bgClass }} relative z-10 overflow-hidden">
+                        @if($company->logo)
+                            <img src="{{ $company->logo }}" alt="{{ $company->company_name }}" class="w-full h-full object-cover">
+                        @else
+                            {{ strtoupper(substr($company->company_name, 0, 2)) }}
+                        @endif
                     </div>
 
-                    <!-- Action items -->
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        @if($company->website)
-                            <a href="{{ $company->website }}" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white border border-gray-300 text-gray-700 font-medium py-2.5 px-6 rounded-lg hover:bg-gray-50 transition-colors">
-                                Visit Website ↗
-                            </a>
-                        @endif
-                        <button type="button" class="flex-1 md:flex-none bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2.5 px-8 rounded-lg transition-colors">
-                            Follow
-                        </button>
+                    <!-- Brand Info & Actions -->
+                    <div class="flex-1 mt-2 md:mt-4">
+                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                            <!-- Info -->
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h1 class="text-3xl font-bold text-gray-900">
+                                        {{ $company->company_name }}
+                                    </h1>
+                                    @if($company->verification_status === 'verified')
+                                        <svg class="w-6 h-6 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Verified Employer">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                </div>
+
+                                <p class="text-gray-600 mt-2 flex flex-wrap items-center gap-2 text-sm sm:text-base">
+                                    <span class="flex items-center gap-1">📍 {{ $company->headquarters ?: 'Canada' }}</span>
+                                    <span class="text-gray-300 hidden sm:inline">&bull;</span>
+                                    <span class="flex items-center gap-1">🏷️ {{ $company->industry ?: 'Industry' }}</span>
+                                </p>
+
+                                <!-- Rating summary -->
+                                <div class="flex items-center gap-2 mt-2">
+                                    <div class="flex text-amber-400 text-lg">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <span>{{ $i <= round($avg) ? '★' : '☆' }}</span>
+                                        @endfor
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-600">({{ number_format($avg, 1) }})</span>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center gap-3 w-full md:w-auto pt-2 md:pt-0 shrink-0">
+                                @if($company->website)
+                                    <a href="{{ $company->website }}" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white border border-gray-300 text-gray-700 font-medium py-2 px-6 rounded-lg hover:bg-gray-50 transition-colors">
+                                        Website ↗
+                                    </a>
+                                @endif
+                                <button type="button" class="flex-1 md:flex-none bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2 px-8 rounded-lg transition-colors">
+                                    Follow
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
