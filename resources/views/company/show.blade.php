@@ -483,6 +483,8 @@
                             headquarters: '{{ $company->headquarters ?: 'Canada' }}',
                             loading: true,
                             error: false,
+                            isFullscreen: false,
+                            mapInstance: null,
                             initMap() {
                                 fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(this.headquarters) + '&limit=1')
                                     .then(res => res.json())
@@ -493,14 +495,14 @@
                                             let lon = parseFloat(data[0].lon);
                                             
                                             // Initialize Leaflet map with attribution disabled
-                                            let map = L.map($refs.mapContainer, {
+                                            this.mapInstance = L.map($refs.map, {
                                                 attributionControl: false,
                                                 zoomControl: true
                                             }).setView([lat, lon], 13);
                                             
                                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                                                 maxZoom: 19
-                                            }).addTo(map);
+                                            }).addTo(this.mapInstance);
                                             
                                             // Add a custom styled marker
                                             let markerHtml = `<div class=\'w-8 h-8 bg-[#1650e1] text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white\'><svg class=\'w-4 h-4\' fill=\'currentColor\' viewBox=\'0 0 20 20\'><path fill-rule=\'evenodd\' d=\'M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z\' clip-rule=\'evenodd\'/></svg></div>`;
@@ -511,19 +513,40 @@
                                                 iconAnchor: [16, 32]
                                             });
                                             
-                                            L.marker([lat, lon], {icon: customIcon}).addTo(map);
+                                            L.marker([lat, lon], {icon: customIcon}).addTo(this.mapInstance);
                                         } else {
                                             this.error = true;
                                         }
                                     })
-                                    .catch(() => { 
+                                    .catch((err) => { 
+                                        console.error('Map Error:', err);
                                         this.loading = false; 
                                         this.error = true;
                                     });
+
+                                // Listen to native fullscreen changes
+                                document.addEventListener('fullscreenchange', () => {
+                                    this.isFullscreen = !!document.fullscreenElement;
+                                    if (this.mapInstance) {
+                                        setTimeout(() => {
+                                            this.mapInstance.invalidateSize();
+                                        }, 100);
+                                    }
+                                });
+                            },
+                            toggleFullscreen() {
+                                if (!document.fullscreenElement) {
+                                    $refs.mapWrapper.requestFullscreen().catch(err => {
+                                        console.error('Error attempting to enable fullscreen:', err);
+                                    });
+                                } else {
+                                    document.exitFullscreen();
+                                }
                             }
                         }"
                         x-init="initMap()"
-                        class="rounded-xl overflow-hidden bg-gray-100 aspect-video relative mb-3 border border-gray-200 z-0"
+                        x-ref="mapWrapper"
+                        class="rounded-xl overflow-hidden bg-gray-100 aspect-video relative mb-3 border border-gray-200 z-0 bg-white"
                     >
                         <!-- Loading State -->
                         <div x-show="loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 z-10" x-transition>
@@ -543,7 +566,23 @@
                         </div>
 
                         <!-- Leaflet Map Container -->
-                        <div x-ref="map" class="w-full h-full absolute inset-0 z-0"></div>
+                        <div x-ref="map" class="w-full h-full absolute inset-0 z-0 bg-gray-100"></div>
+
+                        <!-- Fullscreen Toggle Button -->
+                        <button 
+                            x-show="!loading && !error"
+                            @click="toggleFullscreen()"
+                            type="button" 
+                            class="absolute top-2 right-2 z-[400] bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-[#1650e1] p-2 rounded-lg shadow-md transition-colors flex items-center justify-center"
+                            :title="isFullscreen ? 'Exit Fullscreen' : 'View Fullscreen'"
+                        >
+                            <svg x-show="!isFullscreen" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                            </svg>
+                            <svg x-show="isFullscreen" x-cloak class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4M4 14l5 5M16 4v4h4M16 4l5-5M4 10h4V6M4 10l5-5M16 20v-4h4M16 20l5 5" />
+                            </svg>
+                        </button>
                     </div>
                     
                     <p class="font-medium text-gray-900 flex items-start gap-2">
