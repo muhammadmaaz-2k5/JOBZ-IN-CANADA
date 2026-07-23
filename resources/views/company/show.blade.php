@@ -471,20 +471,84 @@
                     </div>
                 </div>
 
-                <!-- Headquarters Location Interactive Map simulation -->
+                <!-- Headquarters Location Interactive Map -->
                 <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                     <h3 class="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">Office Location</h3>
-                    <div class="rounded-xl overflow-hidden bg-gray-100 aspect-video relative mb-3 group cursor-pointer">
-                        <div class="absolute inset-0 bg-blue-50 border-2 border-blue-100 rounded-xl flex items-center justify-center">
-                            <svg class="w-8 h-8 text-blue-400 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    
+                    <!-- Load Leaflet CSS & JS -->
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+                    <div x-data="{
+                            headquarters: '{{ $company->headquarters ?: 'Canada' }}',
+                            loading: true,
+                            error: false,
+                            initMap() {
+                                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(this.headquarters) + '&limit=1')
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        this.loading = false;
+                                        if (data && data.length > 0) {
+                                            let lat = parseFloat(data[0].lat);
+                                            let lon = parseFloat(data[0].lon);
+                                            
+                                            // Initialize Leaflet map with attribution disabled
+                                            let map = L.map($refs.mapContainer, {
+                                                attributionControl: false,
+                                                zoomControl: true
+                                            }).setView([lat, lon], 13);
+                                            
+                                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                maxZoom: 19
+                                            }).addTo(map);
+                                            
+                                            // Add a custom styled marker
+                                            let markerHtml = `<div class=\'w-8 h-8 bg-[#1650e1] text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white\'><svg class=\'w-4 h-4\' fill=\'currentColor\' viewBox=\'0 0 20 20\'><path fill-rule=\'evenodd\' d=\'M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z\' clip-rule=\'evenodd\'/></svg></div>`;
+                                            let customIcon = L.divIcon({
+                                                html: markerHtml,
+                                                className: '',
+                                                iconSize: [32, 32],
+                                                iconAnchor: [16, 32]
+                                            });
+                                            
+                                            L.marker([lat, lon], {icon: customIcon}).addTo(map);
+                                        } else {
+                                            this.error = true;
+                                        }
+                                    })
+                                    .catch(() => { 
+                                        this.loading = false; 
+                                        this.error = true;
+                                    });
+                            }
+                        }"
+                        x-init="initMap()"
+                        class="rounded-xl overflow-hidden bg-gray-100 aspect-video relative mb-3 border border-gray-200 z-0"
+                    >
+                        <!-- Loading State -->
+                        <div x-show="loading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 z-10" x-transition>
+                            <svg class="animate-spin h-8 w-8 text-[#1650e1] mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
+                            <span class="text-sm font-medium">Loading Map...</span>
                         </div>
+
+                        <!-- Error/Not Found State -->
+                        <div x-show="error" x-cloak class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 z-10" x-transition>
+                            <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="text-sm font-medium">Location map not available</span>
+                        </div>
+
+                        <!-- Leaflet Map Container -->
+                        <div x-ref="map" class="w-full h-full absolute inset-0 z-0"></div>
                     </div>
+                    
                     <p class="font-medium text-gray-900 flex items-start gap-2">
                         <span class="mt-0.5">📍</span>
-                        <span>{{ $company->headquarters ?: 'Toronto, ON' }}</span>
+                        <span>{{ $company->headquarters ?: 'Canada' }}</span>
                     </p>
                 </div>
 
