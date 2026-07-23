@@ -8,35 +8,6 @@
         </div>
     </x-slot>
 
-    <!-- Styles for print & screen separation -->
-    <style>
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #resume-print-area, #resume-print-area * {
-                visibility: visible;
-            }
-            #resume-print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 210mm; /* A4 width */
-                min-height: 297mm; /* A4 height */
-                padding: 15mm !important;
-                background: white !important;
-                color: black !important;
-                box-shadow: none !important;
-                border: none !important;
-                margin: 0 !important;
-            }
-            /* Hide non-print elements */
-            header, aside, .no-print {
-                display: none !important;
-            }
-        }
-    </style>
-
     <div
          x-data="{
             activeTab: 'personal',

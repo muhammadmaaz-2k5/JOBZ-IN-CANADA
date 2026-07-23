@@ -32,7 +32,7 @@
                             <span>J</span>
                         </div>
                         <span>
-                            JOBZ <span>CA</span>
+                            JOBZ IN <span>CANADA</span>
                         </span>
                     </a>
                 </div>
