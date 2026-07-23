@@ -127,7 +127,6 @@
                             'CanBridge Engineering' => 'bg-indigo-600',
                         ];
                         $bgClass = $bgColors[$company->company_name] ?? 'bg-[#1650e1]';
-                        $avg = $company->reviews()->avg('rating') ?: 4.5;
                     @endphp
                     
                     <div class="-mt-12 md:-mt-16 w-24 h-24 md:w-32 md:h-32 rounded-2xl border-4 border-white shadow-md flex-shrink-0 flex items-center justify-center text-3xl md:text-4xl font-bold text-white {{ $company->logo ? 'bg-white' : $bgClass }} relative z-10 overflow-hidden">
@@ -164,10 +163,10 @@
                                 <div class="flex items-center gap-2 mt-2">
                                     <div class="flex text-amber-400 text-lg">
                                         @for($i = 1; $i <= 5; $i++)
-                                            <span>{{ $i <= round($avg) ? '★' : '☆' }}</span>
+                                            <span>{{ $i <= round($avgRating) ? '★' : '☆' }}</span>
                                         @endfor
                                     </div>
-                                    <span class="text-sm font-medium text-gray-600">({{ number_format($avg, 1) }})</span>
+                                    <span class="text-sm font-medium text-gray-600">({{ number_format($avgRating, 1) }})</span>
                                 </div>
                             </div>
 
@@ -286,38 +285,26 @@
                     <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm mb-6 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
                         <div class="text-center md:border-r border-gray-200 md:pr-8">
                             <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Average Rating</h4>
-                            <p class="text-5xl font-bold text-gray-900 mb-2">{{ number_format($avg, 1) }}</p>
+                            <p class="text-5xl font-bold text-gray-900 mb-2">{{ number_format($avgRating, 1) }}</p>
                             <div class="flex justify-center text-amber-400 text-2xl mb-2">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <span>{{ $i <= round($avg) ? '★' : '☆' }}</span>
+                                    <span>{{ $i <= round($avgRating) ? '★' : '☆' }}</span>
                                 @endfor
                             </div>
-                            <p class="text-sm text-gray-500">Based on {{ $reviews->count() ?: 12 }} reviews</p>
+                            <p class="text-sm text-gray-500">Based on {{ $totalReviews }} reviews</p>
                         </div>
                         <div class="md:col-span-2">
                             <h4 class="text-lg font-bold text-gray-900 mb-4">Candidate Opinion</h4>
                             <div class="space-y-3">
-                                <div class="flex items-center gap-4">
-                                    <span class="w-8 text-sm font-medium text-gray-600">5 ★</span>
-                                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-amber-400 rounded-full" style="width: 75%"></div>
+                                @foreach([5, 4, 3, 2, 1] as $star)
+                                    <div class="flex items-center gap-4">
+                                        <span class="w-8 text-sm font-medium text-gray-600">{{ $star }} ★</span>
+                                        <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-amber-400 rounded-full" style="width: {{ $ratingPercentages[$star] ?? 0 }}%"></div>
+                                        </div>
+                                        <span class="w-10 text-right text-sm text-gray-500">{{ $ratingPercentages[$star] ?? 0 }}%</span>
                                     </div>
-                                    <span class="w-10 text-right text-sm text-gray-500">75%</span>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <span class="w-8 text-sm font-medium text-gray-600">4 ★</span>
-                                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-amber-400 rounded-full" style="width: 20%"></div>
-                                    </div>
-                                    <span class="w-10 text-right text-sm text-gray-500">20%</span>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <span class="w-8 text-sm font-medium text-gray-600">3 ★</span>
-                                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-amber-400 rounded-full" style="width: 5%"></div>
-                                    </div>
-                                    <span class="w-10 text-right text-sm text-gray-500">5%</span>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -334,10 +321,11 @@
                             </button>
                         </div>
                         
-                        <form x-show="openForm" x-transition class="mt-6 pt-6 border-t border-gray-100 space-y-4" style="display: none;">
+                        <form action="{{ route('companies.reviews.store', $company->slug) }}" method="POST" x-show="openForm" x-transition class="mt-6 pt-6 border-t border-gray-100 space-y-4" style="display: none;">
+                            @csrf
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Rating</label>
-                                <select class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none">
+                                <select name="rating" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none">
                                     <option value="5">★★★★★ (5 - Excellent)</option>
                                     <option value="4">★★★★☆ (4 - Very Good)</option>
                                     <option value="3">★★★☆☆ (3 - Average)</option>
@@ -347,15 +335,19 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Summary / Title</label>
-                                <input type="text" placeholder="e.g. Great work-life balance and supportive team" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none">
+                                <input type="text" name="title" required placeholder="e.g. Great work-life balance and supportive team" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Detailed Feedback</label>
-                                <textarea rows="4" placeholder="Share details about the interview process, company culture, benefits, or general work experience..." class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none"></textarea>
+                                <textarea name="review" required rows="4" placeholder="Share details about the interview process, company culture, benefits, or general work experience..." class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none"></textarea>
                             </div>
                             <div class="flex justify-end gap-3 pt-2">
                                 <button type="button" @click="openForm = false" class="px-6 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-                                <button type="button" @click="openForm = false" class="bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2.5 px-6 rounded-lg transition-colors">Submit Review</button>
+                                @auth
+                                    <button type="submit" class="bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2.5 px-6 rounded-lg transition-colors">Submit Review</button>
+                                @else
+                                    <a href="{{ route('login') }}" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-6 rounded-lg transition-colors">Login to Review</a>
+                                @endauth
                             </div>
                         </form>
                     </div>
@@ -375,7 +367,7 @@
                                     </div>
                                     <span class="text-sm text-gray-500 whitespace-nowrap">{{ $rev->created_at->format('M d, Y') }}</span>
                                 </div>
-                                <p class="text-gray-700 leading-relaxed mb-4">{{ $rev->comment }}</p>
+                                <p class="text-gray-700 leading-relaxed mb-4">{{ $rev->review }}</p>
                                 <p class="text-sm text-gray-500 font-medium">By: {{ $rev->user->first_name ?? 'Anonymous Candidate' }}</p>
                             </div>
                         @empty
@@ -395,27 +387,36 @@
                     <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm mb-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-6">Our Core Values</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100">
-                                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            @if(isset($company->culture_data['core_values']) && is_array($company->culture_data['core_values']) && count($company->culture_data['core_values']) > 0)
+                                @foreach($company->culture_data['core_values'] as $value)
+                                    <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100">
+                                        <h4 class="text-lg font-bold text-gray-900 mb-2">{{ $value['title'] ?? 'Value' }}</h4>
+                                        <p class="text-sm text-gray-600">{{ $value['description'] ?? '' }}</p>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100">
+                                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-900 mb-2">Innovation</h4>
+                                    <p class="text-sm text-gray-600">Constantly seeking newer solutions to help candidates scale in their domains.</p>
                                 </div>
-                                <h4 class="text-lg font-bold text-gray-900 mb-2">Innovation</h4>
-                                <p class="text-sm text-gray-600">Constantly seeking newer solutions to help candidates scale in their domains.</p>
-                            </div>
-                            <div class="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
-                                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-4">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                <div class="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
+                                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-4">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-900 mb-2">Inclusion</h4>
+                                    <p class="text-sm text-gray-600">Embracing diverse candidates and backgrounds to enrich the local marketplace.</p>
                                 </div>
-                                <h4 class="text-lg font-bold text-gray-900 mb-2">Inclusion</h4>
-                                <p class="text-sm text-gray-600">Embracing diverse candidates and backgrounds to enrich the local marketplace.</p>
-                            </div>
-                            <div class="bg-teal-50/50 p-6 rounded-xl border border-teal-100">
-                                <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center mb-4">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                <div class="bg-teal-50/50 p-6 rounded-xl border border-teal-100">
+                                    <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center mb-4">
+                                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-900 mb-2">Reliability</h4>
+                                    <p class="text-sm text-gray-600">Ensuring verified jobs, safe billing transactions, and responsive layouts.</p>
                                 </div>
-                                <h4 class="text-lg font-bold text-gray-900 mb-2">Reliability</h4>
-                                <p class="text-sm text-gray-600">Ensuring verified jobs, safe billing transactions, and responsive layouts.</p>
-                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -423,27 +424,38 @@
                     <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
                         <h3 class="text-xl font-bold text-gray-900 mb-6">Office &amp; Team Gallery</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
-                                <span class="text-4xl group-hover:scale-110 transition-transform">🏢</span>
-                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                    <span class="text-white font-bold">Office Space</span>
-                                    <span class="text-gray-200 text-xs">Headquarters</span>
+                            @if(isset($company->culture_data['gallery']) && is_array($company->culture_data['gallery']) && count($company->culture_data['gallery']) > 0)
+                                @foreach($company->culture_data['gallery'] as $image)
+                                    <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
+                                        <img src="{{ $image['url'] ?? '' }}" alt="{{ $image['caption'] ?? 'Gallery Image' }}" class="w-full h-full object-cover">
+                                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                            <span class="text-white font-bold">{{ $image['caption'] ?? '' }}</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
+                                    <span class="text-4xl group-hover:scale-110 transition-transform">🏢</span>
+                                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                        <span class="text-white font-bold">Office Space</span>
+                                        <span class="text-gray-200 text-xs">Headquarters</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
-                                <span class="text-4xl group-hover:scale-110 transition-transform">👥</span>
-                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                    <span class="text-white font-bold">Team Meeting</span>
-                                    <span class="text-gray-200 text-xs">Collaboration</span>
+                                <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
+                                    <span class="text-4xl group-hover:scale-110 transition-transform">👥</span>
+                                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                        <span class="text-white font-bold">Team Meeting</span>
+                                        <span class="text-gray-200 text-xs">Collaboration</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
-                                <span class="text-4xl group-hover:scale-110 transition-transform">☕</span>
-                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                    <span class="text-white font-bold">Breakout Area</span>
-                                    <span class="text-gray-200 text-xs">Social Lounge</span>
+                                <div class="group relative rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 flex items-center justify-center cursor-pointer">
+                                    <span class="text-4xl group-hover:scale-110 transition-transform">☕</span>
+                                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                        <span class="text-white font-bold">Breakout Area</span>
+                                        <span class="text-gray-200 text-xs">Social Lounge</span>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -469,7 +481,7 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Average Review:</span>
-                            <span class="font-bold text-gray-900">{{ number_format($avg, 1) }} / 5.0</span>
+                            <span class="font-bold text-gray-900">{{ number_format($avgRating, 1) }} / 5.0</span>
                         </div>
                     </div>
                 </div>

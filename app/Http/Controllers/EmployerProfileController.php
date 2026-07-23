@@ -61,6 +61,7 @@ class EmployerProfileController extends Controller
             // Branding uploads
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // 2MB
             'cover_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'], // 3MB
+            'gallery_images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // 2MB per gallery image
         ]);
 
         // Upload Logo to Cloudinary
@@ -87,6 +88,27 @@ class EmployerProfileController extends Controller
             }
         }
 
+        // Upload Gallery Images
+        if ($request->hasFile('gallery_images')) {
+            $cultureData = $company->culture_data ?? [];
+            if (!isset($cultureData['gallery'])) {
+                $cultureData['gallery'] = [];
+            }
+
+            foreach ($request->file('gallery_images') as $image) {
+                $result = \App\Services\CloudinaryService::upload($image, 'job-portal/company-gallery');
+                if ($result) {
+                    $cultureData['gallery'][] = [
+                        'url' => $result['secure_url'],
+                        'public_id' => $result['public_id'],
+                        'caption' => 'Office Image'
+                    ];
+                }
+            }
+
+            $company->culture_data = $cultureData;
+        }
+
         // Update Company
         $company->update([
             'company_name' => $request->company_name,
@@ -102,6 +124,7 @@ class EmployerProfileController extends Controller
             'logo_public_id' => $company->logo_public_id,
             'cover_image' => $company->cover_image,
             'cover_image_public_id' => $company->cover_image_public_id,
+            'culture_data' => $company->culture_data,
         ]);
 
         // Update User details
@@ -123,6 +146,40 @@ class EmployerProfileController extends Controller
         return redirect()->route('employer.profile.edit')->with('status', 'profile-updated');
     }
 
+    public function deleteGalleryImage($index)
+    {
+        $user = Auth::user();
+        $employerProfile = $user->employerProfile;
+        
+        if (!$employerProfile || !$employerProfile->company) {
+            return back()->with('error', 'Company not found.');
+        }
+        
+        $company = $employerProfile->company;
+        $cultureData = $company->culture_data ?? [];
+        
+        if (isset($cultureData['gallery']) && isset($cultureData['gallery'][$index])) {
+            $image = $cultureData['gallery'][$index];
+            
+            // Delete from Cloudinary
+            if (!empty($image['public_id'])) {
+                \App\Services\CloudinaryService::delete($image['public_id']);
+            }
+            
+            // Remove from array and reindex
+            unset($cultureData['gallery'][$index]);
+            $cultureData['gallery'] = array_values($cultureData['gallery']);
+            
+            $company->update(['culture_data' => $cultureData]);
+            
+            AuditLogHelper::log($user->id, 'gallery_image_deleted', 'Employer deleted a gallery image.');
+            
+            return back()->with('status', 'image-deleted')->with('success', 'Image successfully removed from gallery.');
+        }
+
+        return back()->with('error', 'Image not found.');
+    }
+
     /**
      * Display the public company profile view.
      */
@@ -134,7 +191,28 @@ class EmployerProfileController extends Controller
         $jobs = $company->jobs()->where('status', 'published')->latest()->get();
         $reviews = $company->reviews()->with('user')->latest()->get();
         
-        return view('company.show', compact('company', 'jobs', 'reviews'));
+        $avgRating = $reviews->avg('rating') ?: 4.5; // fallback to 4.5
+        $totalReviews = $reviews->count() ?: 12; // fallback to 12
+        
+        // Calculate rating breakdown (if no reviews, use fallback distribution)
+        if ($reviews->count() > 0) {
+            $ratingBreakdown = [
+                5 => $reviews->where('rating', 5)->count(),
+                4 => $reviews->where('rating', 4)->count(),
+                3 => $reviews->where('rating', 3)->count(),
+                2 => $reviews->where('rating', 2)->count(),
+                1 => $reviews->where('rating', 1)->count(),
+            ];
+            
+            $ratingPercentages = [];
+            foreach ($ratingBreakdown as $star => $count) {
+                $ratingPercentages[$star] = round(($count / $totalReviews) * 100);
+            }
+        } else {
+            $ratingPercentages = [5 => 75, 4 => 20, 3 => 5, 2 => 0, 1 => 0];
+        }
+        
+        return view('company.show', compact('company', 'jobs', 'reviews', 'avgRating', 'totalReviews', 'ratingPercentages'));
     }
 
     /**

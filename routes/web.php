@@ -12,6 +12,7 @@ use App\Http\Controllers\EmployerJobController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\EmployerApplicantController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CompanyReviewController;
 use App\Http\Controllers\SearchSuggestionController;
 use App\Http\Controllers\SearchAnalyticsController;
 use App\Http\Controllers\BillingController;
@@ -171,6 +172,7 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
     Route::get('/employer/profile', [EmployerProfileController::class, 'show'])->name('employer.profile.edit');
     Route::put('/employer/profile', [EmployerProfileController::class, 'update'])->name('employer.profile.update');
+    Route::delete('/employer/profile/gallery/{index}', [EmployerProfileController::class, 'deleteGalleryImage'])->name('employer.profile.gallery.delete');
     
     // View jobs list
     Route::get('/employer/jobs', [EmployerJobController::class, 'index'])->name('employer.jobs.index');
@@ -234,6 +236,10 @@ Route::get('/api/jobs/suggestions', [SearchSuggestionController::class, 'index']
 // History Session Clearing Actions
 Route::post('/jobs/history/clear-search', [JobController::class, 'clearSearchHistory'])->name('jobs.history.clear-search');
 Route::post('/jobs/history/clear-viewed', [JobController::class, 'clearViewedHistory'])->name('jobs.history.clear-viewed');
+
+// Public Company Review
+Route::post('/companies/{company:slug}/reviews', [CompanyReviewController::class, 'store'])->name('companies.reviews.store')->middleware('auth');
+
 
 // Dynamic XML Sitemap Generator
 Route::get('/sitemap.xml', function () {

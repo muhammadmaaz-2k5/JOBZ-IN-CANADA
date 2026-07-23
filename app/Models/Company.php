@@ -23,6 +23,11 @@ class Company extends Model
         'phone',
         'verification_status',
         'average_rating',
+        'culture_data',
+    ];
+
+    protected $casts = [
+        'culture_data' => 'array',
     ];
 
     public function locations()

@@ -156,15 +156,48 @@
                                 <p>Image up to 3MB.</p>
                             </div>
                         </div>
+                        <div class="mt-8">
+                            <h4 class="text-lg font-bold text-gray-900 mb-4">Office & Team Gallery</h4>
+                            <div class="mb-4">
+                                <x-input-label for="gallery_images" :value="__('Add Gallery Images')" />
+                                <input id="gallery_images" name="gallery_images[]" type="file" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1650e1]/10 file:text-[#1650e1] hover:file:bg-[#1650e1]/20" />
+                                <p class="mt-1 text-sm text-gray-500">You can select multiple images (JPEG, PNG, WEBP). Max 2MB each.</p>
+                                <x-input-error :messages="$errors->get('gallery_images.*')" class="mt-2" />
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <button type="submit">
+                    <div class="mt-6 flex items-center justify-end">
+                        <button type="submit" class="bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2.5 px-6 rounded-lg transition-colors">
                             Save Branding Profile
                         </button>
                     </div>
                 </form>
             </div>
+
+            <!-- Existing Gallery Images Management -->
+            @if(isset($company->culture_data['gallery']) && is_array($company->culture_data['gallery']) && count($company->culture_data['gallery']) > 0)
+                <div class="mt-8 p-6 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <h4 class="text-lg font-bold text-gray-900 mb-6">Manage Gallery</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        @foreach($company->culture_data['gallery'] as $index => $image)
+                            <div class="relative group rounded-xl overflow-hidden aspect-[4/3] bg-gray-100 shadow-sm">
+                                <img src="{{ $image['url'] }}" alt="Gallery Image {{ $index + 1 }}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <form action="{{ route('employer.profile.gallery.delete', $index) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this gallery image?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
         </div>
     </div>
