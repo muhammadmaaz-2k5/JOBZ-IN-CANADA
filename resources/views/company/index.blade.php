@@ -32,7 +32,6 @@
             <a href="{{ route('jobs.index') }}" class="hnav-link">Find Jobs</a>
             <a href="{{ route('companies.index') }}" class="hnav-link">Companies</a>
             <a href="{{ route('pricing') }}" class="hnav-link">Pricing</a>
-            <a href="#" class="hnav-link">Resources</a>
         </nav>
         <div class="nav-actions">
             <button @click="dark = !dark" type="button"
@@ -117,6 +116,9 @@
                         'CanBridge Engineering' => 'bg-indigo-600',
                     ];
                     $bgClass = $bgColors[$company->company_name] ?? 'bg-[#1650e1]';
+                    $avgRating = $company->reviews()->avg('rating') ?: 0;
+                    $followersCount = $company->followers()->count() ?? rand(100, 5000);
+                    $followersFormatted = $followersCount > 1000 ? number_format($followersCount/1000, 1).'k' : $followersCount;
                 @endphp
                 <a href="{{ route('companies.show', $company->slug) }}" class="block group">
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 p-6 flex items-start gap-4 h-full relative overflow-hidden">
@@ -165,6 +167,63 @@
                     </div>
                 </a>
             @endforeach
+        </div>
+        
+        <div x-data="{
+                 loading: false,
+                 nextPageUrl: '{{ $companies->nextPageUrl() }}',
+                 loadMore() {
+                     if(this.loading || !this.nextPageUrl) return;
+                     this.loading = true;
+                     
+                     fetch(this.nextPageUrl)
+                        .then(res => res.text())
+                        .then(html => {
+                            let parser = new DOMParser();
+                            let doc = parser.parseFromString(html, 'text/html');
+                            
+                            let newGrid = doc.querySelector('#companies-grid');
+                            if (newGrid) {
+                                document.querySelector('#companies-grid').insertAdjacentHTML('beforeend', newGrid.innerHTML);
+                            }
+                            
+                            let newTrigger = doc.querySelector('#load-more-trigger');
+                            if (newTrigger && newTrigger.getAttribute('data-url')) {
+                                this.nextPageUrl = newTrigger.getAttribute('data-url');
+                            } else {
+                                this.nextPageUrl = null;
+                            }
+                            this.loading = false;
+                        })
+                        .catch(() => this.loading = false);
+                 }
+             }"
+             x-init="
+                 let observer = new IntersectionObserver((entries) => {
+                     if (entries[0].isIntersecting) {
+                         loadMore();
+                     }
+                 }, { rootMargin: '400px' });
+                 observer.observe($el);
+             "
+             class="mt-12 flex justify-center py-8 relative z-20"
+             id="load-more-trigger"
+             data-url="{{ $companies->nextPageUrl() }}">
+             
+             <!-- Loading State -->
+             <div x-show="loading" class="flex flex-col items-center gap-3">
+                 <div class="relative w-10 h-10">
+                     <div class="absolute inset-0 rounded-full border-4 border-[#1650e1]/20"></div>
+                     <div class="absolute inset-0 rounded-full border-4 border-[#1650e1] border-t-transparent animate-spin"></div>
+                 </div>
+                 <span class="text-sm font-medium text-[#1650e1] tracking-wide animate-pulse">Loading more companies...</span>
+             </div>
+
+             <!-- End State -->
+             <div x-cloak x-show="!nextPageUrl && !loading" class="flex flex-col items-center gap-2 opacity-60">
+                 <div class="w-16 h-1 bg-gray-200 rounded-full mb-2"></div>
+                 <span class="text-sm font-medium text-gray-500">You've reached the end!</span>
+             </div>
         </div>
 
     </div>

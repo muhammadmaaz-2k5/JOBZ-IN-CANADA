@@ -32,7 +32,6 @@
             <a href="{{ route('jobs.index') }}" class="hnav-link">Find Jobs</a>
             <a href="{{ route('companies.index') }}" class="hnav-link">Companies</a>
             <a href="{{ route('pricing') }}" class="hnav-link">Pricing</a>
-            <a href="#" class="hnav-link">Resources</a>
         </nav>
         <div class="nav-actions">
             <button @click="dark = !dark" type="button"
@@ -453,37 +452,73 @@
             </div>
             <span class="results-count">{{ $jobs->total() }} results</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="jobs-grid">
             @forelse($jobs as $job)
                 <x-job-card :job="$job" />
             @empty
                 <x-empty-state title="No Job Listings Found" subtitle="Try clearing search inputs, broadening keyword terms, or selecting different locations." icon="🔍" />
             @endforelse
         </div>
-            <div class="mt-8">
-                {{ $jobs->links() }}
-            </div>
+        
+        <div x-data="{
+                 loading: false,
+                 nextPageUrl: '{{ $jobs->nextPageUrl() }}',
+                 loadMore() {
+                     if(this.loading || !this.nextPageUrl) return;
+                     this.loading = true;
+                     
+                     fetch(this.nextPageUrl)
+                        .then(res => res.text())
+                        .then(html => {
+                            let parser = new DOMParser();
+                            let doc = parser.parseFromString(html, 'text/html');
+                            
+                            let newGrid = doc.querySelector('#jobs-grid');
+                            if (newGrid) {
+                                document.querySelector('#jobs-grid').insertAdjacentHTML('beforeend', newGrid.innerHTML);
+                            }
+                            
+                            let newTrigger = doc.querySelector('#load-more-trigger');
+                            if (newTrigger && newTrigger.getAttribute('data-url')) {
+                                this.nextPageUrl = newTrigger.getAttribute('data-url');
+                            } else {
+                                this.nextPageUrl = null;
+                            }
+                            this.loading = false;
+                        })
+                        .catch(() => this.loading = false);
+                 }
+             }"
+             x-init="
+                 let observer = new IntersectionObserver((entries) => {
+                     if (entries[0].isIntersecting) {
+                         loadMore();
+                     }
+                 }, { rootMargin: '400px' });
+                 observer.observe($el);
+             "
+             class="mt-12 flex justify-center py-8"
+             id="load-more-trigger"
+             data-url="{{ $jobs->nextPageUrl() }}">
+             
+             <!-- Loading State -->
+             <div x-show="loading" class="flex flex-col items-center gap-3">
+                 <div class="relative w-10 h-10">
+                     <div class="absolute inset-0 rounded-full border-4 border-[#1650e1]/20"></div>
+                     <div class="absolute inset-0 rounded-full border-4 border-[#1650e1] border-t-transparent animate-spin"></div>
+                 </div>
+                 <span class="text-sm font-medium text-[#1650e1] tracking-wide animate-pulse">Loading more jobs...</span>
+             </div>
+
+             <!-- End State -->
+             <div x-cloak x-show="!nextPageUrl && !loading" class="flex flex-col items-center gap-2 opacity-60">
+                 <div class="w-16 h-1 bg-gray-200 rounded-full mb-2"></div>
+                 <span class="text-sm font-medium text-gray-500">You've reached the end!</span>
+             </div>
+        </div>
     </div>
 </section>
 
-{{-- RECENTLY VIEWED --}}
-@if(count($recentlyViewed) > 0)
-<section class="section">
-    <div class="section-inner">
-        <div class="section-header">
-            <div class="section-title">
-                <span class="section-accent accent-amber"></span>
-                <h2 class="section-heading">Recently Viewed</h2>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            @foreach($recentlyViewed as $viewedJob)
-                <x-job-card :job="$viewedJob" :compact="true" />
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
 
 <x-footer />
 

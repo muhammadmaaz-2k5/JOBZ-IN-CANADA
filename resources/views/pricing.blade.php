@@ -199,64 +199,7 @@
     </div>
 </main>
 
-{{-- ══════════════════════════════════════
-     FOOTER
-══════════════════════════════════════ --}}
-<footer class="home-footer mt-auto">
-    <div class="footer-inner">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="brand">
-                    <div class="brand-icon">J</div>
-                    <span class="brand-text">JOBZ IN <span class="brand-accent">CANADA</span></span>
-                </div>
-                <p class="brand-desc">
-                    Canada's premier job board connecting top talent with leading employers nationwide.
-                </p>
-                <div class="contact-info">
-                    <p>📍 250 Yonge St, Toronto, ON</p>
-                    <p>✉️ support@jobzincanada.ca</p>
-                </div>
-            </div>
-            <div class="footer-links">
-                <div>
-                    <h4>Quick Links</h4>
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="{{ route('companies.index') }}">Verified Companies</a>
-                    <a href="{{ route('pricing') }}">Pricing Plans</a>
-                </div>
-                <div>
-                    <h4>Candidates</h4>
-                    <a href="{{ route('jobs.index') }}">Browse Jobs</a>
-                    <a href="#">Career Advice</a>
-                    <a href="#">Salary Guide</a>
-                </div>
-                <div>
-                    <h4>Employers</h4>
-                    <a href="{{ route('register') }}">Post a Job</a>
-                    <a href="{{ route('pricing') }}">Pricing</a>
-                    <a href="#">Talent Search</a>
-                </div>
-            </div>
-            <div class="footer-social">
-                <h4>Connect</h4>
-                <div class="social-icons">
-                    <a href="#">LN</a>
-                    <a href="#">TW</a>
-                    <a href="#">FB</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} JOBZ IN CANADA. All rights reserved.</p>
-            <div class="legal-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Cookies</a>
-            </div>
-        </div>
-    </div>
-</footer>
+<x-footer />
 
 </body>
 </html>

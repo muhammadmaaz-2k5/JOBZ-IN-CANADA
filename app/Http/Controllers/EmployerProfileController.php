@@ -142,7 +142,7 @@ class EmployerProfileController extends Controller
      */
     public function publicIndex()
     {
-        $companies = Company::where('verification_status', 'verified')->latest()->get();
+        $companies = Company::where('verification_status', 'verified')->latest()->paginate(12);
         return view('company.index', compact('companies'));
     }
 }

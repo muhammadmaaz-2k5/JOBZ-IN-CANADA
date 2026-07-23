@@ -19,7 +19,6 @@
             <a href="{{ route('jobs.index') }}" class="hnav-link">Find Jobs</a>
             <a href="{{ route('companies.index') }}" class="hnav-link">Companies</a>
             <a href="{{ route('pricing') }}" class="hnav-link">Pricing</a>
-            <a href="#" class="hnav-link">Resources</a>
         </nav>
         <div class="nav-actions">
             <button class="icon-btn" title="Search">
