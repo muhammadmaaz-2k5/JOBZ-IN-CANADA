@@ -30,6 +30,10 @@ Route::get('/why-choose-us', function () {
     return view('why-choose-us');
 })->name('why-choose-us');
 
+Route::get('/pricing', function () {
+    return view('pricing');
+})->name('pricing');
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');

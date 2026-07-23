@@ -38,6 +38,9 @@
                 <a href="{{ route('companies.index') }}" class="hnav-link font-semibold text-[#1650e1]">
                     Companies
                 </a>
+                <a href="#" class="hnav-link">
+                    Pricing
+                </a>
             </nav>
 
             <!-- Actions Panel -->
