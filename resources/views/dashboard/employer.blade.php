@@ -173,35 +173,41 @@
 
                         <div class="p-8 space-y-4">
                             @forelse($recentApplications as $app)
-                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md shadow-sm hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md transition-all duration-300 gap-4">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-black text-lg shrink-0">
-                                            {{ substr($app->applicant->first_name,0,1) }}{{ substr($app->applicant->last_name,0,1) }}
+                                @if(is_object($app) && isset($app->applicant))
+                                    <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md shadow-sm hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md transition-all duration-300 gap-4">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-black text-lg shrink-0">
+                                                {{ substr($app->applicant->first_name ?? 'A',0,1) }}{{ substr($app->applicant->last_name ?? '',0,1) }}
+                                            </div>
+                                            <div>
+                                                <h4 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                                    <a href="{{ route('employer.applicants.show', $app->id) }}">{{ $app->applicant->first_name ?? 'Unknown' }} {{ $app->applicant->last_name ?? '' }}</a>
+                                                </h4>
+                                                <p class="text-gray-500 dark:text-gray-400 font-medium mt-1">
+                                                    <span>{{ optional($app->job)->title ?? 'Unknown Job' }}</span> &bull; 
+                                                    <span>Applied {{ $app->applied_at ? $app->applied_at->diffForHumans() : 'recently' }}</span>
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                                <a href="{{ route('employer.applicants.show', $app->id) }}">{{ $app->applicant->first_name }} {{ $app->applicant->last_name }}</a>
-                                            </h4>
-                                            <p class="text-gray-500 dark:text-gray-400 font-medium mt-1">
-                                                <span>{{ $app->job->title }}</span> &bull; 
-                                                <span>Applied {{ $app->applied_at->diffForHumans() }}</span>
-                                            </p>
+                                        <div class="flex items-center gap-4 shrink-0 w-full sm:w-auto">
+                                            <span class="px-3 py-1 text-xs font-bold rounded-full 
+                                                @if($app->status === 'hired') bg-green-100 text-green-700
+                                                @elseif($app->status === 'interview_scheduled') bg-blue-100 text-blue-700
+                                                @elseif($app->status === 'rejected') bg-red-100 text-red-700
+                                                @else bg-gray-100 text-gray-700 @endif
+                                                uppercase tracking-wide">
+                                                {{ str_replace('_', ' ', $app->status) }}
+                                            </span>
+                                            <a href="{{ route('employer.applicants.show', $app->id) }}" class="inline-flex items-center gap-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors text-sm">
+                                                Review
+                                            </a>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-4 shrink-0 w-full sm:w-auto">
-                                        <span class="px-3 py-1 text-xs font-bold rounded-full 
-                                            @if($app->status === 'hired') bg-green-100 text-green-700
-                                            @elseif($app->status === 'interview_scheduled') bg-blue-100 text-blue-700
-                                            @elseif($app->status === 'rejected') bg-red-100 text-red-700
-                                            @else bg-gray-100 text-gray-700 @endif
-                                            uppercase tracking-wide">
-                                            {{ str_replace('_', ' ', $app->status) }}
-                                        </span>
-                                        <a href="{{ route('employer.applicants.show', $app->id) }}" class="inline-flex items-center gap-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors text-sm">
-                                            Review
-                                        </a>
+                                @elseif(is_string($app))
+                                    <div class="p-5 rounded-xl border border-gray-100 bg-gray-50 text-gray-500 font-medium">
+                                        <p>{{ $app }}</p>
                                     </div>
-                                </div>
+                                @endif
                             @empty
                                 <div class="text-center py-8">
                                     <div class="text-5xl mb-4">✉️</div>
