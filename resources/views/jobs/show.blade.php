@@ -41,12 +41,7 @@
                     </svg>
                 </span>
             </button>
-            @auth
-                <a href="{{ route('dashboard') }}" class="nav-cta">{{ __('Dashboard') }}</a>
-            @else
-                <a href="{{ route('login') }}" class="nav-post">Sign In</a>
-                <a href="{{ route('register') }}" class="nav-cta">Get Started</a>
-            @endauth
+            <x-nav-auth />
         </div>
     </div>
 </header>
@@ -63,7 +58,7 @@
                 </svg>
             </div>
             <input type="text" name="keyword" value="{{ request('keyword') }}"
-                   class="w-full py-3.5 pr-4 text-sm text-gray-900 bg-transparent border-none focus:ring-0 outline-none placeholder-gray-500" 
+                   class="w-full py-3.5 pr-4 text-sm bg-transparent border-none focus:ring-0 outline-none placeholder-gray-500 form-input-premium" 
                    placeholder="Job title, keywords, or company">
         </div>
 
@@ -79,7 +74,7 @@
                 </svg>
             </div>
             <input type="text" name="location" value="{{ request('location') }}"
-                   class="w-full py-3.5 pr-4 text-sm text-gray-900 bg-transparent border-none focus:ring-0 outline-none placeholder-gray-500" 
+                   class="w-full py-3.5 pr-4 text-sm bg-transparent border-none focus:ring-0 outline-none placeholder-gray-500 form-input-premium" 
                    placeholder='City, state, zip code, or "remote"'>
         </div>
 

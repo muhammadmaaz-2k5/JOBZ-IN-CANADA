@@ -145,13 +145,13 @@
 
 {{-- ── DEFAULT CARD ──────────────────────────────────────────── --}}
 @else
-<div {{ $attributes->merge(['class' => 'rounded-2xl bg-white dark:bg-dark-900 border border-gray-150 dark:border-gray-800/80 shadow-sm transition-all duration-300 overflow-hidden ' . ($hover ? 'hover:-translate-y-1 hover:shadow-md hover:border-primary-500/30' : '')]) }}>
+<div {{ $attributes->merge(['class' => 'bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 ' . ($hover ? 'hover:-translate-y-1 hover:shadow-2xl hover:border-indigo-500/30' : '')]) }}>
     @if(isset($header))
-        <div>{{ $header }}</div>
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">{{ $header }}</div>
     @endif
-    <div>{{ $slot }}</div>
+    <div class="p-8">{{ $slot }}</div>
     @if(isset($footer))
-        <div>{{ $footer }}</div>
+        <div class="px-8 py-6 border-t border-slate-100/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">{{ $footer }}</div>
     @endif
 </div>
 @endif

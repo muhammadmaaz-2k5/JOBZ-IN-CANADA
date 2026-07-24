@@ -41,8 +41,8 @@
         </div>
 
         <!-- Social Login Buttons -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <a href="#" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 font-semibold text-gray-700 transition-colors shadow-sm">
+        <div class="grid grid-cols-1 gap-4 mb-6">
+            <button type="button" id="google-login-btn" onclick="handleGoogleLogin('employer')" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 font-semibold text-gray-700 transition-colors shadow-sm w-full">
                 <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                     <g transform="matrix(1, 0, 0, 1, 0, 0)">
                         <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.38C21.68,11.96 21.56,11.5 21.35,11.1z" fill="#4285F4" />
@@ -52,13 +52,7 @@
                     </g>
                 </svg>
                 Google
-            </a>
-            <a href="#" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 font-semibold text-gray-700 transition-colors shadow-sm">
-                <svg class="text-[#0a66c2]" width="20" height="20" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-                LinkedIn
-            </a>
+            </button>
         </div>
 
         <div class="relative flex items-center py-2 mb-6">
@@ -78,20 +72,20 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label for="company_name" class="block text-sm font-semibold text-gray-700 mb-1">Company Name</label>
-                        <input id="company_name" type="text" name="company_name" value="{{ old('company_name') }}" required placeholder="e.g. Acme Corp" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="company_name" type="text" name="company_name" value="{{ old('company_name') }}" required placeholder="e.g. Acme Corp" class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <x-input-error :messages="$errors->get('company_name')" class="mt-1" />
                     </div>
 
                     <div class="col-span-2">
                         <label for="website" class="block text-sm font-semibold text-gray-700 mb-1">Company Website</label>
-                        <input id="website" type="url" name="website" value="{{ old('website') }}" required placeholder="https://example.com" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="website" type="url" name="website" value="{{ old('website') }}" required placeholder="https://example.com" class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <x-input-error :messages="$errors->get('website')" class="mt-1" />
                     </div>
 
                     <div>
                         <label for="industry" class="block text-sm font-semibold text-gray-700 mb-1">Industry</label>
                         <div class="relative">
-                            <select id="industry" name="industry" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all appearance-none">
+                            <select id="industry" name="industry" class="w-full border pl-4 pr-10 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none appearance-none form-input-premium">
                                 <option value="Technology">Technology & Software</option>
                                 <option value="Finance">Finance & Banking</option>
                                 <option value="Healthcare">Healthcare & Medicine</option>
@@ -112,7 +106,7 @@
                     <div>
                         <label for="company_size" class="block text-sm font-semibold text-gray-700 mb-1">Company Size</label>
                         <div class="relative">
-                            <select id="company_size" name="company_size" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all appearance-none">
+                            <select id="company_size" name="company_size" class="w-full border pl-4 pr-10 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none appearance-none form-input-premium">
                                 <option value="1-10">1-10 employees</option>
                                 <option value="11-50">11-50 employees</option>
                                 <option value="51-200">51-200 employees</option>
@@ -137,18 +131,18 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="first_name" class="block text-sm font-semibold text-gray-700 mb-1">First Name</label>
-                        <input id="first_name" type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="first_name" type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <x-input-error :messages="$errors->get('first_name')" class="mt-1" />
                     </div>
                     <div>
                         <label for="last_name" class="block text-sm font-semibold text-gray-700 mb-1">Last Name</label>
-                        <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <x-input-error :messages="$errors->get('last_name')" class="mt-1" />
                     </div>
 
                     <div class="col-span-2">
                         <label for="designation" class="block text-sm font-semibold text-gray-700 mb-1">Designation / Title</label>
-                        <input id="designation" type="text" name="designation" value="{{ old('designation') }}" required placeholder="e.g. Recruiting Manager" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="designation" type="text" name="designation" value="{{ old('designation') }}" required placeholder="e.g. Recruiting Manager" class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <x-input-error :messages="$errors->get('designation')" class="mt-1" />
                     </div>
 
@@ -156,7 +150,7 @@
                         <label for="employer_phone" class="block text-sm font-semibold text-gray-700 mb-1">Contact Phone</label>
                         <div class="flex gap-2">
                             <div class="relative w-1/3">
-                                <select x-model="phone_code" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-3 pr-8 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all appearance-none">
+                                <select x-model="phone_code" class="w-full border pl-3 pr-8 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none appearance-none form-input-premium">
                                     <option value="+1">🇨🇦 +1</option>
                                     <option value="+1-us">🇺🇸 +1</option>
                                     <option value="+44">🇬🇧 +44</option>
@@ -170,20 +164,20 @@
                                     </svg>
                                 </div>
                             </div>
-                            <input type="tel" id="employer_phone" name="employer_phone" placeholder="(555) 000-0000" class="w-2/3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all">
+                            <input type="tel" id="employer_phone" name="employer_phone" placeholder="(555) 000-0000" class="w-2/3 border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium">
                         </div>
                         <x-input-error :messages="$errors->get('employer_phone')" class="mt-1" />
                     </div>
 
                     <div class="col-span-2">
                         <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Work Email Address</label>
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <x-input-error :messages="$errors->get('email')" class="mt-1" />
                     </div>
 
                     <div class="col-span-2">
                         <label for="password" class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
-                        <input id="password" type="password" name="password" x-model="password" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="password" type="password" name="password" x-model="password" required class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         
                         <!-- Password Strength Meter -->
                         <div x-show="password.length > 0" x-transition class="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-3">
@@ -218,7 +212,7 @@
 
                     <div class="col-span-2">
                         <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1">Confirm Password</label>
-                        <input id="password_confirmation" type="password" name="password_confirmation" x-model="password_confirmation" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none transition-all" />
+                        <input id="password_confirmation" type="password" name="password_confirmation" x-model="password_confirmation" required class="w-full border px-4 py-2.5 text-sm focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none form-input-premium" />
                         <div x-show="password_confirmation.length > 0" x-transition class="mt-1 text-xs font-medium">
                             <span :class="password === password_confirmation ? 'text-emerald-500' : 'text-rose-500'">
                                 <span x-show="password === password_confirmation">✓ Passwords match</span>
@@ -263,4 +257,46 @@
             </div>
         </form>
     </div>
+    
+    <script>
+        async function handleGoogleLogin(role = null) {
+            try {
+                if (!window.firebaseAuth) {
+                    console.error("Firebase auth not initialized");
+                    return;
+                }
+                
+                const { auth, signInWithPopup, googleProvider } = window.firebaseAuth;
+                
+                document.getElementById('google-login-btn').innerHTML = 'Logging in...';
+
+                const result = await signInWithPopup(auth, googleProvider);
+                const idToken = await result.user.getIdToken();
+
+                const response = await fetch('{{ route('firebase.callback') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ idToken, role })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    console.error("Backend auth failed:", data.error);
+                    alert("Authentication failed: " + (data.error || "Unknown error"));
+                    document.getElementById('google-login-btn').innerHTML = 'Google';
+                }
+
+            } catch (error) {
+                console.error("Firebase Login Error:", error);
+                alert("Login was cancelled or failed.");
+                document.getElementById('google-login-btn').innerHTML = 'Google';
+            }
+        }
+    </script>
 </x-guest-layout>

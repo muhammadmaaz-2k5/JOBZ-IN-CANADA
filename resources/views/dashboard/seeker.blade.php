@@ -3,7 +3,13 @@
         {{ __('Job Seeker Dashboard') }}
     </x-slot>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 relative z-10">
+        <!-- Decorative blurred background elements -->
+        <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+            <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-400/10 blur-[120px]"></div>
+            <div class="absolute top-[40%] -right-[10%] w-[40%] h-[60%] rounded-full bg-emerald-400/10 blur-[120px]"></div>
+            <div class="absolute -bottom-[20%] left-[20%] w-[60%] h-[40%] rounded-full bg-blue-400/10 blur-[120px]"></div>
+        </div>
         
         @if(session('success'))
             <x-alert type="success" class="mb-8">
@@ -12,7 +18,13 @@
         @endif
 
         <!-- Welcome Header Banner -->
-        <x-card variant="gradient" color="blue" padding="lg">
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-800 text-white shadow-2xl shadow-blue-900/20 p-10 md:p-14 border border-white/10">
+            <!-- Decorative overlay -->
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+            <div class="absolute -right-24 -top-24 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-24 -bottom-24 w-72 h-72 bg-blue-400 opacity-20 rounded-full blur-2xl"></div>
+            
+            <div class="relative z-10">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div class="text-white">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-sm font-semibold tracking-wide backdrop-blur-md mb-3 shadow-sm border border-white/10">
@@ -38,58 +50,71 @@
                         Edit Profile
                     </a>
                 </div>
-            </div>
-        </x-card>
+            </div></div></div>
 
         <!-- Stats Grid using design system stat cards -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <x-card variant="stat" label="Applied" value="{{ $metrics['applied'] }}" color="blue" padding="sm">
-                <x-slot name="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
+            <div class="group relative overflow-hidden rounded-[2rem] bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none hover:-translate-y-1 hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300 p-6 flex flex-col items-center text-center justify-center gap-4">
+    <div class="p-4 rounded-2xl ring-4 bg-blue-50 text-blue-600 ring-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-800/40 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2" />
                     </svg>
-                </x-slot>
-            </x-card>
+    </div>
+    <div>
+        <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Applied</p>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $metrics['applied'] }}</p>
+    </div>
+</div>
 
-            <x-card variant="stat" label="Saved" value="{{ $metrics['saved'] }}" color="rose" padding="sm">
-                <x-slot name="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="group relative overflow-hidden rounded-[2rem] bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none hover:-translate-y-1 hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300 p-6 flex flex-col items-center text-center justify-center gap-4">
+    <div class="p-4 rounded-2xl ring-4 bg-rose-50 text-rose-600 ring-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:ring-rose-800/40 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                </x-slot>
-            </x-card>
+    </div>
+    <div>
+        <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Saved</p>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $metrics['saved'] }}</p>
+    </div>
+</div>
 
-            <x-card variant="stat" label="Interviews" value="{{ $metrics['interviews'] }}" color="amber" padding="sm">
-                <x-slot name="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                </x-slot>
-            </x-card>
+            
 
-            <x-card variant="stat" label="Profile Strength" value="{{ $metrics['profile_completion'] }}%" color="green" padding="sm">
-                <x-slot name="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="group relative overflow-hidden rounded-[2rem] bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none hover:-translate-y-1 hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300 p-6 flex flex-col items-center text-center justify-center gap-4">
+    <div class="p-4 rounded-2xl ring-4 bg-emerald-50 text-emerald-600 ring-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-800/40 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                </x-slot>
-            </x-card>
+    </div>
+    <div>
+        <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Profile Strength</p>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $metrics['profile_completion'] }}%</p>
+    </div>
+</div>
 
-            <x-card variant="stat" label="Following" value="{{ $metrics['follows'] }}" color="purple" padding="sm">
-                <x-slot name="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="group relative overflow-hidden rounded-[2rem] bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none hover:-translate-y-1 hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300 p-6 flex flex-col items-center text-center justify-center gap-4">
+    <div class="p-4 rounded-2xl ring-4 bg-violet-50 text-violet-600 ring-violet-100 dark:bg-violet-900/30 dark:text-violet-400 dark:ring-violet-800/40 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                </x-slot>
-            </x-card>
+    </div>
+    <div>
+        <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Following</p>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $metrics['follows'] }}</p>
+    </div>
+</div>
 
-            <x-card variant="stat" label="Alerts" value="{{ $metrics['alerts'] }}" color="indigo" padding="sm">
-                <x-slot name="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="group relative overflow-hidden rounded-[2rem] bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none hover:-translate-y-1 hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300 p-6 flex flex-col items-center text-center justify-center gap-4">
+    <div class="p-4 rounded-2xl ring-4 bg-indigo-50 text-indigo-600 ring-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400 dark:ring-indigo-800/40 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                </x-slot>
-            </x-card>
+    </div>
+    <div>
+        <p class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Alerts</p>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $metrics['alerts'] }}</p>
+    </div>
+</div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -98,14 +123,14 @@
 
                 <!-- Profile Completion Suggestions -->
                 @if(count($suggestions) > 0)
-                    <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/30 rounded-2xl p-6 shadow-sm">
+                    <div class="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-amber-200/60 dark:border-amber-700/30 rounded-3xl p-8 shadow-xl shadow-amber-900/5 relative overflow-hidden">
                         <h3 class="text-amber-800 dark:text-amber-400 font-bold text-lg mb-4 flex items-center gap-2">
                             <span class="text-2xl animate-bounce">💡</span>
                             Tips to improve profile strength & get noticed:
                         </h3>
                         <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             @foreach($suggestions as $sug)
-                                <li class="flex items-start gap-2 text-amber-700 dark:text-amber-300/80 font-medium bg-white/50 dark:bg-black/20 p-3 rounded-lg">
+                                <li class="flex items-start gap-2 text-amber-700 dark:text-amber-300/80 font-medium bg-amber-50/50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-800/30 shadow-sm backdrop-blur-sm">
                                     <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                     <span>{{ $sug }}</span>
                                 </li>
@@ -115,12 +140,13 @@
                 @endif
 
                 <!-- Recommended Jobs -->
-                <x-card variant="default">
-                    <x-slot name="header">Recommended Jobs For You</x-slot>
+                <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 mb-8">
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">Recommended Jobs For You</div>
+        <div class="p-8">
                     <div class="space-y-4">
                         @forelse($recommendedJobs as $recJob)
                             @if(is_object($recJob) && isset($recJob->slug))
-                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-xl border border-gray-100 dark:border-slate-700/50 bg-gray-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all duration-300 gap-4">
+                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md shadow-sm hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all duration-300 gap-4">
                                     <div>
                                         <h4 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                             <a href="{{ route('jobs.show', $recJob->slug) }}">{{ $recJob->title }}</a>
@@ -146,21 +172,22 @@
                             <x-empty-state title="No Recommended Jobs" subtitle="Update your profile skills to view recommendations matching your background." icon="🎯" />
                         @endforelse
                     </div>
-                </x-card>
+                </div></div>
 
                 <!-- Recent Applications -->
-                <x-card variant="default">
-                    <x-slot name="header">
+                <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 mb-8">
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">
                         <div class="flex items-center justify-between w-full">
                             <span>Recent Applications</span>
                             <a href="{{ route('seeker.applications.index') }}" class="text-sm font-bold text-blue-600 hover:text-blue-700">View All &rarr;</a>
                         </div>
-                    </x-slot>
+                    </div>
+        <div class="p-8">
                     
                     <div class="space-y-4">
                         @forelse($recentApplications as $app)
                             @if(is_object($app) && isset($app->id) && $app->job)
-                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-xl border border-gray-100 dark:border-slate-700/50 bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all duration-300 gap-4">
+                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md shadow-sm hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all duration-300 gap-4">
                                     <div>
                                         <h4 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                             <a href="{{ route('seeker.applications.show', $app->id) }}">{{ $app->job->title }}</a>
@@ -195,16 +222,17 @@
                             <x-empty-state title="No Applications Yet" subtitle="You haven't submitted any job applications yet. Start applying to open roles!" icon="💼" />
                         @endforelse
                     </div>
-                </x-card>
+                </div></div>
 
                 <!-- Bookmarked Saved Jobs -->
-                <x-card variant="default">
-                    <x-slot name="header">Saved Jobs</x-slot>
+                <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 mb-8">
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">Saved Jobs</div>
+        <div class="p-8">
                     
                     <div class="space-y-4">
                         @forelse($savedJobs as $sv)
                             @if(is_object($sv) && isset($sv->slug))
-                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-xl border border-gray-100 dark:border-slate-700/50 bg-white dark:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all duration-300 gap-4">
+                                <div class="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md shadow-sm hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all duration-300 gap-4">
                                     <div>
                                         <h4 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                             <a href="{{ route('jobs.show', $sv->slug) }}">{{ $sv->title }}</a>
@@ -237,11 +265,12 @@
                             <x-empty-state title="No Saved Jobs" subtitle="Bookmark listings you are interested in to apply later." icon="⭐" />
                         @endforelse
                     </div>
-                </x-card>
+                </div></div>
 
                 <!-- Timeline Activity Log -->
-                <x-card variant="default">
-                    <x-slot name="header">Recent Activity Timeline</x-slot>
+                <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 mb-8">
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">Recent Activity Timeline</div>
+        <div class="p-8">
                     
                     <div class="pl-4">
                         @forelse($timeline as $timeItem)
@@ -262,7 +291,7 @@
                             <x-empty-state title="No Activity" subtitle="No timeline events logged yet." icon="⏳" />
                         @endforelse
                     </div>
-                </x-card>
+                </div></div>
 
             </div>
 
@@ -270,13 +299,14 @@
             <div class="space-y-8">
 
                 <!-- Job Alerts Manager -->
-                <x-card variant="default">
-                    <x-slot name="header">My Job Alerts</x-slot>
+                <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 mb-8">
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">My Job Alerts</div>
+        <div class="p-8">
                     
                     <div class="space-y-4 mb-6">
                         @forelse($alerts as $al)
                             @if(is_object($al) && isset($al->keyword))
-                                <div class="flex items-center justify-between p-4 rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/10 hover:border-blue-300 transition-colors">
+                                <div class="flex items-center justify-between p-5 rounded-2xl border border-blue-100/80 dark:border-blue-800/30 bg-blue-50/50 dark:bg-blue-900/20 backdrop-blur-sm shadow-sm hover:border-blue-300 transition-colors">
                                     <div>
                                         <p class="font-bold text-blue-900 dark:text-blue-100">"{{ $al->keyword }}"</p>
                                         <p class="text-sm text-blue-600/80 dark:text-blue-300/80 mt-1">{{ $al->location ?? 'Anywhere' }} &bull; {{ ucfirst($al->frequency) }}</p>
@@ -331,16 +361,17 @@
                             </button>
                         </div>
                     </form>
-                </x-card>
+                </div></div>
 
                 <!-- Recent Notifications -->
-                <x-card variant="default">
-                    <x-slot name="header">Notifications</x-slot>
+                <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden transition-all duration-300 mb-8">
+        <div class="px-8 py-6 border-b border-slate-100/50 dark:border-slate-700/50 flex items-center justify-between bg-white/30 dark:bg-slate-800/30 font-black text-xl text-slate-900 dark:text-white">Notifications</div>
+        <div class="p-8">
                     
                     <div class="space-y-4">
                         @forelse($notifications as $notif)
                             @if(is_object($notif) && isset($notif->title))
-                                <div class="flex gap-4 p-4 rounded-xl border border-gray-100 dark:border-slate-700/50 bg-gray-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm transition-all">
+                                <div class="flex gap-4 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-800/40 backdrop-blur-sm shadow-sm hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm transition-all">
                                     <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                                     </div>
@@ -366,7 +397,7 @@
                             <p class="text-gray-500 text-sm text-center py-4">No in-app alerts received.</p>
                         @endforelse
                     </div>
-                </x-card>
+                </div></div>
 
             </div>
         </div>

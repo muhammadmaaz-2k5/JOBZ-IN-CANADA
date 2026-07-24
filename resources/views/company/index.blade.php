@@ -47,12 +47,7 @@
                     </svg>
                 </span>
             </button>
-            @auth
-                <a href="{{ route('dashboard') }}" class="nav-cta">{{ __('Dashboard') }}</a>
-            @else
-                <a href="{{ route('login') }}" class="nav-post">Sign In</a>
-                <a href="{{ route('register') }}" class="nav-cta">Get Started</a>
-            @endauth
+            <x-nav-auth />
         </div>
     </div>
 </header>

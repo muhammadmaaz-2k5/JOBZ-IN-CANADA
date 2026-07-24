@@ -123,8 +123,7 @@ Route::get('/companies/{slug}', [EmployerProfileController::class, 'publicProfil
 // Seeker Profile Management
 Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     Route::get('/seeker/profile', [SeekerProfileController::class, 'show'])->name('seeker.profile.edit');
-    Route::get('/seeker/resume-builder', [SeekerProfileController::class, 'resumeBuilder'])->name('seeker.resume-builder');
-    Route::put('/seeker/profile', [SeekerProfileController::class, 'update'])->name('seeker.profile.update');
+        Route::put('/seeker/profile', [SeekerProfileController::class, 'update'])->name('seeker.profile.update');
     Route::post('/seeker/profile/resume', [SeekerProfileController::class, 'uploadResume'])->name('seeker.resume.upload');
     Route::get('/seeker/profile/resume/{id}/download', [SeekerProfileController::class, 'downloadResume'])->name('seeker.resume.download');
     Route::delete('/seeker/profile/resume/{id}', [SeekerProfileController::class, 'deleteResume'])->name('seeker.resume.delete');
@@ -216,7 +215,6 @@ Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
 // Settings & GDPR Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings', [SettingsController::class, 'show'])->name('settings.edit');
-    Route::get('/messages', [DashboardController::class, 'messages'])->name('messages.index');
     Route::post('/settings/sessions/logout', [SettingsController::class, 'logoutOtherDevices'])->name('settings.sessions.logout');
     Route::get('/settings/download-data', [SettingsController::class, 'downloadGdprData'])->name('settings.download-data');
     Route::post('/settings/deactivate', [SettingsController::class, 'deactivateAccount'])->name('settings.deactivate');

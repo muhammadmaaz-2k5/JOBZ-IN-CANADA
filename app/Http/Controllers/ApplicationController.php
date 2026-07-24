@@ -173,16 +173,13 @@ class ApplicationController extends Controller
         $filter = $request->get('filter', 'all');
         switch ($filter) {
             case 'active':
-                $query->whereIn('status', ['applied', 'pending_review', 'shortlisted', 'interview_scheduled', 'interview_completed', 'offered']);
+                $query->whereIn('status', ['applied', 'pending_review', 'shortlisted', 'offered']);
                 break;
             case 'pending':
                 $query->whereIn('status', ['applied', 'pending_review']);
                 break;
             case 'shortlisted':
                 $query->where('status', 'shortlisted');
-                break;
-            case 'interviews':
-                $query->whereIn('status', ['interview_scheduled', 'interview_completed']);
                 break;
             case 'offers':
                 $query->where('status', 'offered');

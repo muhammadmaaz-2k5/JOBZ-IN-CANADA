@@ -67,7 +67,6 @@ class DashboardController extends Controller
                 'draft_jobs' => Job::where('employer_id', $user->id)->where('status', 'draft')->count(),
                 'closed_jobs' => Job::where('employer_id', $user->id)->where('status', 'closed')->count(),
                 'total_applications' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->count(),
-                'interviews_scheduled' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'interview_scheduled')->count(),
                 'candidates_hired' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'hired')->count(),
                 'followers_count' => $company ? $company->followers()->count() : 0,
                 'total_views' => Job::where('employer_id', $user->id)->sum('views_count'),
@@ -123,86 +122,84 @@ class DashboardController extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
-        $cachedData = \Illuminate\Support\Facades\Cache::remember("dashboard:seeker:{$userId}", now()->addMinutes(5), function () use ($userId) {
-            $user = User::find($userId);
-            $seekerProfile = $user->jobSeekerProfile()->first();
+        $user = User::find($userId);
+        $seekerProfile = $user->jobSeekerProfile()->first();
 
-            $metrics = [
-                'applied' => Application::where('applicant_id', $user->id)->where('status', '!=', 'withdrawn')->count(),
-                'saved' => $user->savedJobs()->count(),
-                'interviews' => Application::where('applicant_id', $user->id)->whereIn('status', ['interview_scheduled', 'interview_completed'])->count(),
-                'follows' => $user->companyFollowings()->count(),
-                'alerts' => $user->jobAlerts()->count(),
-                'profile_completion' => $seekerProfile ? $seekerProfile->calculateCompletionPercentage() : 0,
-            ];
+        $metrics = [
+            'applied' => Application::where('applicant_id', $user->id)->where('status', '!=', 'withdrawn')->count(),
+            'saved' => $user->savedJobs()->count(),
+            'follows' => $user->companyFollowings()->count(),
+            'alerts' => $user->jobAlerts()->count(),
+            'profile_completion' => $seekerProfile ? $seekerProfile->calculateCompletionPercentage() : 0,
+        ];
 
-            $suggestions = [];
-            if (!$seekerProfile || empty($seekerProfile->headline)) {
-                $suggestions[] = 'Add a professional headline';
-            }
-            if (!$seekerProfile || empty($seekerProfile->summary)) {
-                $suggestions[] = 'Write a short professional summary';
-            }
-            if (!$user->resumes()->exists()) {
-                $suggestions[] = 'Upload your resume';
-            }
-            if (!$user->experiences()->exists()) {
-                $suggestions[] = 'Add your work experience';
-            }
-            if (!$user->education()->exists()) {
-                $suggestions[] = 'Add your education history';
-            }
-            if (!$user->skills()->exists()) {
-                $suggestions[] = 'Select your core skills';
-            }
-            if (!$user->projects()->exists()) {
-                $suggestions[] = 'Add projects you have completed';
-            }
+        $suggestions = [];
+        if (!$seekerProfile || empty($seekerProfile->headline)) {
+            $suggestions[] = 'Add a professional headline';
+        }
+        if (!$seekerProfile || empty($seekerProfile->summary)) {
+            $suggestions[] = 'Write a short professional summary';
+        }
+        if (!$user->resumes()->exists()) {
+            $suggestions[] = 'Upload your resume';
+        }
+        if (!$user->experiences()->exists()) {
+            $suggestions[] = 'Add your work experience';
+        }
+        if (!$user->education()->exists()) {
+            $suggestions[] = 'Add your education history';
+        }
+        if (!$user->skills()->exists()) {
+            $suggestions[] = 'Select your core skills';
+        }
+        if (!$user->projects()->exists()) {
+            $suggestions[] = 'Add projects you have completed';
+        }
 
-            $userSkills = $user->skills()->pluck('skills.id');
-            $recommendedJobs = Job::with('company')
-                ->where('status', 'published')
-                ->where(function ($q) use ($userSkills) {
-                    if ($userSkills->isNotEmpty()) {
-                        $q->whereHas('skills', fn($sk) => $sk->whereIn('skills.id', $userSkills));
-                    }
-                })
-                ->latest()
-                ->take(3)
-                ->get();
+        $userSkills = $user->skills()->pluck('skills.id');
+        $recommendedJobs = Job::with('company')
+            ->where('status', 'published')
+            ->where(function ($q) use ($userSkills) {
+                if ($userSkills->isNotEmpty()) {
+                    $q->whereHas('skills', fn($sk) => $sk->whereIn('skills.id', $userSkills));
+                }
+            })
+            ->latest()
+            ->take(3)
+            ->get();
 
-            $recentApplications = Application::with('job.company')
-                ->where('applicant_id', $user->id)
-                ->latest('applied_at')
-                ->take(5)
-                ->get();
+        $recentApplications = Application::with('job.company')
+            ->where('applicant_id', $user->id)
+            ->latest('applied_at')
+            ->take(5)
+            ->get();
 
-            $savedJobs = $user->savedJobs()->with('company')->latest()->take(5)->get();
+        $savedJobs = $user->savedJobs()->with('company')->latest()->take(5)->get();
 
-            $timeline = AuditLog::where('user_id', $user->id)
-                ->latest()
-                ->take(5)
-                ->get();
+        $timeline = AuditLog::where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
 
-            $alerts = $user->jobAlerts()->with('category')->get();
-            $categories = Category::whereNull('parent_id')->get();
-            $notifications = $user->notifications()->latest()->take(5)->get();
+        $alerts = $user->jobAlerts()->with('category')->get();
+        $categories = Category::whereNull('parent_id')->get();
+        $notifications = $user->notifications()->latest()->take(5)->get();
 
-            return compact(
-                'seekerProfile',
-                'metrics',
-                'suggestions',
-                'recommendedJobs',
-                'recentApplications',
-                'savedJobs',
-                'timeline',
-                'alerts',
-                'categories',
-                'notifications'
-            );
-        });
+        $data = compact(
+            'seekerProfile',
+            'metrics',
+            'suggestions',
+            'userSkills',
+            'recommendedJobs',
+            'recentApplications',
+            'savedJobs',
+            'timeline',
+            'alerts',
+            'categories',
+            'notifications'
+        );
 
-        return view('dashboard.seeker', $cachedData);
+        return view('dashboard.seeker', $data);
     }
 
     public function storeAlert(Request $request)
@@ -253,11 +250,4 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'Job alert deleted.');
     }
 
-    /**
-     * Display the in-app chat messaging interface.
-     */
-    public function messages()
-    {
-        return view('messages.index');
-    }
 }

@@ -122,8 +122,8 @@
 
                     <!-- Social Signin Component -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
-                        <button type="button" id="google-login-btn" onclick="handleGoogleLogin()" class="flex w-full items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
-                            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                        <button type="button" id="google-login-seeker-btn" onclick="handleGoogleLogin('job_seeker')" class="flex w-full items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm text-sm">
+                            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
                                 <g transform="matrix(1, 0, 0, 1, 0, 0)">
                                     <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.38C21.68,11.96 21.56,11.5 21.35,11.1z" fill="#4285F4" />
                                     <path d="M12,20.68c2.61,0 4.8,-0.87 6.4,-2.34l-3.3,-2.58c-0.92,0.62 -2.1,0.99 -3.1,0.99c-2.39,0 -4.41,-1.61 -5.13,-3.78H3.39v2.66C4.99,18.82 8.26,20.68 12,20.68z" fill="#34A853" />
@@ -131,14 +131,19 @@
                                     <path d="M12,5.65c1.42,0 2.7,0.49 3.7,1.44l2.77,-2.77C16.8,2.78 14.61,1.91 12,1.91c-3.74,0 -7.01,1.86 -8.61,4.72l3.48,2.66c0.72,-2.17 2.74,-3.78 5.13,-3.78z" fill="#EA4335" />
                                 </g>
                             </svg>
-                            Google
+                            Seeker
                         </button>
-                        <button type="button" class="flex w-full items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm">
-                            <svg class="text-[#0a66c2]" fill="currentColor" width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        <button type="button" id="google-login-employer-btn" onclick="handleGoogleLogin('employer')" class="flex w-full items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 font-semibold text-gray-700 dark:text-gray-200 transition-colors shadow-sm text-sm">
+                            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                                <g transform="matrix(1, 0, 0, 1, 0, 0)">
+                                    <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.38C21.68,11.96 21.56,11.5 21.35,11.1z" fill="#4285F4" />
+                                    <path d="M12,20.68c2.61,0 4.8,-0.87 6.4,-2.34l-3.3,-2.58c-0.92,0.62 -2.1,0.99 -3.1,0.99c-2.39,0 -4.41,-1.61 -5.13,-3.78H3.39v2.66C4.99,18.82 8.26,20.68 12,20.68z" fill="#34A853" />
+                                    <path d="M6.87,12.97c-0.18,-0.54 -0.29,-1.11 -0.29,-1.7c0,-0.59 0.11,-1.16 0.29,-1.7V6.91H3.39C2.77,8.15 2.42,9.54 2.42,11c0,1.46 0.35,2.85 0.97,4.09l3.48,-2.12z" fill="#FBBC05" />
+                                    <path d="M12,5.65c1.42,0 2.7,0.49 3.7,1.44l2.77,-2.77C16.8,2.78 14.61,1.91 12,1.91c-3.74,0 -7.01,1.86 -8.61,4.72l3.48,2.66c0.72,-2.17 2.74,-3.78 5.13,-3.78z" fill="#EA4335" />
+                                </g>
                             </svg>
-                            LinkedIn
-                        </a>
+                            Employer
+                        </button>
                     </div>
 
                     <div class="relative flex items-center py-2 mb-6">
@@ -153,7 +158,7 @@
                         <!-- Email Address -->
                         <div>
                             <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-[#1650e1] focus:ring-1 focus:ring-[#1650e1] outline-none transition-all dark:text-white" />
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="w-full border px-4 py-2.5 text-sm focus:ring-1 outline-none form-input-premium" />
                             <x-input-error :messages="$errors->get('email')" class="mt-1" />
                         </div>
 
@@ -167,7 +172,7 @@
                                     </a>
                                 @endif
                             </div>
-                            <input id="password" type="password" name="password" required autocomplete="current-password" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:border-[#1650e1] focus:ring-1 focus:ring-[#1650e1] outline-none transition-all dark:text-white" />
+                            <input id="password" type="password" name="password" required autocomplete="current-password" class="w-full border px-4 py-2.5 text-sm focus:ring-1 outline-none form-input-premium" />
                             <x-input-error :messages="$errors->get('password')" class="mt-1" />
                         </div>
 
@@ -207,7 +212,11 @@
     </div>
 
     <script>
-        async function handleGoogleLogin() {
+        async function handleGoogleLogin(role = 'job_seeker') {
+            const btnId = role === 'employer' ? 'google-login-employer-btn' : 'google-login-seeker-btn';
+            const btn = document.getElementById(btnId);
+            const originalText = btn ? btn.innerHTML : 'Google';
+
             try {
                 if (!window.firebaseAuth) {
                     console.error("Firebase auth not initialized");
@@ -217,7 +226,7 @@
                 const { auth, signInWithPopup, googleProvider } = window.firebaseAuth;
                 
                 // Show a loading state (optional)
-                document.getElementById('google-login-btn').innerHTML = 'Logging in...';
+                if (btn) btn.innerHTML = 'Logging in...';
 
                 const result = await signInWithPopup(auth, googleProvider);
                 const idToken = await result.user.getIdToken();
@@ -229,7 +238,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ idToken })
+                    body: JSON.stringify({ idToken, role })
                 });
 
                 const data = await response.json();
@@ -239,13 +248,13 @@
                 } else {
                     console.error("Backend auth failed:", data.error);
                     alert("Authentication failed: " + (data.error || "Unknown error"));
-                    document.getElementById('google-login-btn').innerHTML = 'Google';
+                    if (btn) btn.innerHTML = originalText;
                 }
 
             } catch (error) {
                 console.error("Firebase Login Error:", error);
                 alert("Login was cancelled or failed.");
-                document.getElementById('google-login-btn').innerHTML = 'Google';
+                if (btn) btn.innerHTML = originalText;
             }
         }
     </script>

@@ -42,8 +42,6 @@
                                 'applied' => 'Applied',
                                 'pending_review' => 'Pending Review',
                                 'shortlisted' => 'Shortlisted',
-                                'interview_scheduled' => 'Interview Scheduled',
-                                'interview_completed' => 'Interview Completed',
                                 'offered' => 'Offered',
                                 'hired' => 'Hired',
                                 'rejected' => 'Rejected',

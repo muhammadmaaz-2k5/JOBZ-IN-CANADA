@@ -56,12 +56,7 @@
             <a href="{{ route('register') }}" class="nav-post">
                 Post a Job
             </a>
-            @auth
-                <a href="{{ route('dashboard') }}" class="nav-login">Dashboard</a>
-            @else
-                <a href="{{ route('login') }}" class="nav-login">Sign In</a>
-                <a href="{{ route('register') }}" class="nav-register">Register</a>
-            @endauth
+            <x-nav-auth />
         </div>
     </div>
 </header>

@@ -292,9 +292,22 @@ class SeekerProfileController extends Controller
         // Sync skills using many-to-many user_skills table
         $skillsData = [];
         if ($request->has('skills')) {
-            foreach ($request->skills as $skillId) {
-                // optional: add proficiency / experience_years
-                $skillsData[$skillId] = [
+            $inputSkills = $request->skills;
+            
+            // If it's a comma-separated string, explode it
+            if (is_string($inputSkills)) {
+                $skillNames = array_map('trim', explode(',', $inputSkills));
+            } elseif (is_array($inputSkills)) {
+                $skillNames = array_map('trim', $inputSkills);
+            } else {
+                $skillNames = [];
+            }
+            
+            $skillNames = array_filter($skillNames);
+            
+            foreach ($skillNames as $name) {
+                $skill = \App\Models\Skill::firstOrCreate(['name' => $name]);
+                $skillsData[$skill->id] = [
                     'experience_years' => 1,
                     'proficiency' => 'intermediate'
                 ];

@@ -30,7 +30,7 @@
                 <div class="mb-6">
                     <label for="code" class="block text-left text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">6-Digit Code</label>
                     <input id="code" type="text" name="code" required autofocus autocomplete="one-time-code" maxlength="6"
-                        class="w-full text-center text-2xl tracking-[0.5em] font-black py-4 px-4 border-2 border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 rounded-xl focus:ring-[#1650e1] focus:border-[#1650e1] transition-all" 
+                        class="w-full text-center text-2xl tracking-[0.5em] font-black py-4 px-4 border-2 form-input-premium" 
                         placeholder="••••••">
                     <x-input-error :messages="$errors->get('code')" class="mt-2 text-left" />
                 </div>

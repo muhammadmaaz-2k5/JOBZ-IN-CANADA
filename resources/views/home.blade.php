@@ -60,15 +60,7 @@
 
 
 
-            <a href="{{ route('register') }}" class="nav-post">
-                Sign In
-            </a>
-
-            @auth
-                <a href="{{ route('dashboard') }}" class="nav-cta">Dashboard</a>
-            @else
-                <a href="{{ route('register') }}" class="nav-cta">Get Started</a>
-            @endauth
+            <x-nav-auth />
         </div>
     </div>
 </header>

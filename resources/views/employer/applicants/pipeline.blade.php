@@ -16,7 +16,6 @@
                  applied: {{ json_encode($columns['applied']->values()) }},
                  pending_review: {{ json_encode($columns['pending_review']->values()) }},
                  shortlisted: {{ json_encode($columns['shortlisted']->values()) }},
-                 interview: {{ json_encode($columns['interview']->values()) }},
                  offer: {{ json_encode($columns['offer']->values()) }},
                  hired: {{ json_encode($columns['hired']->values()) }},
                  rejected: {{ json_encode($columns['rejected']->values()) }}
@@ -51,8 +50,7 @@
                      const idx = this.columns[prevColKey].findIndex(c => c.id == appId);
                      this.columns[prevColKey].splice(idx, 1);
                      
-                     // If status is interview, update model status to interview_scheduled
-                     const targetModelStatus = newStatus === 'interview' ? 'interview_scheduled' : newStatus;
+                     const targetModelStatus = newStatus;
                      foundCard.status = targetModelStatus;
                      this.columns[newStatus].push(foundCard);
 
@@ -110,7 +108,6 @@
                     'applied' => ['title' => 'Applied', 'color' => 'bg-blue-500'],
                     'pending_review' => ['title' => 'Pending Review', 'color' => 'bg-yellow-500'],
                     'shortlisted' => ['title' => 'Shortlisted', 'color' => 'bg-indigo-500'],
-                    'interview' => ['title' => 'Interview', 'color' => 'bg-purple-500'],
                     'offer' => ['title' => 'Offer', 'color' => 'bg-pink-500'],
                     'hired' => ['title' => 'Hired', 'color' => 'bg-emerald-500'],
                     'rejected' => ['title' => 'Rejected', 'color' => 'bg-red-500']

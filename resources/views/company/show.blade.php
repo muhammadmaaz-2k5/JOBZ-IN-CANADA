@@ -59,12 +59,7 @@
                     </span>
                 </button>
 
-                @auth
-                    <a href="{{ route('dashboard') }}" class="nav-cta">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" class="nav-post">Sign In</a>
-                    <a href="{{ route('register') }}" class="nav-cta">Register</a>
-                @endauth
+                <x-nav-auth />
             </div>
         </div>
     </header>
@@ -325,7 +320,7 @@
                             @csrf
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Rating</label>
-                                <select name="rating" required class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none">
+                                <select name="rating" required class="w-full border p-3 focus:ring-2 outline-none form-input-premium">
                                     <option value="5">★★★★★ (5 - Excellent)</option>
                                     <option value="4">★★★★☆ (4 - Very Good)</option>
                                     <option value="3">★★★☆☆ (3 - Average)</option>
@@ -335,19 +330,15 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Summary / Title</label>
-                                <input type="text" name="title" required placeholder="e.g. Great work-life balance and supportive team" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none">
+                                <input type="text" name="title" required placeholder="e.g. Great work-life balance and supportive team" class="w-full border p-3 focus:ring-2 outline-none form-input-premium">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-1">Detailed Feedback</label>
-                                <textarea name="review" required rows="4" placeholder="Share details about the interview process, company culture, benefits, or general work experience..." class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#1650e1] focus:border-transparent outline-none"></textarea>
+                                <textarea name="review" required rows="4" placeholder="Share details about the interview process, company culture, benefits, or general work experience..." class="w-full border p-3 focus:ring-2 outline-none form-input-premium"></textarea>
                             </div>
                             <div class="flex justify-end gap-3 pt-2">
                                 <button type="button" @click="openForm = false" class="px-6 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-                                @auth
-                                    <button type="submit" class="bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2.5 px-6 rounded-lg transition-colors">Submit Review</button>
-                                @else
-                                    <a href="{{ route('login') }}" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-6 rounded-lg transition-colors">Login to Review</a>
-                                @endauth
+                                <x-nav-auth />
                             </div>
                         </form>
                     </div>
