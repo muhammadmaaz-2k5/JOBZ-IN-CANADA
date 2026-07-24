@@ -101,30 +101,30 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="first_name" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">First Name</label>
-                                    <input id="first_name" name="first_name" type="text" value="{{ old('first_name', $user->first_name) }}" required class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="first_name" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">First Name</label>
+                                    <input id="first_name" name="first_name" type="text" value="{{ old('first_name', $user->first_name) }}" required class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                     <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="last_name" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Last Name</label>
-                                    <input id="last_name" name="last_name" type="text" value="{{ old('last_name', $user->last_name) }}" required class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="last_name" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Last Name</label>
+                                    <input id="last_name" name="last_name" type="text" value="{{ old('last_name', $user->last_name) }}" required class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                     <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label for="designation" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Job Title</label>
-                                    <input id="designation" name="designation" type="text" value="{{ old('designation', $employerProfile->designation) }}" required placeholder="e.g. HR Manager" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="designation" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Job Title</label>
+                                    <input id="designation" name="designation" type="text" value="{{ old('designation', $employerProfile->designation) }}" required placeholder="e.g. HR Manager" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                     <x-input-error :messages="$errors->get('designation')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="department" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Department</label>
-                                    <input id="department" name="department" type="text" value="{{ old('department', $employerProfile->department) }}" placeholder="e.g. Talent Acquisition" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="department" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Department</label>
+                                    <input id="department" name="department" type="text" value="{{ old('department', $employerProfile->department) }}" placeholder="e.g. Talent Acquisition" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                 </div>
                                 <div>
-                                    <label for="phone" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Personal Phone</label>
-                                    <input id="phone" name="phone" type="text" value="{{ old('phone', $employerProfile->phone) }}" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="phone" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Personal Phone</label>
+                                    <input id="phone" name="phone" type="text" value="{{ old('phone', $employerProfile->phone) }}" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                 </div>
                             </div>
                         </div>
@@ -138,26 +138,26 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="company_name" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Company Name</label>
-                                    <input id="company_name" name="company_name" type="text" value="{{ old('company_name', $company->company_name) }}" required class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="company_name" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Company Name</label>
+                                    <input id="company_name" name="company_name" type="text" value="{{ old('company_name', $company->company_name) }}" required class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                     <x-input-error :messages="$errors->get('company_name')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="website" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Website URL</label>
-                                    <input id="website" name="website" type="url" value="{{ old('website', $company->website) }}" required class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="website" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Website URL</label>
+                                    <input id="website" name="website" type="url" value="{{ old('website', $company->website) }}" required class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                     <x-input-error :messages="$errors->get('website')" class="mt-2" />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label for="industry" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Industry</label>
-                                    <input id="industry" name="industry" type="text" value="{{ old('industry', $company->industry) }}" required placeholder="e.g. Tech, Finance" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="industry" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Industry</label>
+                                    <input id="industry" name="industry" type="text" value="{{ old('industry', $company->industry) }}" required placeholder="e.g. Tech, Finance" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                     <x-input-error :messages="$errors->get('industry')" class="mt-2" />
                                 </div>
                                 <div>
-                                    <label for="company_size" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Company Size</label>
-                                    <select id="company_size" name="company_size" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm font-medium">
+                                    <label for="company_size" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Company Size</label>
+                                    <select id="company_size" name="company_size" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm font-medium">
                                         <option value="1-10" @selected(old('company_size', $company->company_size) == '1-10')>1-10 employees</option>
                                         <option value="11-50" @selected(old('company_size', $company->company_size) == '11-50')>11-50 employees</option>
                                         <option value="51-200" @selected(old('company_size', $company->company_size) == '51-200')>51-200 employees</option>
@@ -166,29 +166,29 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="founded_year" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Founded Year</label>
-                                    <input id="founded_year" name="founded_year" type="number" value="{{ old('founded_year', $company->founded_year) }}" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="founded_year" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Founded Year</label>
+                                    <input id="founded_year" name="founded_year" type="number" value="{{ old('founded_year', $company->founded_year) }}" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label for="headquarters" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Headquarters City</label>
-                                    <input id="headquarters" name="headquarters" type="text" value="{{ old('headquarters', $company->headquarters) }}" placeholder="e.g. Toronto, ON" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="headquarters" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Headquarters City</label>
+                                    <input id="headquarters" name="headquarters" type="text" value="{{ old('headquarters', $company->headquarters) }}" placeholder="e.g. Toronto, ON" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                 </div>
                                 <div>
-                                    <label for="company_email" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Support Email</label>
-                                    <input id="company_email" name="company_email" type="email" value="{{ old('company_email', $company->email) }}" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="company_email" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Support Email</label>
+                                    <input id="company_email" name="company_email" type="email" value="{{ old('company_email', $company->email) }}" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                 </div>
                                 <div>
-                                    <label for="company_phone" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Office Phone</label>
-                                    <input id="company_phone" name="company_phone" type="text" value="{{ old('company_phone', $company->phone) }}" class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                                    <label for="company_phone" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Office Phone</label>
+                                    <input id="company_phone" name="company_phone" type="text" value="{{ old('company_phone', $company->phone) }}" class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm" />
                                 </div>
                             </div>
 
                             <div>
-                                <label for="description" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Company Description & Bio</label>
-                                <textarea id="description" name="description" rows="5" placeholder="Write a short summary about your company culture, mission, and benefits..." class="w-full rounded-xl border-gray-200 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm resize-none">{{ old('description', $company->description) }}</textarea>
+                                <label for="description" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Company Description & Bio</label>
+                                <textarea id="description" name="description" rows="5" placeholder="Write a short summary about your company culture, mission, and benefits..." class="w-full px-5 py-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-900 dark:text-white shadow-sm resize-none">{{ old('description', $company->description) }}</textarea>
                             </div>
                         </div>
 
@@ -201,19 +201,19 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div class="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 border-dashed">
-                                    <label for="logo" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Company Logo</label>
+                                    <label for="logo" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Company Logo</label>
                                     <input id="logo" name="logo" type="file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-900/30 dark:file:text-emerald-400 transition-colors" />
                                     <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Square image recommended. Up to 2MB.</p>
                                 </div>
                                 <div class="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 border-dashed">
-                                    <label for="cover_image" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Profile Cover Banner</label>
+                                    <label for="cover_image" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Profile Cover Banner</label>
                                     <input id="cover_image" name="cover_image" type="file" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-900/30 dark:file:text-emerald-400 transition-colors" />
                                     <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Landscape image (1920x400). Up to 3MB.</p>
                                 </div>
                             </div>
                             
                             <div class="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-700 border-dashed mt-6">
-                                <label for="gallery_images" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Office & Culture Gallery</label>
+                                <label for="gallery_images" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Office & Culture Gallery</label>
                                 <input id="gallery_images" name="gallery_images[]" type="file" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-900/30 dark:file:text-emerald-400 transition-colors" />
                                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Select multiple images to show off your workspace. Max 2MB each.</p>
                                 <x-input-error :messages="$errors->get('gallery_images.*')" class="mt-2" />
