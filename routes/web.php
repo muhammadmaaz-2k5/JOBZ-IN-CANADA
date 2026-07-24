@@ -157,6 +157,10 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     Route::get('/seeker/boost', [BillingController::class, 'seekerBoost'])->name('seeker.boost.index');
     Route::post('/seeker/boost', [BillingController::class, 'boostProfile'])->name('seeker.boost.submit');
 
+});
+
+// Notifications & Shared Settings (All authenticated users)
+Route::middleware(['auth', 'verified'])->group(function () {
     // Notification Preferences
     Route::get('/profile/notifications', [\App\Http\Controllers\NotificationPreferenceController::class, 'edit'])->name('profile.notifications.edit');
     Route::put('/profile/notifications', [\App\Http\Controllers\NotificationPreferenceController::class, 'update'])->name('profile.notifications.update');

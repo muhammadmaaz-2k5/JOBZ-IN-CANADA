@@ -74,7 +74,7 @@
                 <div class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none p-8 flex flex-col items-center justify-center">
                     <div class="w-32 h-32 rounded-3xl bg-gray-50 dark:bg-slate-800 border-4 border-white dark:border-slate-700 shadow-xl flex items-center justify-center overflow-hidden mb-6 relative group">
                         @if($company->logo)
-                            <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="w-full h-full object-contain p-2" />
+                            <img src="{{ Str::startsWith($company->logo, ['http://', 'https://']) ? $company->logo : asset('storage/' . $company->logo) }}" alt="Logo" class="w-full h-full object-contain p-2" />
                         @else
                             <span class="text-4xl font-black text-gray-300 dark:text-slate-600">Logo</span>
                         @endif

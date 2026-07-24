@@ -20,20 +20,20 @@
 @endphp
 
 <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" {{ $attributes->merge([
-    'class' => "flex items-start p-4 rounded-xl border {$classes}"
+    'class' => "flex items-start gap-3 p-4 rounded-xl border relative {$classes}"
 ]) }}>
-    <span>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+    <span class="shrink-0 mt-0.5">
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             {!! $icon !!}
         </svg>
     </span>
-    <div>
+    <div class="flex-1 font-medium text-sm">
         {{ $slot }}
     </div>
     @if($dismissible)
-        <button @click="show = false" type="button">
-            <span>Dismiss</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <button @click="show = false" type="button" class="shrink-0 p-1 rounded-lg opacity-70 hover:opacity-100 transition-opacity focus:outline-none hover:bg-black/5 dark:hover:bg-white/5">
+            <span class="sr-only">Dismiss</span>
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>

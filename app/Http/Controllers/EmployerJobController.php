@@ -40,7 +40,12 @@ class EmployerJobController extends Controller
     {
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'category_id' => ['required', function($attribute, $value, $fail) {
+                if ($value !== 'other' && !\App\Models\Category::where('id', $value)->exists()) {
+                    $fail('The selected category is invalid.');
+                }
+            }],
+            'custom_category' => ['required_if:category_id,other', 'nullable', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'responsibilities' => ['nullable', 'string'],
             'requirements' => ['required', 'string'],
@@ -61,7 +66,14 @@ class EmployerJobController extends Controller
             // Location
             'country' => ['required', 'string', 'max:100'],
             'city' => ['required', 'string', 'max:100'],
+            'location' => ['nullable', 'string'],
             'full_address' => ['nullable', 'string'],
+            
+            // New Wizard Fields
+            'hiring_timeline' => ['nullable', 'string', 'max:255'],
+            'expected_hours' => ['nullable', 'string', 'max:255'],
+            'application_method' => ['nullable', 'string', 'max:255'],
+            'language' => ['nullable', 'string', 'max:255'],
             
             // Requirements
             'application_deadline' => ['nullable', 'date', 'after:today'],
@@ -82,11 +94,19 @@ class EmployerJobController extends Controller
         $user = Auth::user();
         $companyId = $user->employerProfile->company_id;
 
-        $jobData = $request->except(['skills', '_token', 'questions', 'questions_required']);
+        $jobData = $request->except(['skills', '_token', 'questions', 'questions_required', 'custom_category']);
         $jobData['company_id'] = $companyId;
         $jobData['employer_id'] = $user->id;
-        $jobData['location'] = $request->city;
+        $jobData['location'] = $request->location ?? $request->city;
         $jobData['slug'] = Str::slug($request->title . '-' . uniqid());
+        
+        if ($request->category_id === 'other' && $request->filled('custom_category')) {
+            $newCategory = \App\Models\Category::firstOrCreate(
+                ['slug' => Str::slug($request->custom_category)],
+                ['name' => $request->custom_category]
+            );
+            $jobData['category_id'] = $newCategory->id;
+        }
         
         // Map form parameters to database columns
         $jobData['salary_min'] = $request->min_salary;
@@ -148,7 +168,12 @@ class EmployerJobController extends Controller
 
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'category_id' => ['required', function($attribute, $value, $fail) {
+                if ($value !== 'other' && !\App\Models\Category::where('id', $value)->exists()) {
+                    $fail('The selected category is invalid.');
+                }
+            }],
+            'custom_category' => ['required_if:category_id,other', 'nullable', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'responsibilities' => ['nullable', 'string'],
             'requirements' => ['required', 'string'],
@@ -169,7 +194,14 @@ class EmployerJobController extends Controller
             // Location
             'country' => ['required', 'string', 'max:100'],
             'city' => ['required', 'string', 'max:100'],
+            'location' => ['nullable', 'string'],
             'full_address' => ['nullable', 'string'],
+            
+            // New Wizard Fields
+            'hiring_timeline' => ['nullable', 'string', 'max:255'],
+            'expected_hours' => ['nullable', 'string', 'max:255'],
+            'application_method' => ['nullable', 'string', 'max:255'],
+            'language' => ['nullable', 'string', 'max:255'],
             
             // Requirements
             'application_deadline' => ['nullable', 'date'],
@@ -186,8 +218,16 @@ class EmployerJobController extends Controller
             'questions_required' => ['nullable', 'array'],
         ]);
 
-        $jobData = $request->except(['skills', '_token', '_method', 'questions', 'questions_required']);
-        $jobData['location'] = $request->city;
+        $jobData = $request->except(['skills', '_token', '_method', 'questions', 'questions_required', 'custom_category']);
+        $jobData['location'] = $request->location ?? $request->city;
+        
+        if ($request->category_id === 'other' && $request->filled('custom_category')) {
+            $newCategory = \App\Models\Category::firstOrCreate(
+                ['slug' => Str::slug($request->custom_category)],
+                ['name' => $request->custom_category]
+            );
+            $jobData['category_id'] = $newCategory->id;
+        }
         
         // Map form parameters to database columns
         $jobData['salary_min'] = $request->min_salary;

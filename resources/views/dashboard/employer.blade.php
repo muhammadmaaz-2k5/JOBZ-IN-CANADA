@@ -5,30 +5,14 @@
                 {{ __('Recruitment Console') }}
             </h2>
             <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-100 dark:border-blue-800/50">
-                🏢 {{ $employerProfile->company->company_name ?? 'Not Assigned' }}
+                🏢 {!! $employerProfile->company->company_name ?? 'Not Assigned' !!}
             </span>
         </div>
     </x-slot>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 relative z-10"
          x-data="{ 
-            currentTab: 'overview', 
-            chatUser: 'Muhammad Maaz', 
-            messageText: '', 
-            messagesList: [
-                { sender: 'employer', text: 'Hi Muhammad, thanks for applying to our Senior Architect role. We loved your portfolio!' },
-                { sender: 'candidate', text: 'Thank you! I am very excited about the opportunity in Canada.' },
-                { sender: 'employer', text: 'Great. Are you available for a brief Google Meet next Monday?' }
-            ],
-            sendMsg() {
-                if(this.messageText.trim()){
-                    this.messagesList.push({ sender: 'employer', text: this.messageText.trim() });
-                    this.messageText = '';
-                    setTimeout(() => {
-                        this.messagesList.push({ sender: 'candidate', text: 'Sounds good! I will confirm that time.' });
-                    }, 1000);
-                }
-            }
+            currentTab: 'overview'
          }"
     >
         <!-- Decorative blurred background elements -->
@@ -90,11 +74,6 @@
                     :class="currentTab === 'analytics' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm border-white/80 dark:border-slate-600' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 hover:bg-white/60 dark:hover:bg-slate-700/60 border-transparent'"
                     class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all border flex whitespace-nowrap">
                 Analytics Insights
-            </button>
-            <button @click="currentTab = 'messages'" 
-                    :class="currentTab === 'messages' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm border-white/80 dark:border-slate-600' : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 hover:bg-white/60 dark:hover:bg-slate-700/60 border-transparent'"
-                    class="px-5 py-2.5 rounded-xl font-bold text-sm transition-all border flex whitespace-nowrap">
-                Messages Inbox
             </button>
             <button @click="currentTab = 'billing'" 
                     :class="currentTab === 'billing' ? 'bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-400 shadow-sm border-white/80 dark:border-slate-600' : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 hover:bg-white/60 dark:hover:bg-slate-700/60 border-transparent'"
@@ -333,72 +312,6 @@
                     <div class="p-6 rounded-2xl bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 flex flex-col items-center justify-center text-center">
                         <span class="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-xs mb-2">Offers Issued</span>
                         <p class="text-3xl font-black text-slate-900 dark:text-white">4</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. CHAT MESSAGES TAB -->
-        <div x-show="currentTab === 'messages'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" style="display: none;" class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl rounded-[2rem] border border-white/50 dark:border-slate-700/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden h-[700px] flex">
-            
-            <!-- Chat candidate sidebar -->
-            <div class="w-1/3 border-r border-gray-100 dark:border-slate-700/50 flex flex-col bg-white/40 dark:bg-slate-800/40">
-                <div class="px-6 py-5 border-b border-gray-100 dark:border-slate-700/50">
-                    <h3 class="font-black text-lg text-slate-900 dark:text-white">Candidate Chats</h3>
-                </div>
-                <div class="flex-1 overflow-y-auto">
-                    <button @click="chatUser = 'Muhammad Maaz'" :class="chatUser === 'Muhammad Maaz' ? 'bg-blue-50/80 dark:bg-blue-900/20 border-l-4 border-blue-500' : 'hover:bg-gray-50 dark:hover:bg-slate-800/50 border-l-4 border-transparent'" class="w-full flex items-center gap-4 px-6 py-4 transition-colors text-left border-b border-gray-50 dark:border-slate-700/30">
-                        <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg shrink-0">MM</div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-gray-900 dark:text-white truncate">Muhammad Maaz</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">Senior Architect candidate</p>
-                        </div>
-                    </button>
-                    <button @click="chatUser = 'Jane Doe'" :class="chatUser === 'Jane Doe' ? 'bg-blue-50/80 dark:bg-blue-900/20 border-l-4 border-blue-500' : 'hover:bg-gray-50 dark:hover:bg-slate-800/50 border-l-4 border-transparent'" class="w-full flex items-center gap-4 px-6 py-4 transition-colors text-left border-b border-gray-50 dark:border-slate-700/30">
-                        <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg shrink-0">JD</div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-gray-900 dark:text-white truncate">Jane Doe</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">Lead UX designer</p>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Chat message dialogue pane -->
-            <div class="w-2/3 flex flex-col relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-                <!-- Dialogue header -->
-                <div class="px-8 py-5 border-b border-gray-100 dark:border-slate-700/50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md flex items-center justify-between sticky top-0 z-10">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-lg" x-text="chatUser.charAt(0)"></div>
-                        <div>
-                            <h4 class="font-bold text-lg text-slate-900 dark:text-white" x-text="chatUser"></h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
-                                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> 
-                                <span>Online &bull; Candidate</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Conversation bubble display -->
-                <div class="flex-1 overflow-y-auto p-8 space-y-6 flex flex-col bg-white/20 dark:bg-slate-900/20">
-                    <template x-for="(msg, i) in messagesList" :key="i">
-                        <div :class="msg.sender === 'employer' ? 'flex justify-end' : 'flex justify-start'">
-                            <div :class="msg.sender === 'employer' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-gray-100 dark:border-slate-700 rounded-2xl rounded-tl-sm shadow-sm'" 
-                                 class="max-w-[75%] px-5 py-3.5 relative group">
-                                <p x-text="msg.text" class="text-sm leading-relaxed font-medium"></p>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Send input area -->
-                <div class="p-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-t border-gray-100 dark:border-slate-700/50">
-                    <div class="flex items-center gap-4">
-                        <input type="text" x-model="messageText" @keydown.enter.prevent="sendMsg()" placeholder="Type a message to candidate..." class="flex-1 rounded-full border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 px-6 py-3.5 focus:ring-blue-500 focus:border-blue-500 shadow-inner" />
-                        <button type="button" @click="sendMsg()" class="w-12 h-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-transform hover:scale-105 shadow-lg shadow-blue-600/30 shrink-0">
-                            <svg class="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                        </button>
                     </div>
                 </div>
             </div>

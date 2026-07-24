@@ -30,7 +30,18 @@ class JobController extends Controller
             $query->filter($request->all());
         }
 
-        // Apply Sorting
+        // Fetch up to 2 random featured jobs to act as "Sponsored Slots"
+        $featuredJobs = (clone $query)
+            ->where('featured', true)
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        // Exclude these specific featured jobs from the main query to avoid duplicates on the same page
+        if ($featuredJobs->isNotEmpty()) {
+            $query->whereNotIn('jobs.id', $featuredJobs->pluck('id'));
+        }
+        
         $sort = $request->get('sort', 'newest');
         switch ($sort) {
             case 'oldest':
@@ -60,6 +71,11 @@ class JobController extends Controller
         $jobs = $query->paginate(10)->withQueryString();
         $endTime = microtime(true);
         $searchTimeMs = round(($endTime - $startTime) * 1000);
+
+        // Inject the sponsored slots at the top of the collection
+        if ($featuredJobs->isNotEmpty()) {
+            $jobs->setCollection($featuredJobs->merge($jobs->getCollection()));
+        }
 
         // Save cold search results to LangCache
         if ($request->filled('keyword') && !is_array($cachedJobIds) && !$request->filled('location') && !count($request->except(['page', 'sort', 'keyword']))) {

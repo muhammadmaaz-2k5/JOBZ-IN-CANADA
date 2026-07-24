@@ -44,7 +44,7 @@
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left w-full">
                         <div class="w-28 h-28 shrink-0 rounded-2xl shadow-lg border-4 border-white dark:border-gray-700 overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center relative group-hover:scale-105 transition-transform duration-300">
                             @if($application->applicant->jobSeekerProfile && $application->applicant->jobSeekerProfile->profile_photo)
-                                <img src="{{ asset('storage/' . $application->applicant->jobSeekerProfile->profile_photo) }}" alt="Photo" class="w-full h-full object-cover" />
+                                <img src="{{ Str::startsWith($application->applicant->jobSeekerProfile->profile_photo, ['http://', 'https://']) ? $application->applicant->jobSeekerProfile->profile_photo : asset('storage/' . $application->applicant->jobSeekerProfile->profile_photo) }}" alt="Photo" class="w-full h-full object-cover" />
                             @else
                                 <span class="text-4xl font-black text-blue-600 dark:text-blue-500 tracking-tighter">
                                     {{ substr($application->applicant->first_name, 0, 1) }}{{ substr($application->applicant->last_name, 0, 1) }}

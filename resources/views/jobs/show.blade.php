@@ -103,10 +103,15 @@
             <div class="text-sm text-gray-800 mb-2">{{ $job->city }}@if($job->country), {{ $job->country }}@endif</div>
             
             <div class="text-sm font-semibold text-gray-800 mb-4">
+                @php
+                    $period = $job->salary_period === 'monthly' ? 'month' : 
+                             ($job->salary_period === 'yearly' ? 'year' : 
+                             ($job->salary_period === 'hourly' ? 'hour' : 'month'));
+                @endphp
                 @if($job->salary_min && $job->salary_max)
-                    ${{ number_format($job->salary_min) }} - ${{ number_format($job->salary_max) }} a {{ $job->salary_type ?? 'year' }}
+                    ${{ number_format($job->salary_min) }} - ${{ number_format($job->salary_max) }} per {{ $period }}
                 @elseif($job->salary_min)
-                    From ${{ number_format($job->salary_min) }} a {{ $job->salary_type ?? 'year' }}
+                    From ${{ number_format($job->salary_min) }} per {{ $period }}
                 @else
                     Competitive
                 @endif
@@ -164,10 +169,15 @@
                     </div>
                     <div class="ml-7">
                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-gray-100 text-gray-800">
+                            @php
+                                $period = $job->salary_period === 'monthly' ? 'month' : 
+                                         ($job->salary_period === 'yearly' ? 'year' : 
+                                         ($job->salary_period === 'hourly' ? 'hour' : 'month'));
+                            @endphp
                             @if($job->salary_min && $job->salary_max)
-                                ${{ number_format($job->salary_min) }} - ${{ number_format($job->salary_max) }} a {{ $job->salary_type ?? 'year' }}
+                                ${{ number_format($job->salary_min) }} - ${{ number_format($job->salary_max) }} per {{ $period }}
                             @else
-                                From ${{ number_format($job->salary_min) }} a {{ $job->salary_type ?? 'year' }}
+                                From ${{ number_format($job->salary_min) }} per {{ $period }}
                             @endif
                         </span>
                     </div>
@@ -211,8 +221,8 @@
         <div class="mb-12">
             <h2 class="text-xl font-bold text-gray-900 mb-6">Full job description</h2>
             
-            <div class="text-gray-800 text-sm leading-relaxed space-y-4">
-                {!! nl2br(e($job->description)) !!}
+            <div class="text-gray-800 text-base leading-relaxed space-y-4 max-w-none prose prose-blue dark:prose-invert">
+                {!! $job->description !!}
                 
                 @if($job->responsibilities)
                     <p class="mt-4">{!! nl2br(e($job->responsibilities)) !!}</p>
@@ -222,17 +232,22 @@
                     <p class="mt-4">{!! nl2br(e($job->requirements)) !!}</p>
                 @endif
                 
-                <div class="mt-6 pt-4 space-y-2">
+                <div class="mt-6 pt-4 space-y-2 border-t border-gray-100">
                     @if($job->salary_min)
-                    <p>Pay: 
+                    <p class="font-bold">Pay: 
+                        @php
+                            $period = $job->salary_period === 'monthly' ? 'month' : 
+                                     ($job->salary_period === 'yearly' ? 'year' : 
+                                     ($job->salary_period === 'hourly' ? 'hour' : 'month'));
+                        @endphp
                         @if($job->salary_min && $job->salary_max)
-                            ${{ number_format($job->salary_min) }} - ${{ number_format($job->salary_max) }} per {{ $job->salary_type ?? 'year' }}
+                            ${{ number_format($job->salary_min) }} - ${{ number_format($job->salary_max) }} per {{ $period }}
                         @else
-                            ${{ number_format($job->salary_min) }} per {{ $job->salary_type ?? 'year' }}
+                            ${{ number_format($job->salary_min) }} per {{ $period }}
                         @endif
                     </p>
                     @endif
-                    <p>Work Location: {{ ucfirst($job->workplace_type) }}</p>
+                    <p class="font-bold">Work Location: {{ ucfirst(str_replace('-', ' ', $job->workplace_type)) }}</p>
                 </div>
             </div>
         </div>

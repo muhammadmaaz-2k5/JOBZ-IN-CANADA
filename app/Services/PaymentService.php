@@ -95,6 +95,7 @@ class PaymentService
 
     public static function processFeaturedJobPromotion(User $user, Job $job, $durationDays, $couponCode = null)
     {
+        $durationDays = (int) $durationDays;
         return DB::transaction(function () use ($user, $job, $durationDays, $couponCode) {
             // Pricing: 7 days => $10, 15 days => $18, 30 days => $30, 60 days => $50
             $priceMap = [
@@ -174,6 +175,7 @@ class PaymentService
 
     public static function processResumeBoost(User $user, $durationDays, $couponCode = null)
     {
+        $durationDays = (int) $durationDays;
         return DB::transaction(function () use ($user, $durationDays, $couponCode) {
             // Pricing: 7 days => $5, 15 days => $9, 30 days => $15
             $priceMap = [

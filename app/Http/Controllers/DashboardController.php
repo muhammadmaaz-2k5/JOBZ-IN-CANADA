@@ -32,24 +32,22 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        $cachedData = \Illuminate\Support\Facades\Cache::remember("dashboard:admin", now()->addMinutes(5), function () {
-            $metrics = [
-                'total_users' => User::count(),
-                'seekers_count' => User::role('job_seeker')->count(),
-                'employers_count' => User::role('employer')->count(),
-                'active_jobs' => Job::where('status', 'published')->count(),
-                'pending_jobs' => Job::where('status', 'draft')->count(),
-                'applications_count' => Application::count(),
-                'companies_count' => Company::count(),
-                'reports_count' => \App\Models\JobReport::where('status', 'pending')->count(),
-            ];
+        $metrics = [
+            'total_users' => User::count(),
+            'seekers_count' => User::role('job_seeker')->count(),
+            'employers_count' => User::role('employer')->count(),
+            'active_jobs' => Job::where('status', 'published')->count(),
+            'pending_jobs' => Job::where('status', 'draft')->count(),
+            'applications_count' => Application::count(),
+            'companies_count' => Company::count(),
+            'reports_count' => \App\Models\JobReport::where('status', 'pending')->count(),
+        ];
 
-            $recentAudits = AuditLog::with('user')->latest()->take(5)->get();
+        $recentAudits = AuditLog::with('user')->latest()->take(5)->get();
 
-            return compact('metrics', 'recentAudits');
-        });
+        $data = compact('metrics', 'recentAudits');
 
-        return view('dashboard.admin', $cachedData);
+        return view('dashboard.admin', $data);
     }
 
     public function employer()
@@ -57,64 +55,62 @@ class DashboardController extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
-        $cachedData = \Illuminate\Support\Facades\Cache::remember("dashboard:employer:{$userId}", now()->addMinutes(5), function () use ($userId) {
-            $user = User::find($userId);
-            $employerProfile = $user->employerProfile()->with('company')->first();
-            $company = $employerProfile ? $employerProfile->company : null;
+        $user = User::find($userId);
+        $employerProfile = $user->employerProfile()->with('company')->first();
+        $company = $employerProfile ? $employerProfile->company : null;
 
-            $metrics = [
-                'active_jobs' => Job::where('employer_id', $user->id)->where('status', 'published')->count(),
-                'draft_jobs' => Job::where('employer_id', $user->id)->where('status', 'draft')->count(),
-                'closed_jobs' => Job::where('employer_id', $user->id)->where('status', 'closed')->count(),
-                'total_applications' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->count(),
-                'candidates_hired' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'hired')->count(),
-                'followers_count' => $company ? $company->followers()->count() : 0,
-                'total_views' => Job::where('employer_id', $user->id)->sum('views_count'),
-            ];
+        $metrics = [
+            'active_jobs' => Job::where('employer_id', $user->id)->where('status', 'published')->count(),
+            'draft_jobs' => Job::where('employer_id', $user->id)->where('status', 'draft')->count(),
+            'closed_jobs' => Job::where('employer_id', $user->id)->where('status', 'closed')->count(),
+            'total_applications' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->count(),
+            'candidates_hired' => Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))->where('status', 'hired')->count(),
+            'followers_count' => $company ? $company->followers()->count() : 0,
+            'total_views' => Job::where('employer_id', $user->id)->sum('views_count'),
+        ];
 
-            $recentApplications = Application::with(['job', 'applicant.jobSeekerProfile'])
-                ->whereHas('job', fn($q) => $q->where('employer_id', $user->id))
-                ->latest('applied_at')
-                ->take(5)
-                ->get();
+        $recentApplications = Application::with(['job', 'applicant.jobSeekerProfile'])
+            ->whereHas('job', fn($q) => $q->where('employer_id', $user->id))
+            ->latest('applied_at')
+            ->take(5)
+            ->get();
 
-            $jobPerformance = Job::where('employer_id', $user->id)
-                ->withCount('savedByUsers')
-                ->latest()
-                ->get();
+        $jobPerformance = Job::where('employer_id', $user->id)
+            ->withCount('savedByUsers')
+            ->latest()
+            ->get();
 
-            $statusData = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
-                ->selectRaw('status, count(*) as count')
-                ->groupBy('status')
-                ->pluck('count', 'status')
-                ->toArray();
+        $statusData = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
+            ->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
 
-            $weeklyApplications = [];
-            for ($i = 3; $i >= 0; $i--) {
-                $start = now()->subWeeks($i)->startOfWeek();
-                $end = now()->subWeeks($i)->endOfWeek();
-                $count = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
-                    ->whereBetween('applied_at', [$start, $end])
-                    ->count();
-                $weeklyApplications["Week " . (4 - $i)] = $count;
-            }
+        $weeklyApplications = [];
+        for ($i = 3; $i >= 0; $i--) {
+            $start = now()->subWeeks($i)->startOfWeek();
+            $end = now()->subWeeks($i)->endOfWeek();
+            $count = Application::whereHas('job', fn($q) => $q->where('employer_id', $user->id))
+                ->whereBetween('applied_at', [$start, $end])
+                ->count();
+            $weeklyApplications["Week " . (4 - $i)] = $count;
+        }
 
-            $reviewsCount = $company ? $company->reviews()->count() : 0;
-            $averageRating = $company ? $company->reviews()->avg('rating') : 0;
+        $reviewsCount = $company ? $company->reviews()->count() : 0;
+        $averageRating = $company ? $company->reviews()->avg('rating') : 0;
 
-            return compact(
-                'employerProfile',
-                'metrics',
-                'recentApplications',
-                'jobPerformance',
-                'statusData',
-                'weeklyApplications',
-                'reviewsCount',
-                'averageRating'
-            );
-        });
+        $data = compact(
+            'employerProfile',
+            'metrics',
+            'recentApplications',
+            'jobPerformance',
+            'statusData',
+            'weeklyApplications',
+            'reviewsCount',
+            'averageRating'
+        );
 
-        return view('dashboard.employer', $cachedData);
+        return view('dashboard.employer', $data);
     }
 
     public function seeker()

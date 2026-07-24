@@ -88,7 +88,7 @@ class EmployerProfileController extends Controller
             }
         }
 
-        // Upload Gallery Images
+        // Upload Gallery Images to Cloudinary
         if ($request->hasFile('gallery_images')) {
             $cultureData = $company->culture_data ?? [];
             if (!isset($cultureData['gallery'])) {
@@ -161,9 +161,13 @@ class EmployerProfileController extends Controller
         if (isset($cultureData['gallery']) && isset($cultureData['gallery'][$index])) {
             $image = $cultureData['gallery'][$index];
             
-            // Delete from Cloudinary
-            if (!empty($image['public_id'])) {
-                \App\Services\CloudinaryService::delete($image['public_id']);
+            // Delete from Storage or Cloudinary depending on public_id format
+            if (isset($image['public_id'])) {
+                if (str_contains($image['public_id'], 'company-gallery/')) {
+                    Storage::disk('public')->delete($image['public_id']);
+                } else {
+                    \App\Services\CloudinaryService::delete($image['public_id']);
+                }
             }
             
             // Remove from array and reindex
