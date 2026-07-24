@@ -12,6 +12,10 @@ class CompanyReviewController extends Controller
      */
     public function store(Request $request, Company $company)
     {
+        $user = auth()->user();
+        if ($user && $user->role === 'employer' && $user->employerProfile && $user->employerProfile->company_id === $company->id) {
+            return back()->with('error', 'You cannot review your own company.');
+        }
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'required|string|max:255',

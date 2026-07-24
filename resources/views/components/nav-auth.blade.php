@@ -6,6 +6,12 @@
         <span class="font-bold text-gray-900 dark:text-white text-sm hidden md:inline-block">{{ Auth::user()->first_name ?? 'User' }}</span>
     </div>
     <a href="{{ route('dashboard') }}" class="nav-cta">Dashboard</a>
+    <form method="POST" action="{{ route('logout') }}" class="inline-block ml-2">
+        @csrf
+        <button type="submit" class="text-sm font-bold text-gray-500 hover:text-red-600 transition-colors">
+            Logout
+        </button>
+    </form>
 @else
     <a href="{{ route('login') }}" class="nav-post">Sign In</a>
     <a href="{{ route('register') }}" class="nav-cta">Get Started</a>

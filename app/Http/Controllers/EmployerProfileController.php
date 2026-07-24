@@ -195,11 +195,12 @@ class EmployerProfileController extends Controller
         $jobs = $company->jobs()->where('status', 'published')->latest()->get();
         $reviews = $company->reviews()->with('user')->latest()->get();
         
-        $avgRating = $reviews->avg('rating') ?: 4.5; // fallback to 4.5
-        $totalReviews = $reviews->count() ?: 12; // fallback to 12
+        $avgRating = $reviews->avg('rating') ?: 0;
+        $totalReviews = $reviews->count();
         
-        // Calculate rating breakdown (if no reviews, use fallback distribution)
-        if ($reviews->count() > 0) {
+        // Calculate rating breakdown
+        $ratingPercentages = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        if ($totalReviews > 0) {
             $ratingBreakdown = [
                 5 => $reviews->where('rating', 5)->count(),
                 4 => $reviews->where('rating', 4)->count(),
@@ -208,12 +209,9 @@ class EmployerProfileController extends Controller
                 1 => $reviews->where('rating', 1)->count(),
             ];
             
-            $ratingPercentages = [];
             foreach ($ratingBreakdown as $star => $count) {
                 $ratingPercentages[$star] = round(($count / $totalReviews) * 100);
             }
-        } else {
-            $ratingPercentages = [5 => 75, 4 => 20, 3 => 5, 2 => 0, 1 => 0];
         }
         
         return view('company.show', compact('company', 'jobs', 'reviews', 'avgRating', 'totalReviews', 'ratingPercentages'));
@@ -226,5 +224,36 @@ class EmployerProfileController extends Controller
     {
         $companies = Company::where('verification_status', 'verified')->latest()->paginate(12);
         return view('company.index', compact('companies'));
+    }
+
+    /**
+     * Toggle follow status for a company.
+     */
+    public function toggleFollow($slug)
+    {
+        $company = Company::where('slug', $slug)->firstOrFail();
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Please login to follow companies.'], 401);
+        }
+
+        if ($user->role === 'employer' && $user->employerProfile && $user->employerProfile->company_id === $company->id) {
+            return response()->json(['success' => false, 'message' => 'You cannot follow your own company.'], 403);
+        }
+
+        if ($user->companyFollowings()->where('company_id', $company->id)->exists()) {
+            $user->companyFollowings()->detach($company->id);
+            $isFollowing = false;
+        } else {
+            $user->companyFollowings()->attach($company->id);
+            $isFollowing = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_following' => $isFollowing,
+            'followers_count' => $company->followers()->count()
+        ]);
     }
 }

@@ -285,10 +285,21 @@
                             let newTrigger = doc.querySelector('#load-more-trigger');
                             if (newTrigger && newTrigger.getAttribute('data-url')) {
                                 this.nextPageUrl = newTrigger.getAttribute('data-url');
+                                $el.setAttribute('data-url', this.nextPageUrl);
                             } else {
                                 this.nextPageUrl = null;
+                                $el.removeAttribute('data-url');
                             }
                             this.loading = false;
+                            
+                            setTimeout(() => {
+                                if (this.nextPageUrl) {
+                                    let rect = $el.getBoundingClientRect();
+                                    if (rect.top <= window.innerHeight + 400) {
+                                        this.loadMore();
+                                    }
+                                }
+                            }, 100);
                         })
                         .catch(() => this.loading = false);
                  }

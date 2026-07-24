@@ -166,15 +166,58 @@
                             </div>
 
                             <!-- Actions -->
-                            <div class="flex items-center gap-3 w-full md:w-auto pt-2 md:pt-0 shrink-0">
+                            @php
+                                $isOwnCompany = auth()->check() && auth()->user()->role === 'employer' && auth()->user()->employerProfile && auth()->user()->employerProfile->company_id === $company->id;
+                            @endphp
+                            <div class="flex items-center gap-3 w-full md:w-auto pt-2 md:pt-0 shrink-0"
+                                 x-data="{ 
+                                    isFollowing: {{ auth()->check() && auth()->user()->companyFollowings()->where('company_id', $company->id)->exists() ? 'true' : 'false' }}, 
+                                    loading: false,
+                                    toggleFollow() {
+                                        @if(!auth()->check())
+                                            window.location.href = '{{ route('login') }}';
+                                            return;
+                                        @endif
+                                        
+                                        this.loading = true;
+                                        fetch('{{ route('companies.follow', $company->slug) }}', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                            }
+                                        })
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                this.isFollowing = data.is_following;
+                                                let statsEl = document.getElementById('quick-stats-followers');
+                                                if(statsEl) statsEl.innerText = new Intl.NumberFormat().format(data.followers_count);
+                                            } else {
+                                                alert(data.message);
+                                            }
+                                        })
+                                        .finally(() => {
+                                            this.loading = false;
+                                        });
+                                    }
+                                 }">
                                 @if($company->website)
                                     <a href="{{ $company->website }}" target="_blank" rel="noopener" class="flex-1 md:flex-none text-center bg-white border border-gray-300 text-gray-700 font-medium py-2 px-6 rounded-lg hover:bg-gray-50 transition-colors">
                                         Website ↗
                                     </a>
                                 @endif
-                                <button type="button" class="flex-1 md:flex-none bg-[#1650e1] hover:bg-[#0f3ea6] text-white font-bold py-2 px-8 rounded-lg transition-colors">
-                                    Follow
+                                @if(!$isOwnCompany)
+                                <button type="button" @click="toggleFollow" :disabled="loading" :class="isFollowing ? 'bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200' : 'bg-[#1650e1] hover:bg-[#0f3ea6] text-white'" class="flex-1 md:flex-none font-bold py-2 px-8 rounded-lg transition-colors relative flex justify-center items-center">
+                                    <span x-show="!loading" x-text="isFollowing ? 'Following' : 'Follow'"></span>
+                                    <span x-show="loading" x-cloak>
+                                        <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </span>
                                 </button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -305,17 +348,26 @@
                     </div>
 
                     <!-- Write a Review Form -->
+                    @php
+                        $isOwnCompany = auth()->check() && auth()->user()->role === 'employer' && auth()->user()->employerProfile && auth()->user()->employerProfile->company_id === $company->id;
+                    @endphp
+
                     <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm mb-6" x-data="{ openForm: false }">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <h4 class="text-lg font-bold text-gray-900">Have you worked here?</h4>
                                 <p class="text-gray-500 text-sm mt-1">Share your experience to help other job seekers.</p>
                             </div>
-                            <button @click="openForm = !openForm" class="bg-white border-2 border-[#1650e1] text-[#1650e1] font-bold py-2 px-6 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
-                                Write a Review
-                            </button>
+                            @if(!$isOwnCompany)
+                                <button @click="openForm = !openForm" class="bg-white border-2 border-[#1650e1] text-[#1650e1] font-bold py-2 px-6 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
+                                    Write a Review
+                                </button>
+                            @else
+                                <span class="text-gray-500 italic text-sm border border-gray-200 px-4 py-2 rounded-lg bg-gray-50">You cannot review your own company</span>
+                            @endif
                         </div>
                         
+                        @if(!$isOwnCompany)
                         <form action="{{ route('companies.reviews.store', $company->slug) }}" method="POST" x-show="openForm" x-transition class="mt-6 pt-6 border-t border-gray-100 space-y-4" style="display: none;">
                             @csrf
                             <div>
@@ -341,6 +393,7 @@
                                 <x-nav-auth />
                             </div>
                         </form>
+                        @endif
                     </div>
 
                     <!-- Review Cards list -->
@@ -462,8 +515,8 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600">Followers:</span>
-                            <span class="font-bold text-gray-900">
-                                @if($company->company_name === 'Shopify Canada') 12.4k @elseif($company->company_name === 'TechNorth Solutions') 3.2k @elseif($company->company_name === 'Maple Finance Group') 8.9k @elseif($company->company_name === 'Northern Health Systems') 5.6k @elseif($company->company_name === 'CanBridge Engineering') 2.1k @else 1.2k @endif
+                            <span class="font-bold text-gray-900" id="quick-stats-followers">
+                                {{ number_format($company->followers()->count()) }}
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
